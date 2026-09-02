@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mindful — Emotion-Aware Wellness Dashboard</title>
+<meta name="description" content="A calm, emotion-aware wellness dashboard: mood score, weekly mood wave, mood mix, check-in history and personalized recommendations." />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="greet">
+    <img class="avatar" src="assets/brain.png" alt="Sara's profile" />
+    <div>
+      <h1 class="hello">Hello, <span id="userName">Sara</span> <span aria-hidden="true">👋</span></h1>
+      <p class="sub">How are you feeling today?</p>
+    </div>
+  </div>
+
+  <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="nav" aria-label="Open menu">
+    <span></span><span></span><span></span>
+  </button>
+
+  <nav id="nav" class="nav" aria-label="Main">
+    <a href="#main" class="active" aria-current="page">Dashboard</a>
+    <a href="#trend">Statistics</a>
+    <a href="#reports">Sessions</a>
+    <a href="#insight">Support</a>
+  </nav>
+</header>
+
+<main id="main">
+
+  <section class="stats" aria-label="Key metrics">
+    <article class="card stat reveal">
+      <div class="ring" data-ring="moodScore"><svg viewBox="0 0 80 80" aria-hidden="true"><circle class="ring-bg" cx="40" cy="40" r="34"/><circle class="ring-fg teal" cx="40" cy="40" r="34"/></svg><span class="ring-val" data-count="65" data-suffix="%">0%</span></div>
+      <div class="stat-body">
+        <h2>Mood Score</h2>
+        <p class="tag tag-teal">Stable</p>
+        <p class="delta up">▲ +4% from last week</p>
+      </div>
+    </article>
+
+    <article class="card stat reveal">
+      <div class="stat-body wide">
+        <h2>Stress Level</h2>
+        <p class="big" data-count="70" data-suffix="%">0%</p>
+        <div class="bar"><i class="fill coral" data-width="70"></i></div>
+        <p class="tag tag-coral">Moderate</p>
+        <p class="delta down">▼ 3% calmer</p>
+      </div>
+    </article>
+
+    <article class="card stat reveal">
+      <div class="ring" data-ring="sleep"><svg viewBox="0 0 80 80" aria-hidden="true"><circle class="ring-bg" cx="40" cy="40" r="34"/><circle class="ring-fg gold" cx="40" cy="40" r="34"/></svg><span class="ring-val"><span data-count="42">0</span><small>min</small></span></div>
+      <div class="stat-body">
+        <h2>Sleep Wellness</h2>
+        <p class="tag tag-gold">Average</p>
+        <p class="delta">Streak · <strong id="streak">7</strong> days active</p>
+      </div>
+    </article>
+  </section>
+
+  <section class="split">
+    <article class="card brain-card reveal" aria-label="Emotional balance visualization">
+      <div class="brain-copy">
+        <p class="eyebrow">Emotional balance</p>
+        <h2>Your mind, this week</h2>
+        <p class="muted">A living picture of how calm, energy and stress are moving together.</p>
+      </div>
+      <div class="brain-stage">
+        <div class="brain-glow" aria-hidden="true"></div>
+        <!-- Replace assets/brain.png with the final glossy 3D brain render -->
+        <img id="brain" src="assets/brain.png" alt="Glossy three-dimensional brain illustration lit in teal, gold and coral" width="1024" height="1024" />
+      </div>
+      <ul class="brain-chips">
+        <li><span class="dot teal"></span>Calm dominant</li>
+        <li><span class="dot gold"></span>Energy rising</li>
+        <li><span class="dot coral"></span>Stress easing</li>
+      </ul>
+    </article>
+
+    <div class="stack" id="trend">
+      <article class="card reveal">
+        <header class="card-head">
+          <div><h2>Weekly Mood Wave</h2><p class="muted">Your emotional pattern over the past 7 days</p></div>
+          <span class="pill">7 days</span>
+        </header>
+        <div class="chart-wrap">
+          <svg id="chart" viewBox="0 0 600 220" preserveAspectRatio="none" role="img" aria-label="Line chart of mood scores from Monday to Sunday: 62, 68, 64, 76, 88, 79, 84"></svg>
+          <ul class="days" id="days"></ul>
+        </div>
+      </article>
+
+      <article class="card reveal">
+        <header class="card-head"><div><h2>Mood Mix</h2><p class="muted">Proportion of emotional states</p></div></header>
+        <div class="mix" id="mix" role="img" aria-label="Mood mix: energized 30%, calm 40%, stressed 15%, low 15%"></div>
+        <ul class="legend" id="mixLegend"></ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="split" id="reports">
+    <article class="card reveal">
+      <header class="card-head"><div><h2>Reports &amp; History</h2><p class="muted">Your previous check-ins</p></div></header>
+      <ul class="rows" id="reportList"></ul>
+    </article>
+
+    <article class="card next reveal">
+      <header class="card-head"><div><h2>Next Check-in</h2><p class="muted">Emotional wellness reflection</p></div></header>
+      <p class="countdown" id="countdown" aria-live="polite">--h --m --s</p>
+      <p class="muted small">remaining · Today · 4:30 PM</p>
+      <div class="coach">
+        <span class="coach-avatar" aria-hidden="true">JA</span>
+        <div><strong>Dr. Jamie Alther</strong><span class="muted small">Guided reflection · 25 min</span></div>
+      </div>
+      <button class="btn btn-primary" type="button">Join session</button>
+    </article>
+  </section>
+
+  <section class="card insight reveal" id="insight" aria-label="Smart insight">
+    <div class="insight-head">
+      <span class="spark" aria-hidden="true">✦</span>
+      <h2>Your weekly insight</h2>
+      <span class="pill pill-gold">AI-powered</span>
+    </div>
+    <p class="insight-text" id="insightText"></p>
+    <button class="btn btn-gold" type="button">Start Evening Reflection</button>
+  </section>
+
+  <section class="card reveal" aria-label="Active path">
+    <header class="card-head"><div><h2>Active Path</h2><p class="muted">Personalized for how you have been feeling</p></div></header>
+    <ul class="paths" id="paths"></ul>
+  </section>
+
+</main>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" hidden>
+  <div class="modal-card">
+    <h3 id="modalTitle"></h3>
+    <p class="muted small" id="modalMeta"></p>
+    <p id="modalBody"></p>
+    <button class="btn btn-primary" type="button" id="modalClose">Close</button>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
