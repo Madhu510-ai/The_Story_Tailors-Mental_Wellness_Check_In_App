@@ -14,6 +14,7 @@
 *{box-sizing:border-box}
 html,body{margin:0;overflow-x:hidden}
 body{
+  --scroll-p:0;
   background:
     radial-gradient(900px 500px at 90% -10%, rgba(242,184,75,.18), transparent 60%),
     radial-gradient(800px 500px at -10% 10%, rgba(63,166,184,.18), transparent 60%),
@@ -21,7 +22,56 @@ body{
   color:var(--charcoal);
   font:16px/1.5 "Segoe UI",system-ui,-apple-system,Helvetica,Arial,sans-serif;
   padding:clamp(16px,3vw,36px);
+  position:relative;
+  transition:color .6s ease;
 }
+/* Scroll-driven deep teal gradient wash */
+body::before{
+  content:"";
+  position:fixed;inset:0;z-index:-1;pointer-events:none;
+  opacity:var(--scroll-p);
+  transition:opacity .25s linear;
+  background:
+    radial-gradient(900px 600px at 85% 0%, rgba(242,184,75,.22), transparent 62%),
+    radial-gradient(700px 600px at 5% 30%, rgba(232,155,107,.18), transparent 60%),
+    linear-gradient(180deg,#12525F 0%,#1C6E7E 42%,#2E8496 78%,#3FA6B8 100%);
+}
+/* Deep mode: palette re-tuned for the teal background */
+body.deep{
+  --charcoal:#F4EEDF;
+  --mountain-brown:#B7D6DC;
+  --muted-sand:rgba(251,243,227,.22);
+  --surface:rgba(255,253,248,.09);
+  --shadow:0 18px 40px -20px rgba(4,32,38,.75);
+}
+body.deep .card{background:linear-gradient(160deg,rgba(255,253,248,.12),rgba(255,253,248,.05));backdrop-filter:blur(6px)}
+body.deep .nav{background:rgba(255,253,248,.1)}
+body.deep .nav a.active{background:var(--sunset-gold);color:#3d2a04}
+body.deep .rows button{background:rgba(255,253,248,.07)}
+body.deep .rows button:hover{background:rgba(255,253,248,.16)}
+body.deep .rows .ico{background:rgba(63,166,184,.3)}
+body.deep .rows .status{color:#FBF3E3;background:rgba(242,184,75,.28)}
+body.deep .paths li{background:rgba(255,253,248,.07)}
+body.deep .paths li:hover{background:rgba(255,253,248,.16)}
+body.deep .pill{background:rgba(63,166,184,.3);color:#EAF7F9}
+body.deep .pill-gold{background:rgba(242,184,75,.3);color:#FFE6B4}
+body.deep .tag-teal{background:rgba(63,166,184,.28);color:#DFF4F8}
+body.deep .tag-coral{background:rgba(232,155,107,.3);color:#FFE0CD}
+body.deep .tag-gold{background:rgba(242,184,75,.3);color:#FFEBC2}
+body.deep .delta.up{color:#8FE3D0}
+body.deep .delta.down{color:#F3B48C}
+body.deep .countdown{color:var(--sunset-gold)}
+body.deep .next{background:linear-gradient(165deg,rgba(255,253,248,.14),rgba(63,166,184,.16))}
+body.deep .insight{background:linear-gradient(120deg,rgba(242,184,75,.26),rgba(232,155,107,.2));border-color:rgba(242,184,75,.45)}
+body.deep .brain-card{background:linear-gradient(165deg,rgba(6,42,50,.65),rgba(28,110,126,.45));border-color:rgba(251,243,227,.25)}
+body.deep .btn-primary{background:var(--ocean-teal);color:#08333B}
+body.deep .ring-bg{stroke:rgba(251,243,227,.22)}
+body.deep .ring-fg.teal{stroke:var(--ocean-teal)}
+body.deep #chart .line{stroke:var(--sunset-gold)}
+body.deep #chart .pt{fill:#0F4C58;stroke:var(--sunset-gold)}
+body.deep .bar{background:rgba(251,243,227,.18)}
+body.deep .modal-card{background:#0F4C58}
+body.deep .hello span#userName{color:var(--sunset-gold)}
 h1,h2,h3{margin:0;letter-spacing:-.02em}
 p{margin:0}
 .muted{color:var(--mountain-brown)}
