@@ -188,22 +188,3 @@ drawPaths();
 startCountdown();
 boot();
 window.addEventListener("resize", () => { clearTimeout(window.__r); window.__r = setTimeout(drawChart, 200); });
-
-/* Scroll-driven blue/teal gradient + adaptive color scheme */
-(function () {
-  const body = document.body;
-  let ticking = false;
-  const update = () => {
-    const max = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
-    const p = Math.min(Math.max(window.scrollY / max, 0), 1);
-    // gradient ramps in over the first ~55% of the page
-    const wash = Math.min(p / 0.55, 1);
-    body.style.setProperty("--scroll-p", wash.toFixed(3));
-    body.classList.toggle("deep", wash > 0.45);
-    ticking = false;
-  };
-  const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
-  window.addEventListener("scroll", onScroll, { passive: true });
-  window.addEventListener("resize", onScroll);
-  update();
-})();
