@@ -24,6 +24,24 @@ const dashboardData = {
   ]
 };
 
+/* Single source of truth for every mood visualization (charts, mix, stats, legends).
+   Later this can be replaced by values coming from the questionnaire backend. */
+const MOOD_LEVELS = [
+  { key: "veryLow",   level: 1, label: "Very Low",   note: "Overwhelmed",        color: "#171923", face: "😞" },
+  { key: "low",       level: 2, label: "Low",        note: "Sad / withdrawn",    color: "#49307A", face: "🙁" },
+  { key: "uneasy",    level: 3, label: "Uneasy",     note: "Worried / anxious",  color: "#7B45D6", face: "😟" },
+  { key: "neutral",   level: 4, label: "Neutral",    note: "Steady / okay",      color: "#48B9E8", face: "😐" },
+  { key: "good",      level: 5, label: "Good",       note: "Positive / balanced",color: "#42D39A", face: "🙂" },
+  { key: "happy",     level: 6, label: "Happy",      note: "Motivated / joyful", color: "#FFD447", face: "😄" },
+  { key: "veryHappy", level: 7, label: "Very Happy", note: "Excited / energetic",color: "#FF7A45", face: "😃" },
+  { key: "euphoric",  level: 8, label: "Euphoric",   note: "Feel like flying",   color: "#FF3F8E", face: "🤩" }
+];
+
+/* score 0-100 -> mood level (never hardcoded per element) */
+const levelFor = score => MOOD_LEVELS[Math.min(MOOD_LEVELS.length - 1, Math.max(0, Math.floor((score / 100) * MOOD_LEVELS.length)))];
+/* stress is inverse: high stress = low mood level */
+const levelForInverse = score => levelFor(100 - score);
+
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const $ = (s, r = document) => r.querySelector(s);
 
@@ -54,77 +72,83 @@ function animateNumber(el) {
 function boot() {
   document.querySelectorAll("[data-count]").forEach(animateNumber);
   const C = 2 * Math.PI * 34;
-  const ringValues = { moodScore: dashboardData.moodScore, sleep: Math.min(dashboardData.sleepWellness / 60 * 100, 100) };
+  const sleepPct = Math.min((dashboardData.sleepWellness / 60) * 100, 100);
+  const ringValues = { moodScore: dashboardData.moodScore, sleep: sleepPct };
+  const ringLevels = { moodScore: levelFor(dashboardData.moodScore), sleep: levelFor(sleepPct) };
   document.querySelectorAll(".ring").forEach(r => {
     const pct = ringValues[r.dataset.ring] || 0;
+    const lv = ringLevels[r.dataset.ring];
     const fg = r.querySelector(".ring-fg");
+    if (lv) {
+      fg.style.stroke = lv.color;
+      fg.style.filter = `drop-shadow(0 0 8px ${lv.color}88)`;
+      const tag = r.parentElement.querySelector(".tag");
+      if (tag) {
+        tag.textContent = `${lv.label} · ${lv.note}`;
+        tag.style.background = lv.color + "22";
+        tag.style.color = lv.color;
+      }
+    }
     fg.style.strokeDasharray = C;
     fg.style.strokeDashoffset = C;
     requestAnimationFrame(() => { fg.style.strokeDashoffset = C * (1 - pct / 100); });
   });
+
+  /* stress uses the same palette, inverted (more stress = lower mood level) */
+  const stressLv = levelForInverse(dashboardData.stressLevel);
+  const stressFill = $(".fill.coral");
+  if (stressFill) {
+    stressFill.style.background = `linear-gradient(90deg, ${stressLv.color}, ${stressLv.color}aa)`;
+    stressFill.style.boxShadow = `0 0 14px ${stressLv.color}80`;
+    const stressTag = stressFill.closest(".stat-body").querySelector(".tag");
+    if (stressTag) {
+      stressTag.textContent = `${stressLv.label} · ${stressLv.note}`;
+      stressTag.style.background = stressLv.color + "22";
+      stressTag.style.color = stressLv.color;
+    }
+  }
+
   document.querySelectorAll(".fill[data-width]").forEach(f => {
     requestAnimationFrame(() => { f.style.width = f.dataset.width + "%"; });
   });
 }
 
-/* mood wave chart */
+/* weekly mood wave — gradient bars coloured by mood level */
 function drawChart() {
-  const svg = $("#chart"), W = 600, H = 220, pad = 26;
   const d = dashboardData.moodTrend;
-  const min = Math.min(...d) - 10, max = Math.max(...d) + 8;
-  const x = i => pad + (i * (W - pad * 2)) / (d.length - 1);
-  const y = v => H - pad - ((v - min) / (max - min)) * (H - pad * 2);
-  const pts = d.map((v, i) => [x(i), y(v)]);
-
-  let path = `M ${pts[0][0]} ${pts[0][1]}`;
-  for (let i = 0; i < pts.length - 1; i++) {
-    const [x0, y0] = pts[i], [x1, y1] = pts[i + 1], cx = (x0 + x1) / 2;
-    path += ` C ${cx} ${y0}, ${cx} ${y1}, ${x1} ${y1}`;
-  }
   const peak = d.indexOf(Math.max(...d));
-
-  svg.innerHTML = `
-    <defs>
-      <linearGradient id="moodFill" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#3FA6B8" stop-opacity=".35"/>
-        <stop offset="100%" stop-color="#FBF3E3" stop-opacity="0"/>
-      </linearGradient>
-    </defs>
-    <path class="area" d="${path} L ${x(d.length - 1)} ${H - pad} L ${pad} ${H - pad} Z"/>
-    <path class="line" d="${path}"/>
-    ${pts.map(([px, py], i) => `<circle class="pt${i === peak ? " peak" : ""}" cx="${px}" cy="${py}" r="${i === peak ? 7 : 5}"><title>${DAYS[i]}: ${d[i]}</title></circle>`).join("")}
-  `;
-  const line = svg.querySelector(".line");
-  const len = line.getTotalLength();
-  line.style.strokeDasharray = len;
-  line.style.strokeDashoffset = len;
-  line.animate([{ strokeDashoffset: len }, { strokeDashoffset: 0 }], { duration: 1400, easing: "ease-out", fill: "forwards" });
-
-  $("#days").innerHTML = DAYS.map((day, i) => `<li class="${i === peak ? "peak" : ""}">${day}</li>`).join("");
+  $("#chart").innerHTML = d.map((v, i) => {
+    const lv = levelFor(v);
+    return `
+      <div class="wbar${i === peak ? " peak" : ""}" style="--c:${lv.color}">
+        <span class="wval">${v}%</span>
+        <div class="wtrack"><i class="wfill" data-h="${v}"></i></div>
+        <span class="wday">${DAYS[i]}</span>
+        <span class="wface" aria-hidden="true">${lv.face}</span>
+        <span class="wlabel">${lv.label}</span>
+      </div>`;
+  }).join("");
+  $("#chart").setAttribute("aria-label",
+    "Weekly mood: " + d.map((v, i) => `${DAYS[i]} ${v}% ${levelFor(v).label}`).join(", "));
+  requestAnimationFrame(() => {
+    $("#chart").querySelectorAll(".wfill").forEach((f, i) => {
+      setTimeout(() => { f.style.height = f.dataset.h + "%"; }, i * 80);
+    });
+  });
 }
 
-/* mood mix */
+/* mood mix — bright, glowing segments */
 function drawMix() {
-  const meta = {
-    veryLow: { label: "1 · Very Low", note: "Overwhelmed", color: "#171923" },
-    low: { label: "2 · Low", note: "Sad / withdrawn", color: "#49307A" },
-    uneasy: { label: "3 · Uneasy", note: "Worried / anxious", color: "#7B45D6" },
-    neutral: { label: "4 · Neutral", note: "Steady / okay", color: "#48B9E8" },
-    good: { label: "5 · Good", note: "Positive / balanced", color: "#42D39A" },
-    happy: { label: "6 · Happy", note: "Motivated / joyful", color: "#FFD447" },
-    veryHappy: { label: "7 · Very Happy", note: "Excited / energetic", color: "#FF7A45" },
-    euphoric: { label: "8 · Euphoric", note: "Feel like flying", color: "#FF3F8E" }
-  };
   const mix = dashboardData.moodMix;
-  $("#mix").innerHTML = Object.keys(meta)
-    .map(k => `<i style="background:${meta[k].color}" data-w="${mix[k]}" title="${meta[k].label} — ${meta[k].note}: ${mix[k]}%"></i>`).join("");
+  $("#mix").innerHTML = MOOD_LEVELS
+    .map(m => `<i style="--c:${m.color}" data-w="${mix[m.key] || 0}" title="${m.level} · ${m.label} — ${m.note}: ${mix[m.key] || 0}%"></i>`).join("");
   requestAnimationFrame(() => {
     $("#mix").querySelectorAll("i").forEach(i => { i.style.width = i.dataset.w + "%"; });
   });
   $("#mix").setAttribute("aria-label",
-    "Mood mix: " + Object.keys(meta).map(k => `${meta[k].label} ${mix[k]}%`).join(", "));
-  $("#mixLegend").innerHTML = Object.keys(meta)
-    .map(k => `<li><span class="dot" style="background:${meta[k].color}"></span>${meta[k].label} <strong>${mix[k]}%</strong></li>`).join("");
+    "Mood mix: " + MOOD_LEVELS.map(m => `${m.level} ${m.label} ${mix[m.key] || 0}%`).join(", "));
+  $("#mixLegend").innerHTML = MOOD_LEVELS
+    .map(m => `<li><span class="dot glow" style="--c:${m.color};background:${m.color}"></span>${m.level} · ${m.label} <strong>${mix[m.key] || 0}%</strong></li>`).join("");
 }
 
 /* reports */
@@ -155,14 +179,17 @@ function drawReports() {
 
 /* recommendations */
 function drawPaths() {
-  $("#paths").innerHTML = dashboardData.recommendations.map(p => `
+  $("#paths").innerHTML = dashboardData.recommendations.map(p => {
+    const lv = levelFor(p.progress);
+    return `
     <li>
       <div class="p-ico" aria-hidden="true">${p.icon}</div>
       <h3>${p.title}</h3>
       <p class="muted small">${p.desc}</p>
-      <div class="bar"><i class="fill ${p.tone}" style="background:${p.tone === "coral" ? "var(--warm-coral)" : ""}" data-width="${p.progress}"></i></div>
+      <div class="bar"><i class="fill" style="background:${lv.color};box-shadow:0 0 10px ${lv.color}80" data-width="${p.progress}"></i></div>
       <span class="small muted">${p.progress}% complete</span>
-    </li>`).join("");
+    </li>`;
+  }).join("");
 }
 
 /* countdown */
@@ -187,4 +214,3 @@ drawReports();
 drawPaths();
 startCountdown();
 boot();
-window.addEventListener("resize", () => { clearTimeout(window.__r); window.__r = setTimeout(drawChart, 200); });
