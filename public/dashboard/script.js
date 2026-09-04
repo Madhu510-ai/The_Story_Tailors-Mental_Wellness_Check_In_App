@@ -6,7 +6,7 @@ const dashboardData = {
   sleepWellness: 42,
   streak: 7,
   moodTrend: [62, 68, 64, 76, 88, 79, 84],
-  moodMix: { energized: 30, calm: 40, stressed: 15, low: 15 },
+  moodMix: { veryLow: 5, low: 8, uneasy: 12, neutral: 20, good: 22, happy: 16, veryHappy: 12, euphoric: 5 },
   insight:
     "Your mood peaks on Thursdays and improves on days you complete an evening reflection — consider a longer mid-week session.",
   nextCheckIn: { inMinutes: 6 * 60 + 52 },
@@ -106,18 +106,25 @@ function drawChart() {
 /* mood mix */
 function drawMix() {
   const meta = {
-    energized: { label: "Energized", color: "var(--sunset-gold)", dot: "gold" },
-    calm: { label: "Calm", color: "var(--ocean-teal)", dot: "teal" },
-    stressed: { label: "Stressed", color: "var(--warm-coral)", dot: "coral" },
-    low: { label: "Low", color: "var(--mountain-brown)", dot: "brown" }
+    veryLow: { label: "1 · Very Low", note: "Overwhelmed", color: "#171923" },
+    low: { label: "2 · Low", note: "Sad / withdrawn", color: "#49307A" },
+    uneasy: { label: "3 · Uneasy", note: "Worried / anxious", color: "#7B45D6" },
+    neutral: { label: "4 · Neutral", note: "Steady / okay", color: "#48B9E8" },
+    good: { label: "5 · Good", note: "Positive / balanced", color: "#42D39A" },
+    happy: { label: "6 · Happy", note: "Motivated / joyful", color: "#FFD447" },
+    veryHappy: { label: "7 · Very Happy", note: "Excited / energetic", color: "#FF7A45" },
+    euphoric: { label: "8 · Euphoric", note: "Feel like flying", color: "#FF3F8E" }
   };
   const mix = dashboardData.moodMix;
-  $("#mix").innerHTML = Object.keys(meta).map(k => `<i style="background:${meta[k].color}" data-w="${mix[k]}"></i>`).join("");
+  $("#mix").innerHTML = Object.keys(meta)
+    .map(k => `<i style="background:${meta[k].color}" data-w="${mix[k]}" title="${meta[k].label} — ${meta[k].note}: ${mix[k]}%"></i>`).join("");
   requestAnimationFrame(() => {
     $("#mix").querySelectorAll("i").forEach(i => { i.style.width = i.dataset.w + "%"; });
   });
+  $("#mix").setAttribute("aria-label",
+    "Mood mix: " + Object.keys(meta).map(k => `${meta[k].label} ${mix[k]}%`).join(", "));
   $("#mixLegend").innerHTML = Object.keys(meta)
-    .map(k => `<li><span class="dot ${meta[k].dot}"></span>${meta[k].label} <strong>${mix[k]}%</strong></li>`).join("");
+    .map(k => `<li><span class="dot" style="background:${meta[k].color}"></span>${meta[k].label} <strong>${mix[k]}%</strong></li>`).join("");
 }
 
 /* reports */
