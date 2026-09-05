@@ -10,33 +10,44 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiRecommendationsRecommendationIdRouteImport } from './routes/api/recommendations.$recommendationId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiRecommendationsRecommendationIdRoute =
+  ApiRecommendationsRecommendationIdRouteImport.update({
+    id: '/api/recommendations/$recommendationId',
+    path: '/api/recommendations/$recommendationId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api/recommendations/$recommendationId': typeof ApiRecommendationsRecommendationIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/recommendations/$recommendationId': typeof ApiRecommendationsRecommendationIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/api/recommendations/$recommendationId': typeof ApiRecommendationsRecommendationIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/api/recommendations/$recommendationId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/api/recommendations/$recommendationId'
+  id: '__root__' | '/' | '/api/recommendations/$recommendationId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApiRecommendationsRecommendationIdRoute: typeof ApiRecommendationsRecommendationIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +59,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/recommendations/$recommendationId': {
+      id: '/api/recommendations/$recommendationId'
+      path: '/api/recommendations/$recommendationId'
+      fullPath: '/api/recommendations/$recommendationId'
+      preLoaderRoute: typeof ApiRecommendationsRecommendationIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiRecommendationsRecommendationIdRoute:
+    ApiRecommendationsRecommendationIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
