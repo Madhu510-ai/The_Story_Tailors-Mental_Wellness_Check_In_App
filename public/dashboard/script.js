@@ -205,6 +205,68 @@ function startCountdown() {
   setInterval(tick, 1000);
 }
 
+/* ---- live data from the emotional check-in ---- */
+const CHECKIN_KEY = "mindful.checkins";
+const readCheckins = () => { try { return JSON.parse(localStorage.getItem(CHECKIN_KEY)) || []; } catch { return []; } };
+
+function buildInsight(latest, history) {
+  const parts = [];
+  parts.push(latest.mood >= 70 ? "Your latest check-in reads bright and motivated."
+    : latest.mood >= 45 ? "Your latest check-in reads steady, with room to lift."
+    : "Your latest check-in reads low — be gentle with yourself today.");
+  if (latest.stress >= 65) parts.push("Stress is running high, so a short breathing reset is the highest-value action right now.");
+  else if (latest.stress <= 35) parts.push("Stress is comfortably low — a good moment to build momentum on something you care about.");
+  if (history.length > 1) {
+    const prev = history[history.length - 2];
+    const d = latest.mood - prev.mood;
+    parts.push(d > 3 ? `Mood is up ${d} points since your previous check-in.`
+      : d < -3 ? `Mood is down ${Math.abs(d)} points since your previous check-in.`
+      : "Mood is holding close to your previous check-in.");
+  }
+  return parts.join(" ");
+}
+
+function applyCheckins() {
+  const history = readCheckins();
+  if (!history.length) return;
+  const latest = history[history.length - 1];
+
+  dashboardData.moodScore = latest.mood;
+  dashboardData.stressLevel = latest.stress;
+  dashboardData.sleepWellness = latest.sleep;
+  dashboardData.moodMix = latest.mix;
+  dashboardData.streak = history.length;
+  dashboardData.insight = buildInsight(latest, history);
+
+  const recent = history.slice(-7).map(h => h.mood);
+  dashboardData.moodTrend = dashboardData.moodTrend.slice(0, Math.max(0, 7 - recent.length)).concat(recent);
+
+  dashboardData.questionnaireHistory = history.slice().reverse().slice(0, 6).map((h, i) => {
+    const lv = levelFor(h.mood);
+    const d = new Date(h.at);
+    return {
+      icon: lv.face,
+      title: "Emotional Check-in",
+      date: i === 0 ? "Latest" : d.toLocaleDateString(undefined, { month: "short", day: "numeric" }),
+      status: "Completed",
+      detail: `${lv.label} · ${lv.note}. Mood ${h.mood}%, stress ${h.stress}%, sleep wellness ${h.sleep} min.`
+    };
+  });
+
+  /* keep the animated counters in sync with the check-in */
+  const setCount = (sel, v) => { const el = $(sel); if (el) el.dataset.count = v; };
+  setCount('.ring[data-ring="moodScore"] .ring-val', latest.mood);
+  setCount('.stat-body.wide .big', latest.stress);
+  setCount('.ring[data-ring="sleep"] .ring-val [data-count]', latest.sleep);
+  const sf = $(".fill.coral"); if (sf) sf.dataset.width = latest.stress;
+
+  $("#userName").textContent = dashboardData.user.name;
+  $("#streak").textContent = dashboardData.streak;
+  $("#insightText").textContent = dashboardData.insight;
+}
+
+applyCheckins();
+
 /* reveal stagger */
 document.querySelectorAll(".reveal").forEach((el, i) => { el.style.animationDelay = `${i * 90}ms`; });
 
@@ -214,3 +276,4 @@ drawReports();
 drawPaths();
 startCountdown();
 boot();
+
