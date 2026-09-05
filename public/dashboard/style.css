@@ -176,7 +176,11 @@ main{max-width:1240px;margin:0 auto;display:grid;gap:22px}
 .paths{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
 .paths li{border:1px solid var(--muted-sand);border-radius:18px;padding:18px;background:rgba(251,243,227,.55);transition:.25s}
 .paths li:hover{background:#fff;transform:translateY(-4px)}
+.paths .p-open{display:block;width:100%;text-align:left;background:none;border:0;padding:0;font:inherit;color:inherit;cursor:pointer}
+.paths .p-open:focus-visible{outline:2px solid var(--ocean-teal);outline-offset:6px;border-radius:12px}
 .paths .p-ico{font-size:1.4rem}
+.modal-steps{margin:12px 0 18px;padding-left:20px;display:grid;gap:8px;color:var(--charcoal)}
+.modal-steps li{line-height:1.5}
 .paths h3{font-size:1rem;margin:10px 0 4px}
 .paths .bar{margin-top:14px;height:6px}
 .fill.teal{background:var(--deep-teal)}
