@@ -161,35 +161,88 @@ function drawReports() {
       <span class="chev" aria-hidden="true">›</span>
     </button></li>`).join("");
 
-  const modal = $("#modal");
   $("#reportList").addEventListener("click", e => {
     const btn = e.target.closest("button[data-i]");
     if (!btn) return;
     const r = dashboardData.questionnaireHistory[+btn.dataset.i];
-    $("#modalTitle").textContent = r.title;
-    $("#modalMeta").textContent = `${r.date} · ${r.status}`;
-    $("#modalBody").textContent = r.detail;
-    modal.hidden = false;
-    $("#modalClose").focus();
+    openModal(r.title, `${r.date} · ${r.status}`, r.detail);
   });
+}
+
+/* shared modal */
+const modalEl = () => $("#modal");
+function openModal(title, meta, body, steps) {
+  $("#modalTitle").textContent = title;
+  $("#modalMeta").textContent = meta;
+  $("#modalBody").textContent = body;
+  const list = $("#modalSteps");
+  if (list) {
+    if (steps && steps.length) {
+      list.innerHTML = steps.map(s => `<li>${s}</li>`).join("");
+      list.hidden = false;
+    } else {
+      list.innerHTML = "";
+      list.hidden = true;
+    }
+  }
+  modalEl().hidden = false;
+  $("#modalClose").focus();
+}
+function initModal() {
+  const modal = modalEl();
   $("#modalClose").addEventListener("click", () => { modal.hidden = true; });
   modal.addEventListener("click", e => { if (e.target === modal) modal.hidden = true; });
   document.addEventListener("keydown", e => { if (e.key === "Escape") modal.hidden = true; });
 }
 
-/* recommendations */
+/* recommendations — details come from GET /api/recommendations/{recommendationId} */
+const TOKEN_KEY = "mindful.token";
+function userToken() {
+  let t = localStorage.getItem(TOKEN_KEY);
+  if (!t) { t = "demo-user"; localStorage.setItem(TOKEN_KEY, t); }
+  return t;
+}
+
+async function loadRecommendation(id) {
+  const res = await fetch(`/api/recommendations/${encodeURIComponent(id)}`, {
+    headers: { Authorization: `Bearer ${userToken()}` }
+  });
+  if (!res.ok) {
+    const msg = res.status === 401 ? "Please sign in again to view this suggestion."
+      : res.status === 403 ? "This suggestion belongs to another account."
+      : res.status === 404 ? "This suggestion is no longer available."
+      : "Something went wrong loading this suggestion.";
+    throw new Error(msg);
+  }
+  return res.json();
+}
+
 function drawPaths() {
   $("#paths").innerHTML = dashboardData.recommendations.map(p => {
     const lv = levelFor(p.progress);
     return `
     <li>
-      <div class="p-ico" aria-hidden="true">${p.icon}</div>
-      <h3>${p.title}</h3>
-      <p class="muted small">${p.desc}</p>
-      <div class="bar"><i class="fill" style="background:${lv.color};box-shadow:0 0 10px ${lv.color}80" data-width="${p.progress}"></i></div>
-      <span class="small muted">${p.progress}% complete</span>
+      <button type="button" class="p-open" data-id="${p.id}" aria-label="Open ${p.title} suggestion">
+        <div class="p-ico" aria-hidden="true">${p.icon}</div>
+        <h3>${p.title}</h3>
+        <p class="muted small">${p.desc}</p>
+        <div class="bar"><i class="fill" style="background:${lv.color};box-shadow:0 0 10px ${lv.color}80" data-width="${p.progress}"></i></div>
+        <span class="small muted">${p.progress}% complete</span>
+      </button>
     </li>`;
   }).join("");
+
+  $("#paths").addEventListener("click", async e => {
+    const btn = e.target.closest("button[data-id]");
+    if (!btn) return;
+    openModal("Loading…", "Fetching your suggestion", "");
+    try {
+      const r = await loadRecommendation(btn.dataset.id);
+      openModal(r.activityName, `Detected mood · ${r.detectedMood}`, r.recommendationText, r.instructions);
+    } catch (err) {
+      openModal("Not available", "", err.message);
+    }
+  });
 }
 
 /* countdown */
