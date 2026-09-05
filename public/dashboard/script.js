@@ -327,6 +327,7 @@ drawChart();
 drawMix();
 drawReports();
 drawPaths();
+initModal();
 startCountdown();
 boot();
 
