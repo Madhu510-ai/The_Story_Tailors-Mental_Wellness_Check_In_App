@@ -17,10 +17,10 @@ const dashboardData = {
     { icon: "🍂", title: "Mood Reflection", date: "Aug 30", status: "Completed", detail: "Journaling noted gratitude and social energy as the strongest positive drivers." }
   ],
   recommendations: [
-    { icon: "🧘", title: "Meditation", desc: "5 min · Calm your mind", progress: 60, tone: "teal" },
-    { icon: "✍️", title: "Journaling", desc: "10 min · Evening reflection", progress: 35, tone: "gold" },
-    { icon: "✨", title: "Reflection", desc: "5 min · Understand today's mood", progress: 80, tone: "ocean" },
-    { icon: "🌬", title: "Breathing", desc: "3 min · Reset your nervous system", progress: 20, tone: "coral" }
+    { id: "rec_meditation_calm", icon: "🧘", title: "Meditation", desc: "5 min · Calm your mind", progress: 60, tone: "teal" },
+    { id: "rec_journaling_evening", icon: "✍️", title: "Journaling", desc: "10 min · Evening reflection", progress: 35, tone: "gold" },
+    { id: "rec_reflection_mood", icon: "✨", title: "Reflection", desc: "5 min · Understand today's mood", progress: 80, tone: "ocean" },
+    { id: "rec_breathing_reset", icon: "🌬", title: "Breathing", desc: "3 min · Reset your nervous system", progress: 20, tone: "coral" }
   ]
 };
 
