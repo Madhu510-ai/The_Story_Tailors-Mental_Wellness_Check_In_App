@@ -244,3 +244,5 @@ main{max-width:1240px;margin:0 auto;display:grid;gap:22px}
 .done-stats strong{font-size:1.6rem;color:var(--deep-teal)}
 .done-card .btn{justify-self:start;text-decoration:none;display:inline-block}
 @media(max-width:640px){.done-stats{grid-template-columns:1fr}}
+
+.quiz-card[hidden],.done-card[hidden]{display:none}
