@@ -213,3 +213,36 @@ main{max-width:1240px;margin:0 auto;display:grid;gap:22px}
   .split:nth-of-type(3){order:5}
   main > section:last-of-type{order:6}
 }
+
+/* ---------- check-in screen ---------- */
+.quiz-main{max-width:860px;margin:0 auto;padding:0 20px 60px;display:grid;gap:22px}
+.q-progress{height:8px;border-radius:99px;background:rgba(140,122,94,.22);overflow:hidden}
+.q-progress i{display:block;height:100%;width:0;border-radius:99px;transition:width .45s ease;
+  background:linear-gradient(90deg,var(--deep-teal),var(--ocean-teal),var(--sunset-gold))}
+.quiz-card,.done-card{padding:clamp(22px,4vw,38px);display:grid;gap:14px}
+.q-signal{font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;color:var(--mountain-brown)}
+.q-scenario{font-size:clamp(1rem,2vw,1.15rem);line-height:1.55;color:var(--charcoal);
+  border-left:3px solid var(--ocean-teal);padding-left:14px}
+.q-text{font-size:clamp(1.25rem,3vw,1.7rem);margin:0}
+.q-options{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:12px}
+.opt{width:100%;display:flex;align-items:center;gap:14px;text-align:left;font:inherit;cursor:pointer;
+  padding:16px 18px;border-radius:18px;border:1px solid var(--muted-sand);background:rgba(251,243,227,.6);
+  color:var(--charcoal);transition:.22s}
+.opt:hover{background:#fff;transform:translateY(-2px);border-color:var(--ocean-teal)}
+.opt:focus-visible{outline:3px solid var(--ocean-teal);outline-offset:2px}
+.opt-key{flex:0 0 34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:700;
+  background:rgba(28,110,126,.12);color:var(--deep-teal)}
+.opt.chosen{background:#fff;border-color:var(--deep-teal);box-shadow:0 0 0 3px rgba(63,166,184,.25)}
+.opt.chosen .opt-key{background:var(--deep-teal);color:#fff}
+.q-actions{display:flex;justify-content:space-between;gap:12px;margin-top:8px}
+.btn-ghost{background:transparent;border:1px solid var(--muted-sand);color:var(--charcoal)}
+.btn-ghost:hover{background:rgba(251,243,227,.8)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.done-stats{list-style:none;margin:6px 0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.done-stats li{display:grid;gap:4px;padding:16px;border-radius:18px;border:1px solid var(--muted-sand);
+  background:rgba(251,243,227,.6)}
+.done-stats strong{font-size:1.6rem;color:var(--deep-teal)}
+.done-card .btn{justify-self:start;text-decoration:none;display:inline-block}
+@media(max-width:640px){.done-stats{grid-template-columns:1fr}}
+
+.quiz-card[hidden],.done-card[hidden]{display:none}

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Daily Emotional Check-in — Mindful</title>
+<meta name="description" content="A short, scenario-based emotional check-in that updates your mood score, stress level and weekly mood wave." />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body class="checkin-page">
+<a class="skip-link" href="#quizCard">Skip to the check-in</a>
+
+<header class="site-header">
+  <div class="greet">
+    <img class="avatar" src="assets/brain.png" alt="Mindful" />
+    <div>
+      <h1 class="hello">Daily check-in</h1>
+      <p class="sub">Eight quick scenarios — answer honestly, there are no wrong choices.</p>
+    </div>
+  </div>
+  <nav class="nav" aria-label="Main">
+    <a href="index.html">Skip to dashboard</a>
+  </nav>
+</header>
+
+<main id="main" class="quiz-main">
+  <div class="q-progress" role="progressbar" aria-label="Check-in progress" aria-valuemin="0" aria-valuemax="100">
+    <i id="qProgressFill"></i>
+  </div>
+
+  <section class="card quiz-card reveal" id="quizCard" aria-live="polite">
+    <p class="eyebrow" id="qStep">Question 1 of 8</p>
+    <p class="q-signal" id="qSignal"></p>
+    <p class="q-scenario" id="qScenario"></p>
+    <h2 class="q-text" id="qText"></h2>
+    <ul class="q-options" id="qOptions"></ul>
+    <div class="q-actions">
+      <button type="button" class="btn btn-ghost" id="qBack">Back</button>
+      <button type="button" class="btn btn-primary" id="qNext">Next</button>
+    </div>
+  </section>
+
+  <section class="card done-card reveal" id="doneCard" hidden tabindex="-1" aria-live="polite">
+    <p class="eyebrow">Check-in complete</p>
+    <h2>Here's how today looks</h2>
+    <ul class="done-stats">
+      <li><span class="muted small">Mood score</span><strong id="resMood">—</strong></li>
+      <li><span class="muted small">Stress level</span><strong id="resStress">—</strong></li>
+      <li><span class="muted small">Sleep wellness</span><strong id="resSleep">—</strong></li>
+    </ul>
+    <p class="muted">Your dashboard has been updated with this check-in.</p>
+    <a class="btn btn-primary" href="index.html">Open my dashboard</a>
+  </section>
+</main>
+
+<script src="checkin.js"></script>
+</body>
+</html>
