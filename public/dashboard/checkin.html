@@ -3,19 +3,19 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Daily Emotional Check-in — Mindful</title>
-<meta name="description" content="A short, scenario-based emotional check-in that updates your mood score, stress level and weekly mood wave." />
+<title>Story Check-in — Mindful</title>
+<meta name="description" content="Pick a genre, live a short story and let six choices update your mood score, stress level and weekly mood wave." />
 <link rel="stylesheet" href="style.css" />
 </head>
 <body class="checkin-page">
-<a class="skip-link" href="#quizCard">Skip to the check-in</a>
+<a class="skip-link" href="#pickCard">Skip to the check-in</a>
 
 <header class="site-header">
   <div class="greet">
     <img class="avatar" src="assets/brain.png" alt="Mindful" />
     <div>
-      <h1 class="hello">Daily check-in</h1>
-      <p class="sub">Eight quick scenarios — answer honestly, there are no wrong choices.</p>
+      <h1 class="hello">Story check-in</h1>
+      <p class="sub">Choose a world, then make six choices — there are no wrong answers.</p>
     </div>
   </div>
   <nav class="nav" aria-label="Main">
@@ -28,8 +28,18 @@
     <i id="qProgressFill"></i>
   </div>
 
-  <section class="card quiz-card reveal" id="quizCard" aria-live="polite">
-    <p class="eyebrow" id="qStep">Question 1 of 8</p>
+  <section class="card quiz-card reveal" id="pickCard" aria-live="polite">
+    <p class="eyebrow" id="pickStep">Step 1 of 2</p>
+    <h2 class="q-text" id="pickTitle">Choose a genre</h2>
+    <p class="muted small" id="pickHint">Each world tells a different story about how you feel today.</p>
+    <ul class="pick-grid" id="pickGrid"></ul>
+    <div class="q-actions">
+      <button type="button" class="btn btn-ghost" id="pickBack" hidden>Back to genres</button>
+    </div>
+  </section>
+
+  <section class="card quiz-card reveal" id="quizCard" hidden aria-live="polite">
+    <p class="eyebrow" id="qStep">Question 1 of 6</p>
     <p class="q-signal" id="qSignal"></p>
     <p class="q-scenario" id="qScenario"></p>
     <h2 class="q-text" id="qText"></h2>
@@ -43,11 +53,14 @@
   <section class="card done-card reveal" id="doneCard" hidden tabindex="-1" aria-live="polite">
     <p class="eyebrow">Check-in complete</p>
     <h2>Here's how today looks</h2>
+    <p class="muted small" id="resMoodLabel"></p>
     <ul class="done-stats">
       <li><span class="muted small">Mood score</span><strong id="resMood">—</strong></li>
       <li><span class="muted small">Stress level</span><strong id="resStress">—</strong></li>
       <li><span class="muted small">Sleep wellness</span><strong id="resSleep">—</strong></li>
     </ul>
+    <div class="mix" id="resMix" role="img" aria-label="Detected mood mix"></div>
+    <ul class="legend" id="resLegend"></ul>
     <p class="muted">Your dashboard has been updated with this check-in.</p>
     <a class="btn btn-primary" href="index.html">Open my dashboard</a>
   </section>
