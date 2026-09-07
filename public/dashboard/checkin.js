@@ -1,116 +1,83 @@
-/* Emotional check-in questionnaire.
-   Each option carries a mood / energy / stress signal (0-100).
-   Results are stored locally and read by the dashboard (script.js).
-   A backend can later replace the storage layer without touching the scoring. */
+/* Story-based emotional check-in.
+   Questions, options and the 8-state mood scores come from data/stories.json,
+   converted from the psychology-scored questionnaire workbooks.
+   Scoring follows the workbook method: each option carries an 8-state mood
+   score vector (sums to 10). Answers are averaged, normalised to percentages,
+   and mapped to mood / energy / stress / sleep for the dashboard. */
 
-const QUESTIONS = [
-  {
-    scenario: "It's Saturday. You have no deadlines, no plans, and nobody expects anything from you.",
-    question: "What sounds most appealing?",
-    signal: "Energy · motivation · withdrawal",
-    options: [
-      { text: "I just want to stay in bed and do nothing.", mood: 15, energy: 10, stress: 70 },
-      { text: "I'd probably watch something and forget about the day.", mood: 35, energy: 25, stress: 55 },
-      { text: "Maybe I'll slowly get myself moving.", mood: 58, energy: 50, stress: 40 },
-      { text: "I'd actually love to go out and do something.", mood: 82, energy: 80, stress: 25 }
-    ]
-  },
-  {
-    scenario: "You send a message to someone you care about. Hours pass. They haven't replied.",
-    question: "What is your first instinct?",
-    signal: "Emotional sensitivity · reassurance-seeking · rumination",
-    options: [
-      { text: "\u201cThey're probably busy. I'll wait.\u201d", mood: 70, energy: 55, stress: 30 },
-      { text: "\u201cDid I say something wrong?\u201d", mood: 25, energy: 30, stress: 80 },
-      { text: "I keep checking my phone.", mood: 35, energy: 40, stress: 72 },
-      { text: "I forget about it and continue my day.", mood: 75, energy: 60, stress: 25 }
-    ]
-  },
-  {
-    scenario: "You're about to leave for something you've been looking forward to. Suddenly, the plan changes completely.",
-    question: "What's your reaction?",
-    signal: "Uncertainty tolerance · stress response · adaptability",
-    options: [
-      { text: "\u201cOkay, let's see what happens.\u201d", mood: 68, energy: 50, stress: 30 },
-      { text: "I immediately want to know every detail.", mood: 45, energy: 55, stress: 58 },
-      { text: "I feel irritated and need a moment.", mood: 28, energy: 40, stress: 78 },
-      { text: "\u201cActually, this could be fun.\u201d", mood: 85, energy: 75, stress: 22 }
-    ]
-  },
-  {
-    scenario: "You walk into a caf\u00e9 you've never visited before. It's quiet, there's good music playing, and you have an hour completely to yourself.",
-    question: "What do you do?",
-    signal: "Baseline emotional regulation · preference for stimulation",
-    options: [
-      { text: "Sit by the window and simply enjoy it.", mood: 72, energy: 45, stress: 25 },
-      { text: "Read or work on something.", mood: 60, energy: 55, stress: 35 },
-      { text: "Take out your phone and message someone.", mood: 42, energy: 45, stress: 55 },
-      { text: "Start exploring the menu and the place.", mood: 80, energy: 75, stress: 30 }
-    ]
-  },
-  {
-    scenario: "Something you've been working on finally goes right. It isn't a huge achievement, but you're genuinely pleased.",
-    question: "What happens next?",
-    signal: "Satisfaction · motivation · positive regulation",
-    options: [
-      { text: "I quietly enjoy the feeling.", mood: 65, energy: 45, stress: 28 },
-      { text: "I immediately tell someone.", mood: 75, energy: 65, stress: 28 },
-      { text: "It motivates me to tackle the next thing.", mood: 80, energy: 80, stress: 32 },
-      { text: "I reward myself with something fun.", mood: 85, energy: 75, stress: 25 }
-    ]
-  },
-  {
-    scenario: "A friend texts: \u201cDon't make plans tonight. I've got something fun planned.\u201d",
-    question: "What's your reaction?",
-    signal: "Anticipation · positive affect · social engagement",
-    options: [
-      { text: "\u201cTell me everything!\u201d", mood: 72, energy: 70, stress: 32 },
-      { text: "I start guessing what it could be.", mood: 62, energy: 60, stress: 42 },
-      { text: "I'm already excited.", mood: 85, energy: 80, stress: 25 },
-      { text: "I send back about 20 excited messages.", mood: 92, energy: 92, stress: 30 }
-    ]
-  },
-  {
-    scenario: "Imagine tomorrow goes almost exactly the way you'd want. You wake up feeling great, your favorite people are around, and everything seems to click.",
-    question: "What would you most likely do?",
-    signal: "Energy · social activation · motivation · novelty-seeking",
-    options: [
-      { text: "Soak it all in.", mood: 70, energy: 45, stress: 22 },
-      { text: "Make plans to keep the energy going.", mood: 80, energy: 75, stress: 28 },
-      { text: "Bring everyone together.", mood: 85, energy: 80, stress: 26 },
-      { text: "Try something completely spontaneous.", mood: 90, energy: 90, stress: 32 }
-    ]
-  },
-  {
-    scenario: "You receive a message: \u201cYou just got something you've wanted for a very long time.\u201d",
-    question: "Before you even know the details, what's your instinct?",
-    signal: "Positive activation · excitement · reward response",
-    options: [
-      { text: "I freeze for a second because it doesn't feel real.", mood: 55, energy: 40, stress: 50 },
-      { text: "I immediately call someone.", mood: 80, energy: 72, stress: 28 },
-      { text: "I start jumping around / celebrating.", mood: 92, energy: 92, stress: 22 },
-      { text: "I want to do something unforgettable right now.", mood: 95, energy: 95, stress: 28 }
-    ]
-  }
+const MOOD_KEYS = ["veryLow", "low", "uneasy", "neutral", "good", "happy", "veryHappy", "euphoric"];
+const MOOD_META = [
+  { label: "Very Low", color: "#171923" }, { label: "Low", color: "#49307A" },
+  { label: "Uneasy", color: "#7B45D6" }, { label: "Neutral", color: "#48B9E8" },
+  { label: "Good", color: "#42D39A" }, { label: "Happy", color: "#FFD447" },
+  { label: "Very Happy", color: "#FF7A45" }, { label: "Euphoric", color: "#FF3F8E" }
 ];
-
 const LETTERS = ["A", "B", "C", "D"];
 const $ = (s, r = document) => r.querySelector(s);
+const clamp = (v, a = 0, b = 100) => Math.min(b, Math.max(a, v));
 
-const answers = new Array(QUESTIONS.length).fill(null);
-let index = 0;
+let DATA = null, genre = null, story = null, questions = [], answers = [], index = 0;
 
-const listEl = $("#qOptions");
+/* ---------- selection screens ---------- */
+function showPickGenres() {
+  $("#quizCard").hidden = true;
+  $("#doneCard").hidden = true;
+  $("#pickCard").hidden = false;
+  $("#pickStep").textContent = "Step 1 of 2";
+  $("#pickTitle").textContent = "Choose a genre";
+  $("#pickHint").textContent = "Each world tells a different story about how you feel today.";
+  $("#pickBack").hidden = true;
+  $("#qProgressFill").style.width = "0%";
+  $("#pickGrid").innerHTML = DATA.genres.map(g => `
+    <li><button type="button" class="pick" data-genre="${g.id}">
+      <span class="pick-ico" aria-hidden="true">${g.icon}</span>
+      <span class="pick-name">${g.name}</span>
+      <span class="muted small">${g.stories.length} stories</span>
+    </button></li>`).join("");
+}
 
+function showPickStories(g) {
+  genre = g;
+  $("#pickStep").textContent = "Step 2 of 2";
+  $("#pickTitle").textContent = `${g.name} — pick your story`;
+  $("#pickHint").textContent = "Six moments from the story, six choices.";
+  $("#pickBack").hidden = false;
+  $("#pickGrid").innerHTML = g.stories.map(s => `
+    <li><button type="button" class="pick" data-story="${s.id}">
+      <span class="pick-ico" aria-hidden="true">${g.icon}</span>
+      <span class="pick-name">${s.title}</span>
+      <span class="muted small">${s.questions.length} questions</span>
+    </button></li>`).join("");
+}
+
+function startStory(s) {
+  story = s;
+  questions = s.questions.slice(0, 6);
+  answers = new Array(questions.length).fill(null);
+  index = 0;
+  $("#pickCard").hidden = true;
+  $("#quizCard").hidden = false;
+  render();
+}
+
+$("#pickGrid").addEventListener("click", e => {
+  const btn = e.target.closest("button[data-genre],button[data-story]");
+  if (!btn) return;
+  if (btn.dataset.genre) showPickStories(DATA.genres.find(g => g.id === btn.dataset.genre));
+  else startStory(genre.stories.find(s => s.id === btn.dataset.story));
+});
+$("#pickBack").addEventListener("click", showPickGenres);
+
+/* ---------- question screen ---------- */
 function render() {
-  const q = QUESTIONS[index];
-  $("#qStep").textContent = `Question ${index + 1} of ${QUESTIONS.length}`;
-  $("#qSignal").textContent = q.signal;
-  $("#qScenario").textContent = q.scenario;
+  const q = questions[index];
+  $("#qStep").textContent = `Question ${index + 1} of ${questions.length}`;
+  $("#qSignal").textContent = `${story.title} · ${q.beat}`;
+  $("#qScenario").textContent = q.scene;
   $("#qText").textContent = q.question;
-  $("#qProgressFill").style.width = ((index) / QUESTIONS.length) * 100 + "%";
+  $("#qProgressFill").style.width = (index / questions.length) * 100 + "%";
 
-  listEl.innerHTML = q.options.map((o, i) => `
+  $("#qOptions").innerHTML = q.options.map((o, i) => `
     <li>
       <button type="button" class="opt${answers[index] === i ? " chosen" : ""}" data-i="${i}"
         aria-pressed="${answers[index] === i}">
@@ -121,49 +88,67 @@ function render() {
 
   $("#qBack").disabled = index === 0;
   $("#qNext").disabled = answers[index] === null;
-  $("#qNext").textContent = index === QUESTIONS.length - 1 ? "See my results" : "Next";
+  $("#qNext").textContent = index === questions.length - 1 ? "See my results" : "Next";
 }
 
-listEl.addEventListener("click", e => {
+$("#qOptions").addEventListener("click", e => {
   const btn = e.target.closest("button[data-i]");
   if (!btn) return;
   answers[index] = +btn.dataset.i;
   render();
   setTimeout(() => { if (answers[index] !== null) next(); }, 260);
 });
-
 function next() {
   if (answers[index] === null) return;
-  if (index < QUESTIONS.length - 1) { index++; render(); }
+  if (index < questions.length - 1) { index++; render(); }
   else finish();
 }
-
 $("#qNext").addEventListener("click", next);
 $("#qBack").addEventListener("click", () => { if (index > 0) { index--; render(); } });
 
-/* ---- scoring ---- */
-const avg = a => Math.round(a.reduce((s, v) => s + v, 0) / a.length);
-
+/* ---------- scoring (workbook method) ---------- */
 function scoreAnswers() {
-  const chosen = answers.map((a, i) => QUESTIONS[i].options[a]);
-  const mood = avg(chosen.map(o => o.mood));
-  const energy = avg(chosen.map(o => o.energy));
-  const stress = avg(chosen.map(o => o.stress));
+  const chosen = answers.map((a, i) => questions[i].options[a]);
 
-  /* mood mix = distribution of the 8 mood levels across the answers */
-  const keys = ["veryLow", "low", "uneasy", "neutral", "good", "happy", "veryHappy", "euphoric"];
+  /* 1. average the 8-state mood score vectors, then normalise to percentages */
+  const totals = {};
+  MOOD_KEYS.forEach(k => (totals[k] = 0));
+  chosen.forEach(o => MOOD_KEYS.forEach(k => (totals[k] += o.mix[k] || 0)));
+  const sum = MOOD_KEYS.reduce((s, k) => s + totals[k], 0) || 1;
+  const mixExact = {};
+  MOOD_KEYS.forEach(k => (mixExact[k] = (totals[k] / sum) * 100));
+
+  /* rounded percentages that still add up to 100 */
   const mix = {};
-  keys.forEach(k => (mix[k] = 0));
-  chosen.forEach(o => {
-    const idx = Math.min(7, Math.max(0, Math.floor((o.mood / 100) * 8)));
-    mix[keys[idx]] += 1;
-  });
-  keys.forEach(k => (mix[k] = Math.round((mix[k] / chosen.length) * 100)));
+  MOOD_KEYS.forEach(k => (mix[k] = Math.round(mixExact[k])));
+  let drift = 100 - MOOD_KEYS.reduce((s, k) => s + mix[k], 0);
+  const order = MOOD_KEYS.slice().sort((a, b) => mixExact[b] - mixExact[a]);
+  for (let i = 0; drift !== 0; i = (i + 1) % order.length) {
+    mix[order[i]] += drift > 0 ? 1 : -1;
+    drift += drift > 0 ? -1 : 1;
+  }
 
-  /* sleep wellness proxy: calm + energy balance, expressed in minutes of deep rest */
-  const sleep = Math.round(((100 - stress) * 0.6 + energy * 0.4) / 100 * 60);
+  /* 2. mood score = mix-weighted position on the 8-level scale (0-100) */
+  const mood = Math.round(MOOD_KEYS.reduce((s, k, i) => s + mixExact[k] * ((i + 0.5) / 8) * 100, 0) / 100);
 
-  return { mood, energy, stress, sleep, mix, at: new Date().toISOString(), answers: answers.slice() };
+  /* 3. energy from arousal, stress from negative states + low valence */
+  const avg = a => a.reduce((s, v) => s + v, 0) / a.length;
+  const arousal = avg(chosen.map(o => o.arousal || 0));   // -1..1
+  const valence = avg(chosen.map(o => o.valence || 0));   // -1..1
+  const energy = Math.round(clamp(((arousal + 1) / 2) * 100));
+  const negShare = mixExact.veryLow + mixExact.low + mixExact.uneasy;
+  const stress = Math.round(clamp(0.7 * negShare + 0.3 * (1 - (valence + 1) / 2) * 100));
+
+  /* 4. sleep wellness proxy: calm + energy balance, in minutes of deep rest */
+  const sleep = Math.round((((100 - stress) * 0.6 + energy * 0.4) / 100) * 60);
+
+  const topKey = order[0];
+  return {
+    mood, energy, stress, sleep, mix,
+    dominant: MOOD_META[MOOD_KEYS.indexOf(topKey)].label,
+    genre: genre.name, story: story.title,
+    at: new Date().toISOString(), answers: answers.slice()
+  };
 }
 
 const KEY = "mindful.checkins";
@@ -179,10 +164,22 @@ function finish() {
   const done = $("#doneCard");
   done.hidden = false;
   $("#qProgressFill").style.width = "100%";
+  $("#resMoodLabel").textContent = `${result.genre} · ${result.story} — detected mood: ${result.dominant}`;
   $("#resMood").textContent = result.mood + "%";
   $("#resStress").textContent = result.stress + "%";
   $("#resSleep").textContent = result.sleep + " min";
+  $("#resMix").innerHTML = MOOD_KEYS.map((k, i) =>
+    `<i style="--c:${MOOD_META[i].color};width:${result.mix[k]}%" title="${MOOD_META[i].label}: ${result.mix[k]}%"></i>`).join("");
+  $("#resLegend").innerHTML = MOOD_KEYS.map((k, i) =>
+    `<li><span class="dot glow" style="--c:${MOOD_META[i].color};background:${MOOD_META[i].color}"></span>${MOOD_META[i].label} <strong>${result.mix[k]}%</strong></li>`).join("");
   done.focus();
 }
 
-render();
+/* ---------- boot ---------- */
+fetch("data/stories.json")
+  .then(r => r.json())
+  .then(d => { DATA = d; showPickGenres(); })
+  .catch(() => {
+    $("#pickTitle").textContent = "Stories couldn't be loaded";
+    $("#pickHint").textContent = "Please refresh the page to try again.";
+  });

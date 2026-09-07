@@ -250,3 +250,17 @@ main{max-width:1240px;margin:0 auto;display:grid;gap:22px}
 @media(max-width:640px){.done-stats{grid-template-columns:1fr}}
 
 .quiz-card[hidden],.done-card[hidden]{display:none}
+
+/* ---- genre / story picker ---- */
+.pick-grid{list-style:none;display:grid;gap:14px;padding:0;margin:18px 0 0;
+  grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+.pick{width:100%;display:flex;flex-direction:column;gap:6px;align-items:flex-start;
+  padding:18px;border-radius:18px;border:1px solid rgba(140,122,94,.28);
+  background:rgba(255,255,255,.6);cursor:pointer;text-align:left;
+  transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease}
+.pick:hover{transform:translateY(-3px);border-color:var(--ocean-teal);
+  box-shadow:0 12px 26px rgba(28,110,126,.16)}
+.pick:focus-visible{outline:3px solid var(--ocean-teal);outline-offset:3px}
+.pick-ico{font-size:1.7rem}
+.pick-name{font-weight:600;color:var(--charcoal)}
+.done-card .mix{margin-top:16px}
