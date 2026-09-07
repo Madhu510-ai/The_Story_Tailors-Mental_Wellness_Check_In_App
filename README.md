@@ -910,3 +910,13 @@ cd <repository-name>
 npm i
 npm run dev
 ```
+
+## Accounts and check-in database
+
+The dashboard uses Supabase Auth (email/password) and a `wellness_checkins` table. Each saved row contains the user's selected answer for every question plus the calculated mood, stress, sleep, and mood-mix result.
+
+1. Create a Supabase project and run [the migration](supabase/migrations/20260907_create_wellness_checkins.sql) in its SQL Editor.
+2. In `public/dashboard/auth-config.js`, set the project URL and **anon/public** key from Supabase Settings → API. Never use a `service_role` key in a browser file.
+3. In Supabase Auth, enable Email authentication and configure the site URL used for this app. If email confirmation is enabled, new users must confirm their email before signing in.
+
+Row Level Security in the migration limits read and write access to the signed-in user, so one person's answers cannot be retrieved by another account.

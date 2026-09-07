@@ -151,14 +151,24 @@ function scoreAnswers() {
   };
 }
 
-const KEY = "mindful.checkins";
-const loadHistory = () => { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch { return []; } };
+function databaseRecord(result) {
+  return {
+    genre: result.genre,
+    story: result.story,
+    answers: questions.map((question, questionIndex) => {
+      const optionIndex = answers[questionIndex];
+      return {
+        question: question.question,
+        selected_option_index: optionIndex,
+        selected_answer: question.options[optionIndex]?.text || ""
+      };
+    }),
+    results: result
+  };
+}
 
-function finish() {
+async function finish() {
   const result = scoreAnswers();
-  const history = loadHistory();
-  history.push(result);
-  localStorage.setItem(KEY, JSON.stringify(history.slice(-30)));
 
   $("#quizCard").hidden = true;
   const done = $("#doneCard");
@@ -173,13 +183,23 @@ function finish() {
   $("#resLegend").innerHTML = MOOD_KEYS.map((k, i) =>
     `<li><span class="dot glow" style="--c:${MOOD_META[i].color};background:${MOOD_META[i].color}"></span>${MOOD_META[i].label} <strong>${result.mix[k]}%</strong></li>`).join("");
   done.focus();
+
+  try {
+    await WellnessAuth.saveCheckin(databaseRecord(result));
+    $("#saveStatus").textContent = "Saved securely to your account. Your dashboard is ready.";
+  } catch (error) {
+    $("#saveStatus").textContent = `Could not save this check-in: ${error.message}`;
+  }
 }
 
 /* ---------- boot ---------- */
-fetch("data/stories.json")
-  .then(r => r.json())
-  .then(d => { DATA = d; showPickGenres(); })
-  .catch(() => {
-    $("#pickTitle").textContent = "Stories couldn't be loaded";
-    $("#pickHint").textContent = "Please refresh the page to try again.";
-  });
+WellnessAuth.getUser().then(user => {
+  if (!user) { location.replace("login.html"); return; }
+  fetch("data/stories.json")
+    .then(r => r.json())
+    .then(d => { DATA = d; showPickGenres(); })
+    .catch(() => {
+      $("#pickTitle").textContent = "Stories couldn't be loaded";
+      $("#pickHint").textContent = "Please refresh the page to try again.";
+    });
+});
