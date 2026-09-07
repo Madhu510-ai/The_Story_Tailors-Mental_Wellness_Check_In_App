@@ -299,12 +299,13 @@ function applyCheckins() {
     const d = new Date(h.at);
     return {
       icon: lv.face,
-      title: "Emotional Check-in",
+      title: h.story ? `${h.story} — ${h.genre}` : "Emotional Check-in",
       date: i === 0 ? "Latest" : d.toLocaleDateString(undefined, { month: "short", day: "numeric" }),
       status: "Completed",
-      detail: `${lv.label} · ${lv.note}. Mood ${h.mood}%, stress ${h.stress}%, sleep wellness ${h.sleep} min.`
+      detail: `${h.dominant ? "Detected mood " + h.dominant + ". " : ""}${lv.label} · ${lv.note}. Mood ${h.mood}%, stress ${h.stress}%, sleep wellness ${h.sleep} min.`
     };
   });
+
 
   /* keep the animated counters in sync with the check-in */
   const setCount = (sel, v) => { const el = $(sel); if (el) el.dataset.count = v; };
