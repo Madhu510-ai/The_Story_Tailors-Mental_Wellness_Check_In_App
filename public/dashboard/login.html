@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sign in — Mindful</title><link rel="stylesheet" href="style.css" />
+</head>
+<body class="auth-page">
+  <main class="auth-shell" aria-labelledby="authTitle">
+    <section class="auth-intro"><span class="auth-mark" aria-hidden="true">✦</span><p class="eyebrow">Mindful check-ins</p><h1>Your story is private.</h1><p>Sign in to keep your answers and wellness insights safely connected to your account.</p></section>
+    <section class="card auth-card">
+      <p class="eyebrow" id="authEyebrow">Welcome back</p><h2 id="authTitle">Sign in to continue</h2>
+      <p class="muted small" id="authDescription">Use your email and password to open your dashboard.</p>
+      <form id="authForm" class="auth-form">
+        <label>Email <input id="email" type="email" autocomplete="email" required /></label>
+        <label>Password <input id="password" type="password" autocomplete="current-password" minlength="8" required /></label>
+        <p class="form-message" id="formMessage" role="status"></p>
+        <button class="btn btn-primary" id="submitButton" type="submit">Sign in</button>
+      </form>
+      <button class="link-button" id="modeButton" type="button">New here? Create an account</button>
+      <p class="setup-note" id="setupNote" hidden>This app needs its Supabase URL and anon key in <code>auth-config.js</code> before accounts can be used.</p>
+    </section>
+  </main>
+  <script src="auth-config.js"></script><script src="auth.js"></script><script src="login.js"></script>
+</body>
+</html>

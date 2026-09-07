@@ -259,9 +259,6 @@ function startCountdown() {
 }
 
 /* ---- live data from the emotional check-in ---- */
-const CHECKIN_KEY = "mindful.checkins";
-const readCheckins = () => { try { return JSON.parse(localStorage.getItem(CHECKIN_KEY)) || []; } catch { return []; } };
-
 function buildInsight(latest, history) {
   const parts = [];
   parts.push(latest.mood >= 70 ? "Your latest check-in reads bright and motivated."
@@ -279,8 +276,15 @@ function buildInsight(latest, history) {
   return parts.join(" ");
 }
 
-function applyCheckins() {
-  const history = readCheckins();
+async function applyCheckins() {
+  const rows = await WellnessAuth.loadCheckins();
+  const history = rows.map(row => ({
+    ...row.results,
+    genre: row.genre,
+    story: row.story,
+    answers: row.answers,
+    at: row.submitted_at
+  }));
   if (!history.length) return;
   const latest = history[history.length - 1];
 
@@ -319,16 +323,28 @@ function applyCheckins() {
   $("#insightText").textContent = dashboardData.insight;
 }
 
-applyCheckins();
+async function initializeDashboard() {
+  const user = await WellnessAuth.getUser();
+  if (!user) { location.replace("login.html"); return; }
+  dashboardData.user.name = user.email.split("@")[0];
+  try { await applyCheckins(); }
+  catch (error) { console.error("Could not load saved check-ins", error); }
 
-/* reveal stagger */
-document.querySelectorAll(".reveal").forEach((el, i) => { el.style.animationDelay = `${i * 90}ms`; });
+  $("#userName").textContent = dashboardData.user.name;
+  document.querySelectorAll(".reveal").forEach((el, i) => { el.style.animationDelay = `${i * 90}ms`; });
+  drawChart();
+  drawMix();
+  drawReports();
+  drawPaths();
+  initModal();
+  startCountdown();
+  boot();
+}
 
-drawChart();
-drawMix();
-drawReports();
-drawPaths();
-initModal();
-startCountdown();
-boot();
+$("#signOutButton").addEventListener("click", async () => {
+  await WellnessAuth.signOut();
+  location.replace("login.html");
+});
+
+initializeDashboard();
 
