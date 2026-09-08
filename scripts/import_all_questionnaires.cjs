@@ -4,6 +4,7 @@ const XLSX = require('xlsx');
 
 const QUESTIONNAIRE_DIR = path.join(__dirname, '..', 'public', 'dashboard', 'data', 'questionnaire');
 const OUTPUT_JSON_PATH = path.join(__dirname, '..', 'public', 'dashboard', 'data', 'stories.json');
+const STORIES_OUTPUT_DIR = path.join(__dirname, '..', 'public', 'dashboard', 'data', 'stories');
 
 // Genre metadata mapping (icons and display names)
 const GENRE_META = {
@@ -134,16 +135,47 @@ function processAllQuestionnaires() {
     }
   });
 
-  const outputData = { genres: genresList };
-  fs.writeFileSync(OUTPUT_JSON_PATH, JSON.stringify(outputData), 'utf8');
+  // Keep the initial download small and load only the selected story's questions.
+  // A single 78 MB JSON payload was unreliable on slower browsers and connections.
+  fs.rmSync(STORIES_OUTPUT_DIR, { recursive: true, force: true });
+  fs.mkdirSync(STORIES_OUTPUT_DIR, { recursive: true });
 
-  // Also write modular genre files under public/dashboard/data/genres/
+  const indexData = {
+    genres: genresList.map(genre => {
+      const genreDir = path.join(STORIES_OUTPUT_DIR, genre.id);
+      fs.mkdirSync(genreDir, { recursive: true });
+
+      return {
+        id: genre.id,
+        name: genre.name,
+        icon: genre.icon,
+        stories: genre.stories.map(story => {
+          const fileName = `${story.id}.json`;
+          fs.writeFileSync(
+            path.join(genreDir, fileName),
+            JSON.stringify({ ...story, genreId: genre.id, genreName: genre.name }),
+            'utf8'
+          );
+          return {
+            id: story.id,
+            title: story.title,
+            questionCount: story.questions.length,
+            dataUrl: `data/stories/${genre.id}/${fileName}`
+          };
+        })
+      };
+    })
+  };
+
+  fs.writeFileSync(OUTPUT_JSON_PATH, JSON.stringify(indexData), 'utf8');
+
+  // Write modular genre files under public/dashboard/data/genres/
   const GENRES_DIR = path.join(__dirname, '..', 'public', 'dashboard', 'data', 'genres');
   if (!fs.existsSync(GENRES_DIR)) {
     fs.mkdirSync(GENRES_DIR, { recursive: true });
   }
 
-  // Write lightweight index file (genres.json) containing genre list & story metadata without heavy question arrays
+  // Write lightweight index file (genres.json) containing genre list & story metadata
   const genresIndex = {
     genres: genresList.map(g => ({
       id: g.id,
@@ -152,7 +184,8 @@ function processAllQuestionnaires() {
       stories: g.stories.map(s => ({
         id: s.id,
         title: s.title,
-        questionCount: s.questions.length
+        questionCount: s.questions.length,
+        dataUrl: `data/stories/${g.id}/${s.id}.json`
       }))
     }))
   };
@@ -169,7 +202,9 @@ function processAllQuestionnaires() {
     console.log(`  └ Saved genre [${g.id}]: ${genreFilePath} (${sizeMb} MB)`);
   });
 
-  console.log(`\n🎉 RAW XLSX QUESTIONNAIRE modular IMPORT COMPLETE!`);
+  console.log(`\n🎉 RAW XLSX QUESTIONNAIRE IMPORT COMPLETE!`);
+  console.log(`Saved index to: ${OUTPUT_JSON_PATH} and ${INDEX_PATH}`);
+  console.log(`Saved story question files to: ${STORIES_OUTPUT_DIR}`);
   console.log(`Summary:`);
   let totalStories = 0;
   let totalQuestions = 0;

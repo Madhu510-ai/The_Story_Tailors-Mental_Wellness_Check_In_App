@@ -277,9 +277,32 @@ async function showPickStories(g) {
   }).join("");
 }
 
+async function loadStoryQuestions(story) {
+  if (story && Array.isArray(story.questions) && story.questions.length > 0) return story;
+  if (story && story.dataUrl) {
+    try {
+      const response = await fetch(story.dataUrl, { cache: "no-store" });
+      if (response.ok) {
+        const loaded = await response.json();
+        if (Array.isArray(loaded.questions) && loaded.questions.length > 0) {
+          Object.assign(story, loaded);
+          return story;
+        }
+      }
+    } catch (e) {}
+  }
+  return story;
+}
+
 async function startStory(s, forceSetNum = null) {
   let targetStory = s;
   let targetGenre = currentGenre;
+
+  if (s && s.dataUrl) {
+    try {
+      targetStory = await loadStoryQuestions(s);
+    } catch (e) {}
+  }
 
   if (!targetStory || !targetStory.questions || targetStory.questions.length === 0) {
     let genreId = currentGenre ? currentGenre.id : null;
@@ -555,8 +578,14 @@ fetch("data/genres.json")
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
     return r.json();
   })
-  .catch(() => fetch("data/stories.json").then(r => r.json()))
+  .catch(() => fetch("data/stories.json", { cache: "no-store" }).then(r => {
+    if (!r.ok) throw new Error(`Questionnaire index request failed (${r.status}).`);
+    return r.json();
+  }))
   .then(d => {
+    if (!Array.isArray(d.genres) || d.genres.length === 0) {
+      throw new Error("Questionnaire index is empty.");
+    }
     DATA = d;
     initUserSessionUI();
     showPickGenres();
