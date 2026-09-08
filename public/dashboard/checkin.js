@@ -257,6 +257,9 @@ function showPickStories(g) {
 
 function startStory(s, forceSetNum = null) {
   currentStory = s;
+  if (!currentGenre && DATA && Array.isArray(DATA.genres)) {
+    currentGenre = DATA.genres.find(g => g.stories && g.stories.some(st => st.id === s.id)) || DATA.genres[0];
+  }
   const uid = getCurrentUserId();
   const prog = loadUserProgress(uid);
   const completedSets = prog[s.id] || 0;
@@ -266,15 +269,26 @@ function startStory(s, forceSetNum = null) {
   answers = new Array(questions.length).fill(null);
   index = 0;
 
-  $("#pickCard").hidden = true;
-  $("#doneCard").hidden = true;
-  $("#quizCard").hidden = false;
+  const pickCard = $("#pickCard");
+  if (pickCard) pickCard.hidden = true;
+
+  const doneCard = $("#doneCard");
+  if (doneCard) doneCard.hidden = true;
+
+  const quizCard = $("#quizCard");
+  if (quizCard) quizCard.hidden = false;
 
   const startQ = (currentSetNumber - 1) * 6 + 1;
   const endQ = currentSetNumber * 6;
-  $("#setBadge").textContent = `Set ${currentSetNumber}`;
-  $("#setRange").textContent = `Questions ${startQ}–${endQ}`;
-  $("#setContinuity").textContent = completedSets > 0 ? `Resuming Session (Completed Set ${completedSets})` : `First Session`;
+
+  const setBadge = $("#setBadge");
+  if (setBadge) setBadge.textContent = `Set ${currentSetNumber}`;
+
+  const setRange = $("#setRange");
+  if (setRange) setRange.textContent = `Questions ${startQ}–${endQ}`;
+
+  const setContinuity = $("#setContinuity");
+  if (setContinuity) setContinuity.textContent = completedSets > 0 ? `Resuming Session (Completed Set ${completedSets})` : `First Session`;
 
   render();
 }
@@ -412,43 +426,68 @@ async function finish() {
   history.push(result);
   localStorage.setItem(getCheckinsKey(uid), JSON.stringify(history.slice(-50)));
 
-  $("#quizCard").hidden = true;
+  const quizCard = $("#quizCard");
+  if (quizCard) quizCard.hidden = true;
+
   const done = $("#doneCard");
-  done.hidden = false;
-  $("#qProgressFill").style.width = "100%";
+  if (done) done.hidden = false;
 
-  $("#doneSetHeader").textContent = `Set ${currentSetNumber} Complete! (${result.questionRange})`;
-  $("#resMoodLabel").textContent = `${result.genre} · ${result.story} — detected mood: ${result.dominant}`;
-  $("#resMood").textContent = result.mood + "%";
-  $("#resStress").textContent = result.stress + "%";
-  $("#resSleep").textContent = result.sleep + " min";
+  const progressFill = $("#qProgressFill");
+  if (progressFill) progressFill.style.width = "100%";
 
-  $("#resMix").innerHTML = MOOD_KEYS.map((k, i) =>
-    `<i style="--c:${MOOD_META[i].color};width:${result.mix[k]}%" title="${MOOD_META[i].label}: ${result.mix[k]}%"></i>`).join("");
+  const doneSetHeader = $("#doneSetHeader");
+  if (doneSetHeader) doneSetHeader.textContent = `Set ${currentSetNumber} Complete! (${result.questionRange})`;
+
+  const resMoodLabel = $("#resMoodLabel");
+  if (resMoodLabel) resMoodLabel.textContent = `${result.genre} · ${result.story} — detected mood: ${result.dominant}`;
+
+  const resMood = $("#resMood");
+  if (resMood) resMood.textContent = result.mood + "%";
+
+  const resStress = $("#resStress");
+  if (resStress) resStress.textContent = result.stress + "%";
+
+  const resSleep = $("#resSleep");
+  if (resSleep) resSleep.textContent = result.sleep + " min";
+
+  const resMix = $("#resMix");
+  if (resMix) {
+    resMix.innerHTML = MOOD_KEYS.map((k, i) =>
+      `<i style="--c:${MOOD_META[i].color};width:${result.mix[k]}%" title="${MOOD_META[i].label}: ${result.mix[k]}%"></i>`).join("");
+  }
   
-  $("#resLegend").innerHTML = MOOD_KEYS.map((k, i) =>
-    `<li><span class="dot glow" style="--c:${MOOD_META[i].color};background:${MOOD_META[i].color}"></span>${MOOD_META[i].label} <strong>${result.mix[k]}%</strong></li>`).join("");
+  const resLegend = $("#resLegend");
+  if (resLegend) {
+    resLegend.innerHTML = MOOD_KEYS.map((k, i) =>
+      `<li><span class="dot glow" style="--c:${MOOD_META[i].color};background:${MOOD_META[i].color}"></span>${MOOD_META[i].label} <strong>${result.mix[k]}%</strong></li>`).join("");
+  }
 
   const nextSetNum = currentSetNumber + 1;
   const nextStartQ = (nextSetNum - 1) * 6 + 1;
   const nextEndQ = nextSetNum * 6;
 
-  $("#nextSetPrompt").innerHTML = `
-    <div class="next-set-card">
-      <span class="spark">📖</span>
-      <div>
-        <strong>Ready for Set ${nextSetNum}?</strong>
-        <p class="muted small">Continue the storyline of <em>${currentStory.title}</em> (Questions ${nextStartQ}–${nextEndQ}).</p>
+  const nextSetPrompt = $("#nextSetPrompt");
+  if (nextSetPrompt) {
+    nextSetPrompt.innerHTML = `
+      <div class="next-set-card">
+        <span class="spark">📖</span>
+        <div>
+          <strong>Ready for Set ${nextSetNum}?</strong>
+          <p class="muted small">Continue the storyline of <em>${currentStory.title}</em> (Questions ${nextStartQ}–${nextEndQ}).</p>
+        </div>
       </div>
-    </div>
-  `;
+    `;
+  }
 
-  $("#continueNextSetBtn").onclick = () => {
-    startStory(currentStory, nextSetNum);
-  };
+  const continueBtn = $("#continueNextSetBtn");
+  if (continueBtn) {
+    continueBtn.onclick = () => {
+      startStory(currentStory, nextSetNum);
+    };
+  }
 
   updateUserSessionHeader();
-  done.focus();
+  if (done) done.focus();
 
   if (typeof WellnessAuth !== "undefined") {
     try {
