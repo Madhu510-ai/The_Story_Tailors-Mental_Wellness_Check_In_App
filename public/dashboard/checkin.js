@@ -220,17 +220,39 @@ function showPickGenres() {
   }).join("");
 }
 
-function showPickStories(g) {
-  currentGenre = g;
+/* ---------- Modular Genre Data Loader ---------- */
+const loadedGenreData = {};
+
+async function fetchGenreData(genreId) {
+  if (loadedGenreData[genreId]) return loadedGenreData[genreId];
+  try {
+    const res = await fetch(`data/genres/${genreId}.json`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const genreData = await res.json();
+    loadedGenreData[genreId] = genreData;
+    return genreData;
+  } catch (err) {
+    console.warn(`Could not load modular genre file for ${genreId}:`, err);
+    return null;
+  }
+}
+
+async function showPickStories(g) {
+  let fullGenre = g;
+  if (!g.stories || !g.stories[0] || !g.stories[0].questions) {
+    const fetched = await fetchGenreData(g.id);
+    if (fetched) fullGenre = fetched;
+  }
+  currentGenre = fullGenre;
   const uid = getCurrentUserId();
   const prog = loadUserProgress(uid);
 
   $("#pickStep").textContent = "Step 2 of 2";
-  $("#pickTitle").textContent = `${g.name} — pick your story`;
+  $("#pickTitle").textContent = `${fullGenre.name} — pick your story`;
   $("#pickHint").textContent = "Select a story to continue from where you left off or start Set 1.";
   $("#pickBack").hidden = false;
 
-  $("#pickGrid").innerHTML = g.stories.map(s => {
+  $("#pickGrid").innerHTML = fullGenre.stories.map(s => {
     const completedSets = prog[s.id] || 0;
     const nextSet = completedSets + 1;
     const startQ = (nextSet - 1) * 6 + 1;
@@ -241,7 +263,7 @@ function showPickStories(g) {
     <li>
       <button type="button" class="pick story-pick-card" data-story="${s.id}">
         <div class="pick-top-flex">
-          <span class="pick-ico" aria-hidden="true">${g.icon}</span>
+          <span class="pick-ico" aria-hidden="true">${fullGenre.icon}</span>
           <span class="badge-tag ${isResuming ? 'badge-resume' : 'badge-new'}">
             ${isResuming ? `Resume Set ${nextSet} (Q${startQ}–${endQ})` : `Set 1 (Q1–6)`}
           </span>
@@ -255,17 +277,38 @@ function showPickStories(g) {
   }).join("");
 }
 
-function startStory(s, forceSetNum = null) {
-  currentStory = s;
-  if (!currentGenre && DATA && Array.isArray(DATA.genres)) {
-    currentGenre = DATA.genres.find(g => g.stories && g.stories.some(st => st.id === s.id)) || DATA.genres[0];
+async function startStory(s, forceSetNum = null) {
+  let targetStory = s;
+  let targetGenre = currentGenre;
+
+  if (!targetStory || !targetStory.questions || targetStory.questions.length === 0) {
+    let genreId = currentGenre ? currentGenre.id : null;
+    if (!genreId && DATA && Array.isArray(DATA.genres)) {
+      const gMatch = DATA.genres.find(g => g.stories && g.stories.some(st => st.id === (s ? s.id : "")));
+      if (gMatch) genreId = gMatch.id;
+    }
+    if (genreId) {
+      const fullGenre = await fetchGenreData(genreId);
+      if (fullGenre) {
+        targetGenre = fullGenre;
+        currentGenre = fullGenre;
+        const foundStory = fullGenre.stories.find(st => st.id === (s ? s.id : ""));
+        if (foundStory) targetStory = foundStory;
+      }
+    }
   }
+
+  currentStory = targetStory;
+  if (!currentGenre && DATA && Array.isArray(DATA.genres)) {
+    currentGenre = DATA.genres.find(g => g.stories && g.stories.some(st => st.id === targetStory.id)) || DATA.genres[0];
+  }
+
   const uid = getCurrentUserId();
   const prog = loadUserProgress(uid);
-  const completedSets = prog[s.id] || 0;
+  const completedSets = prog[targetStory.id] || 0;
   
   currentSetNumber = forceSetNum !== null ? forceSetNum : completedSets + 1;
-  questions = buildQuestionSet(currentGenre, s, currentSetNumber);
+  questions = buildQuestionSet(currentGenre, targetStory, currentSetNumber);
   answers = new Array(questions.length).fill(null);
   index = 0;
 
@@ -293,11 +336,16 @@ function startStory(s, forceSetNum = null) {
   render();
 }
 
-$("#pickGrid").addEventListener("click", e => {
+$("#pickGrid").addEventListener("click", async e => {
   const btn = e.target.closest("button[data-genre],button[data-story]");
   if (!btn) return;
-  if (btn.dataset.genre) showPickStories(DATA.genres.find(g => g.id === btn.dataset.genre));
-  else startStory(currentGenre.stories.find(s => s.id === btn.dataset.story));
+  if (btn.dataset.genre) {
+    const selectedGenreMeta = DATA.genres.find(g => g.id === btn.dataset.genre);
+    if (selectedGenreMeta) await showPickStories(selectedGenreMeta);
+  } else if (btn.dataset.story) {
+    const selectedStory = currentGenre ? currentGenre.stories.find(s => s.id === btn.dataset.story) : null;
+    await startStory(selectedStory || { id: btn.dataset.story });
+  }
 });
 $("#pickBack").addEventListener("click", showPickGenres);
 
@@ -502,14 +550,19 @@ async function finish() {
 }
 
 /* ---------- Boot ---------- */
-fetch("data/stories.json")
-  .then(r => r.json())
+fetch("data/genres.json")
+  .then(r => {
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return r.json();
+  })
+  .catch(() => fetch("data/stories.json").then(r => r.json()))
   .then(d => {
     DATA = d;
     initUserSessionUI();
     showPickGenres();
   })
-  .catch(() => {
+  .catch((err) => {
+    console.error("Failed to load questionnaire data:", err);
     const title = $("#pickTitle");
     if (title) title.textContent = "Stories couldn't be loaded";
     const hint = $("#pickHint");

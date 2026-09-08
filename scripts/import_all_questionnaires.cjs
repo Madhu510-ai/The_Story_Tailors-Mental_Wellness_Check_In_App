@@ -137,8 +137,39 @@ function processAllQuestionnaires() {
   const outputData = { genres: genresList };
   fs.writeFileSync(OUTPUT_JSON_PATH, JSON.stringify(outputData), 'utf8');
 
-  console.log(`\n🎉 RAW XLSX QUESTIONNAIRE IMPORT COMPLETE!`);
-  console.log(`Saved output to: ${OUTPUT_JSON_PATH}`);
+  // Also write modular genre files under public/dashboard/data/genres/
+  const GENRES_DIR = path.join(__dirname, '..', 'public', 'dashboard', 'data', 'genres');
+  if (!fs.existsSync(GENRES_DIR)) {
+    fs.mkdirSync(GENRES_DIR, { recursive: true });
+  }
+
+  // Write lightweight index file (genres.json) containing genre list & story metadata without heavy question arrays
+  const genresIndex = {
+    genres: genresList.map(g => ({
+      id: g.id,
+      name: g.name,
+      icon: g.icon,
+      stories: g.stories.map(s => ({
+        id: s.id,
+        title: s.title,
+        questionCount: s.questions.length
+      }))
+    }))
+  };
+
+  const INDEX_PATH = path.join(__dirname, '..', 'public', 'dashboard', 'data', 'genres.json');
+  fs.writeFileSync(INDEX_PATH, JSON.stringify(genresIndex), 'utf8');
+  console.log(`Saved lightweight index to: ${INDEX_PATH}`);
+
+  // Write individual genre JSON files
+  genresList.forEach(g => {
+    const genreFilePath = path.join(GENRES_DIR, `${g.id}.json`);
+    fs.writeFileSync(genreFilePath, JSON.stringify(g), 'utf8');
+    const sizeMb = (fs.statSync(genreFilePath).size / (1024 * 1024)).toFixed(2);
+    console.log(`  └ Saved genre [${g.id}]: ${genreFilePath} (${sizeMb} MB)`);
+  });
+
+  console.log(`\n🎉 RAW XLSX QUESTIONNAIRE modular IMPORT COMPLETE!`);
   console.log(`Summary:`);
   let totalStories = 0;
   let totalQuestions = 0;
@@ -148,7 +179,7 @@ function processAllQuestionnaires() {
     totalQuestions += qCount;
     console.log(`  • ${g.icon} ${g.name}: ${g.stories.length} stories, ${qCount} questions`);
   });
-  console.log(`\nTOTALS: ${genresList.length} Genres | ${totalStories} Stories | ${totalQuestions} Questions with EXACT Raw XLSX Options`);
+  console.log(`\nTOTALS: ${genresList.length} Genres | ${totalStories} Stories | ${totalQuestions} Questions`);
 }
 
 processAllQuestionnaires();
