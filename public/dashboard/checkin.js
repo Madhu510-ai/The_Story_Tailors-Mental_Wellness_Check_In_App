@@ -255,8 +255,34 @@ function showPickStories(g) {
   }).join("");
 }
 
-function startStory(s, forceSetNum = null) {
-  currentStory = s;
+async function loadStoryQuestions(story) {
+  if (Array.isArray(story.questions) && story.questions.length > 0) return story;
+  if (!story.dataUrl) throw new Error("This story has no questionnaire file.");
+
+  const response = await fetch(story.dataUrl, { cache: "no-store" });
+  if (!response.ok) throw new Error(`Story request failed (${response.status}).`);
+  const loaded = await response.json();
+  if (!Array.isArray(loaded.questions) || loaded.questions.length === 0) {
+    throw new Error("This story does not contain any questions.");
+  }
+  Object.assign(story, loaded);
+  return story;
+}
+
+async function startStory(s, forceSetNum = null) {
+  const pickTitle = $("#pickTitle");
+  const pickHint = $("#pickHint");
+  if (pickTitle) pickTitle.textContent = `Loading ${s.title}…`;
+  if (pickHint) pickHint.textContent = "Preparing your six story questions.";
+
+  try {
+    currentStory = await loadStoryQuestions(s);
+  } catch (error) {
+    if (pickTitle) pickTitle.textContent = "This story couldn't be loaded";
+    if (pickHint) pickHint.textContent = "Please choose the story again to retry.";
+    console.error("Unable to load story questionnaire", error);
+    return;
+  }
   if (!currentGenre && DATA && Array.isArray(DATA.genres)) {
     currentGenre = DATA.genres.find(g => g.stories && g.stories.some(st => st.id === s.id)) || DATA.genres[0];
   }
@@ -502,9 +528,15 @@ async function finish() {
 }
 
 /* ---------- Boot ---------- */
-fetch("data/stories.json")
-  .then(r => r.json())
+fetch("data/stories.json", { cache: "no-store" })
+  .then(r => {
+    if (!r.ok) throw new Error(`Questionnaire index request failed (${r.status}).`);
+    return r.json();
+  })
   .then(d => {
+    if (!Array.isArray(d.genres) || d.genres.length === 0) {
+      throw new Error("Questionnaire index is empty.");
+    }
     DATA = d;
     initUserSessionUI();
     showPickGenres();
