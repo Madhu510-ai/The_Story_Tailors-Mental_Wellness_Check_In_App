@@ -62,6 +62,15 @@ function createNewUserSession(name) {
   return newUser;
 }
 
+// Keep the visible session selector aligned with the signed-in Supabase account.
+function syncAuthenticatedUser(user) {
+  const name = user.user_metadata?.username || user.email || "User";
+  const authenticatedUser = { id: user.id, name };
+  localStorage.setItem(USERS_KEY, JSON.stringify([authenticatedUser]));
+  setCurrentUserId(user.id);
+  return authenticatedUser;
+}
+
 function loadUserCheckins(userId) {
   const key = `mindful.checkins.${userId}`;
   try {
@@ -111,6 +120,40 @@ function loadUserCheckins(userId) {
   return mockHistory;
 }
 
+//  Convert Supabase rows into the dashboard's existing chart shape.
+function normalizeRemoteCheckin(row) {
+  const result = row.results || {};
+  return {
+    ...result,
+    sessionId: row.id || result.sessionId,
+    userId: row.user_id,
+    genre: row.genre || result.genre,
+    story: row.story || result.story,
+    at: row.submitted_at || result.at
+  };
+}
+
+//  Derive story progress from the same persisted check-ins used by the charts.
+function progressFromRemoteCheckins(checkins) {
+  return checkins.reduce((progress, checkin) => {
+    if (checkin.storyId) {
+      progress[checkin.storyId] = Math.max(progress[checkin.storyId] || 0, checkin.setNumber || 0);
+    }
+    return progress;
+  }, {});
+}
+
+// Use authenticated Supabase history as the source of truth.
+async function loadAuthenticatedCheckins() {
+  const user = await WellnessAuth.getUser();
+  if (!user) {
+    location.replace("login.html");
+    return { user: null, checkins: [] };
+  }
+  const rows = await WellnessAuth.loadCheckins();
+  return { user, checkins: rows.map(normalizeRemoteCheckin) };
+}
+
 function loadUserProgress(userId) {
   try {
     return JSON.parse(localStorage.getItem(`mindful.storyProgress.${userId}`)) || { "001_sherlock_holmes": 2 };
@@ -135,7 +178,34 @@ function animateNumber(el) {
   requestAnimationFrame(step);
 }
 
-function updateRingsAndBars(latest) {
+function updateRingsAndBars(latest, previous) {
+  const moodValue = $("#moodValue");
+  const stressValue = $("#stressValue");
+  const sleepValue = $("#sleepValue");
+  if (moodValue) moodValue.dataset.count = latest.mood;
+  if (stressValue) stressValue.dataset.count = latest.stress;
+  if (sleepValue) sleepValue.dataset.count = latest.sleep;
+
+  const moodDelta = $("#moodDelta");
+  if (moodDelta) {
+    const change = previous ? latest.mood - previous.mood : 0;
+    moodDelta.textContent = previous
+      ? `${change >= 0 ? "▲" : "▼"} ${Math.abs(change)}% from last session`
+      : "First recorded session";
+    moodDelta.classList.toggle("up", change >= 0);
+    moodDelta.classList.toggle("down", change < 0);
+  }
+
+  const stressDelta = $("#stressDelta");
+  if (stressDelta) {
+    const change = previous ? previous.stress - latest.stress : 0;
+    stressDelta.textContent = previous
+      ? `${change >= 0 ? "▼" : "▲"} ${Math.abs(change)}% ${change >= 0 ? "calmer" : "more stressed"}`
+      : "First recorded session";
+    stressDelta.classList.toggle("down", change >= 0);
+    stressDelta.classList.toggle("up", change < 0);
+  }
+
   document.querySelectorAll("[data-count]").forEach(animateNumber);
   const C = 2 * Math.PI * 34;
   const sleepPct = Math.min((latest.sleep / 60) * 100, 100);
@@ -164,6 +234,7 @@ function updateRingsAndBars(latest) {
   const stressLv = levelForInverse(latest.stress);
   const stressFill = $(".fill.coral");
   if (stressFill) {
+    stressFill.dataset.width = latest.stress;
     stressFill.style.background = `linear-gradient(90deg, ${stressLv.color}, ${stressLv.color}aa)`;
     stressFill.style.boxShadow = `0 0 14px ${stressLv.color}80`;
     const stressTag = stressFill.closest(".stat-body").querySelector(".tag");
@@ -682,23 +753,39 @@ function initDashboardUserSessionUI() {
   }
 }
 
-function loadDashboard() {
+async function loadDashboard() {
+  let remote;
+  try {
+    remote = await loadAuthenticatedCheckins();
+  } catch (error) {
+    console.error("Failed to load check-ins from Supabase:", error);
+    remote = { user: null, checkins: [] };
+  }
+  if (!remote.user) return;
+
+  activeUser = syncAuthenticatedUser(remote.user);
   initDashboardUserSessionUI();
   const uid = getCurrentUserId();
-  const users = getUsers();
-  activeUser = users.find(u => u.id === uid) || users[0];
 
   const userNameEl = $("#userName");
-  if (userNameEl) userNameEl.textContent = activeUser.name;
+  if (userNameEl) userNameEl.textContent = remote.user.user_metadata?.username || remote.user.email || activeUser.name;
 
-  activeCheckins = loadUserCheckins(uid);
-  const prog = loadUserProgress(uid);
+  // Never replace an authenticated user's empty account with demo data.
+  activeCheckins = remote.checkins;
+  if (activeCheckins.length === 0) {
+    const emptyState = $("#insightText");
+    if (emptyState) emptyState.textContent = "Complete your first story check-in to start your personal wellness history.";
+    drawPaths();
+    initSessionVisualizer([]);
+    return;
+  }
+  const prog = progressFromRemoteCheckins(activeCheckins);
 
   const latest = activeCheckins[activeCheckins.length - 1];
   if (!latest) return;
 
   // Sync rings & metrics
-  updateRingsAndBars(latest);
+  updateRingsAndBars(latest, activeCheckins[activeCheckins.length - 2]);
   const streakEl = $("#streak");
   if (streakEl) streakEl.textContent = activeCheckins.length;
 
@@ -743,4 +830,13 @@ if (menuBtn && nav) {
 }
 
 initModal();
+//  Keep dashboard data loading asynchronous and tied to the auth session.
 loadDashboard();
+
+const signOutButton = $("#signOutButton");
+if (signOutButton) {
+  signOutButton.onclick = async () => {
+    await WellnessAuth.signOut();
+    location.replace("login.html");
+  };
+}

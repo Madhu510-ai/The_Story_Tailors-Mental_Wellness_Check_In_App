@@ -30,10 +30,10 @@ window.WellnessAuth = (() => {
     return data.user;
   }
 
-  async function signUp(email, password) {
+  async function signUp(email, password, username) {
     const data = await request("/auth/v1/signup", {
       method: "POST", headers: headers(null, { "Content-Type": "application/json" }),
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ email, password, data: { username } })
     });
     if (data.access_token) saveSession(data);
     return data;

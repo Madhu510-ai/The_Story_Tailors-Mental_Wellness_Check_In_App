@@ -57,6 +57,15 @@ function createNewUserSession(name) {
   return newUser;
 }
 
+//: Use the authenticated account as the active check-in session.
+function syncAuthenticatedUser(user) {
+  const name = user.user_metadata?.username || user.email || "User";
+  const authenticatedUser = { id: user.id, name };
+  localStorage.setItem(USERS_KEY, JSON.stringify([authenticatedUser]));
+  setCurrentUserId(user.id);
+  return authenticatedUser;
+}
+
 /* ---------- Story Progress Management ---------- */
 function getProgressKey(userId) {
   return `mindful.storyProgress.${userId}`;
@@ -488,6 +497,12 @@ function databaseRecord(result) {
 async function finish() {
   const result = scoreAnswers();
   const uid = getCurrentUserId();
+
+  // Check-ins require the same authenticated account used by the dashboard.
+  if (typeof WellnessAuth === "undefined" || !(await WellnessAuth.getUser())) {
+    location.replace("login.html");
+    return;
+  }
   
   // Save progress for story set
   saveUserProgress(uid, currentStory.id, currentSetNumber);
@@ -565,6 +580,7 @@ async function finish() {
       await WellnessAuth.saveCheckin(databaseRecord(result));
       const saveStatus = $("#saveStatus");
       if (saveStatus) saveStatus.textContent = "Saved securely to your account. Your dashboard is ready.";
+      location.replace("index.html");
     } catch (error) {
       const saveStatus = $("#saveStatus");
       if (saveStatus) saveStatus.textContent = `Could not save this check-in: ${error.message}`;
@@ -582,11 +598,17 @@ fetch("data/genres.json")
     if (!r.ok) throw new Error(`Questionnaire index request failed (${r.status}).`);
     return r.json();
   }))
-  .then(d => {
+  .then(async d => {
     if (!Array.isArray(d.genres) || d.genres.length === 0) {
       throw new Error("Questionnaire index is empty.");
     }
     DATA = d;
+    const user = await WellnessAuth.getUser();
+    if (!user) {
+      location.replace("login.html");
+      return;
+    }
+    syncAuthenticatedUser(user);
     initUserSessionUI();
     showPickGenres();
   })

@@ -43,7 +43,7 @@
 
   <section class="stats" aria-label="Key metrics">
     <article class="card stat reveal">
-      <div class="ring" data-ring="moodScore"><svg viewBox="0 0 80 80" aria-hidden="true"><circle class="ring-bg" cx="40" cy="40" r="34"/><circle class="ring-fg teal" cx="40" cy="40" r="34"/></svg><span class="ring-val" data-count="65" data-suffix="%">0%</span></div>
+      <div class="ring" data-ring="moodScore"><svg viewBox="0 0 80 80" aria-hidden="true"><circle class="ring-bg" cx="40" cy="40" r="34"/><circle class="ring-fg teal" cx="40" cy="40" r="34"/></svg><span class="ring-val" id="moodValue" data-count="0" data-suffix="%">0%</span></div>
       <div class="stat-body">
         <h2>Mood Score</h2>
         <p class="tag tag-teal" id="moodTag">Stable</p>
@@ -54,15 +54,15 @@
     <article class="card stat reveal">
       <div class="stat-body wide">
         <h2>Stress Level</h2>
-        <p class="big" data-count="70" data-suffix="%">0%</p>
-        <div class="bar"><i class="fill coral" data-width="70"></i></div>
+        <p class="big" id="stressValue" data-count="0" data-suffix="%">0%</p>
+        <div class="bar"><i class="fill coral" data-width="0"></i></div>
         <p class="tag tag-coral" id="stressTag">Moderate</p>
         <p class="delta down" id="stressDelta">▼ 3% calmer</p>
       </div>
     </article>
 
     <article class="card stat reveal">
-      <div class="ring" data-ring="sleep"><svg viewBox="0 0 80 80" aria-hidden="true"><circle class="ring-bg" cx="40" cy="40" r="34"/><circle class="ring-fg gold" cx="40" cy="40" r="34"/></svg><span class="ring-val"><span data-count="42">0</span><small>min</small></span></div>
+      <div class="ring" data-ring="sleep"><svg viewBox="0 0 80 80" aria-hidden="true"><circle class="ring-bg" cx="40" cy="40" r="34"/><circle class="ring-fg gold" cx="40" cy="40" r="34"/></svg><span class="ring-val"><span id="sleepValue" data-count="0">0</span><small>min</small></span></div>
       <div class="stat-body">
         <h2>Sleep Wellness</h2>
         <p class="tag tag-gold" id="sleepTag">Average</p>
@@ -143,7 +143,9 @@
 
     <article class="card next reveal">
       <header class="card-head"><div><h2>Next Story Check-in</h2><p class="muted">Continue your active story</p></div></header>
-      <p class="countdown" id="countdown" aria-live="polite">--h --m --s</p>
+      <div class="coming-soon-art">
+        <img src="assets/Gemini_Generated_Image_pcvi34pcvi34pcvi.png" alt="Coming soon" />
+      </div>
       <p class="muted small">remaining until next scheduled check-in</p>
       <div class="coach">
         <span class="coach-avatar" aria-hidden="true">ST</span>

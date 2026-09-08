@@ -11,6 +11,7 @@
       <p class="eyebrow" id="authEyebrow">Welcome back</p><h2 id="authTitle">Sign in to continue</h2>
       <p class="muted small" id="authDescription">Use your email and password to open your dashboard.</p>
       <form id="authForm" class="auth-form">
+        <label id="usernameField" hidden>Username <input id="username" type="text" autocomplete="username" maxlength="32" /></label>
         <label>Email <input id="email" type="email" autocomplete="email" required /></label>
         <label>Password <input id="password" type="password" autocomplete="current-password" minlength="8" required /></label>
         <p class="form-message" id="formMessage" role="status"></p>
