@@ -12,12 +12,19 @@
 
 <header class="site-header">
   <div class="greet">
-    <img class="avatar" src="assets/brain.png" alt="Mindful" />
+    <img class="avatar" id="headerAvatar" src="assets/brain.png" alt="Mindful Profile" />
     <div>
       <h1 class="hello">Story check-in</h1>
-      <p class="sub">Choose a world, then make six choices — there are no wrong answers.</p>
+      <p class="sub">Choose a world, make 6 choices — resume where you left off!</p>
     </div>
   </div>
+
+  <div class="user-session-bar" aria-label="User session manager">
+    <span class="user-badge-label">Active User Session:</span>
+    <select id="userSelect" class="user-select-dropdown" aria-label="Select user profile"></select>
+    <button type="button" id="newUserBtn" class="btn btn-ghost btn-sm" title="Create a new user profile">+ New User Session</button>
+  </div>
+
   <nav class="nav" aria-label="Main">
     <a href="index.html">Skip to dashboard</a>
   </nav>
@@ -29,8 +36,13 @@
   </div>
 
   <section class="card quiz-card reveal" id="pickCard" aria-live="polite">
-    <p class="eyebrow" id="pickStep">Step 1 of 2</p>
-    <h2 class="q-text" id="pickTitle">Choose a genre</h2>
+    <div class="pick-header-flex">
+      <div>
+        <p class="eyebrow" id="pickStep">Step 1 of 2</p>
+        <h2 class="q-text" id="pickTitle">Choose a genre</h2>
+      </div>
+      <div id="userProgressSummary" class="user-prog-pill"></div>
+    </div>
     <p class="muted small" id="pickHint">Each world tells a different story about how you feel today.</p>
     <ul class="pick-grid" id="pickGrid"></ul>
     <div class="q-actions">
@@ -39,6 +51,11 @@
   </section>
 
   <section class="card quiz-card reveal" id="quizCard" hidden aria-live="polite">
+    <div class="set-banner" id="setBanner">
+      <span class="set-badge" id="setBadge">Set 1</span>
+      <span class="set-range" id="setRange">Questions 1–6</span>
+      <span class="set-continuity" id="setContinuity">First Session</span>
+    </div>
     <p class="eyebrow" id="qStep">Question 1 of 6</p>
     <p class="q-signal" id="qSignal"></p>
     <p class="q-scenario" id="qScenario"></p>
@@ -52,7 +69,7 @@
 
   <section class="card done-card reveal" id="doneCard" hidden tabindex="-1" aria-live="polite">
     <p class="eyebrow">Check-in complete</p>
-    <h2>Here's how today looks</h2>
+    <h2 id="doneSetHeader">Here's how today looks</h2>
     <p class="muted small" id="resMoodLabel"></p>
     <ul class="done-stats">
       <li><span class="muted small">Mood score</span><strong id="resMood">—</strong></li>
@@ -60,14 +77,28 @@
       <li><span class="muted small">Sleep wellness</span><strong id="resSleep">—</strong></li>
     </ul>
     <div class="mix" id="resMix" role="img" aria-label="Detected mood mix"></div>
-    <ul class="legend" id="resLegend"></ul>
-    <p class="muted" id="saveStatus">Saving your check-in securely…</p>
-    <a class="btn btn-primary" href="index.html">Open my dashboard</a>
+    <div id="nextSetPrompt" class="next-set-prompt-card"></div>
+    <p class="muted" id="saveStatus">Your dashboard has been updated with this check-in session.</p>
+    <div class="done-actions">
+      <a class="btn btn-primary" href="index.html">Open my dashboard</a>
+      <button type="button" class="btn btn-ghost" id="continueNextSetBtn">Continue Next Question Set</button>
+    </div>
   </section>
 </main>
 
-<script src="auth-config.js"></script>
-<script src="auth.js"></script>
+<!-- New User Session Modal -->
+<div class="modal" id="newUserModal" role="dialog" aria-modal="true" aria-labelledby="modalUserTitle" hidden>
+  <div class="modal-card">
+    <h3 id="modalUserTitle">Create New User Session</h3>
+    <p class="muted small">Enter a name to start an isolated check-in session and story progression track.</p>
+    <input type="text" id="newUserNameInput" class="text-input" placeholder="e.g. Alex, Jordan, Sam..." maxlength="24" />
+    <div class="modal-actions">
+      <button type="button" class="btn btn-primary" id="saveNewUserBtn">Create Session</button>
+      <button type="button" class="btn btn-ghost" id="cancelNewUserBtn">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <script src="checkin.js"></script>
 </body>
 </html>

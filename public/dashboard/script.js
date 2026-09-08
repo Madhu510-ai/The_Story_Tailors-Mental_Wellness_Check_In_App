@@ -1,31 +1,8 @@
-/* Dashboard data — will later be produced by the emotion questionnaire */
-const dashboardData = {
-  user: { name: "Sara" },
-  moodScore: 65,
-  stressLevel: 70,
-  sleepWellness: 42,
-  streak: 7,
-  moodTrend: [62, 68, 64, 76, 88, 79, 84],
-  moodMix: { veryLow: 5, low: 8, uneasy: 12, neutral: 20, good: 22, happy: 16, veryHappy: 12, euphoric: 5 },
-  insight:
-    "Your mood peaks on Thursdays and improves on days you complete an evening reflection — consider a longer mid-week session.",
-  nextCheckIn: { inMinutes: 6 * 60 + 52 },
-  questionnaireHistory: [
-    { icon: "🌤", title: "Emotional Check-in", date: "Today", status: "Completed", detail: "You reported a calm, steady mood with mild afternoon tension. Mood score 65." },
-    { icon: "🌊", title: "Stress Management", date: "Yesterday", status: "Completed", detail: "Breathing exercise completed. Stress dropped 3% compared with the previous day." },
-    { icon: "🌙", title: "Sleep Tracking", date: "Aug 31", status: "Completed", detail: "Average sleep wellness of 42 minutes of deep rest below your personal baseline." },
-    { icon: "🍂", title: "Mood Reflection", date: "Aug 30", status: "Completed", detail: "Journaling noted gratitude and social energy as the strongest positive drivers." }
-  ],
-  recommendations: [
-    { id: "rec_meditation_calm", icon: "🧘", title: "Meditation", desc: "5 min · Calm your mind", progress: 60, tone: "teal" },
-    { id: "rec_journaling_evening", icon: "✍️", title: "Journaling", desc: "10 min · Evening reflection", progress: 35, tone: "gold" },
-    { id: "rec_reflection_mood", icon: "✨", title: "Reflection", desc: "5 min · Understand today's mood", progress: 80, tone: "ocean" },
-    { id: "rec_breathing_reset", icon: "🌬", title: "Breathing", desc: "3 min · Reset your nervous system", progress: 20, tone: "coral" }
-  ]
-};
+/* Mindful Dashboard Script
+   - Supports user session switching and profile isolation.
+   - Powers the interactive Session-Wise Analysis Visualizer.
+   - Synchronizes mood trends, mood mix, story progression, and session breakdown. */
 
-/* Single source of truth for every mood visualization (charts, mix, stats, legends).
-   Later this can be replaced by values coming from the questionnaire backend. */
 const MOOD_LEVELS = [
   { key: "veryLow",   level: 1, label: "Very Low",   note: "Overwhelmed",        color: "#171923", face: "😞" },
   { key: "low",       level: 2, label: "Low",        note: "Sad / withdrawn",    color: "#49307A", face: "🙁" },
@@ -37,27 +14,116 @@ const MOOD_LEVELS = [
   { key: "euphoric",  level: 8, label: "Euphoric",   note: "Feel like flying",   color: "#FF3F8E", face: "🤩" }
 ];
 
-/* score 0-100 -> mood level (never hardcoded per element) */
 const levelFor = score => MOOD_LEVELS[Math.min(MOOD_LEVELS.length - 1, Math.max(0, Math.floor((score / 100) * MOOD_LEVELS.length)))];
-/* stress is inverse: high stress = low mood level */
 const levelForInverse = score => levelFor(100 - score);
-
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const $ = (s, r = document) => r.querySelector(s);
 
-/* header */
-$("#userName").textContent = dashboardData.user.name;
-$("#streak").textContent = dashboardData.streak;
-$("#insightText").textContent = dashboardData.insight;
+/* ---------- User Session Storage ---------- */
+const USERS_KEY = "mindful.users";
+const CURRENT_USER_KEY = "mindful.currentUser";
+const DEFAULT_USERS = [
+  { id: "user_sara", name: "Sara" },
+  { id: "user_alex", name: "Alex" }
+];
 
-const menuBtn = $("#menuBtn"), nav = $("#nav");
-menuBtn.addEventListener("click", () => {
-  const open = nav.classList.toggle("open");
-  menuBtn.setAttribute("aria-expanded", String(open));
-});
-nav.addEventListener("click", e => { if (e.target.tagName === "A") nav.classList.remove("open"); });
+function getUsers() {
+  try {
+    const data = JSON.parse(localStorage.getItem(USERS_KEY));
+    if (Array.isArray(data) && data.length > 0) return data;
+  } catch (e) {}
+  localStorage.setItem(USERS_KEY, JSON.stringify(DEFAULT_USERS));
+  return DEFAULT_USERS;
+}
 
-/* counters + rings + bars */
+function getCurrentUserId() {
+  let uid = localStorage.getItem(CURRENT_USER_KEY);
+  const users = getUsers();
+  if (!uid || !users.some(u => u.id === uid)) {
+    uid = users[0].id;
+    localStorage.setItem(CURRENT_USER_KEY, uid);
+  }
+  return uid;
+}
+
+function setCurrentUserId(uid) {
+  localStorage.setItem(CURRENT_USER_KEY, uid);
+}
+
+function createNewUserSession(name) {
+  const cleanName = (name || "").trim();
+  if (!cleanName) return null;
+  const users = getUsers();
+  const id = "user_" + Date.now().toString(36) + Math.random().toString(36).substr(2, 4);
+  const newUser = { id, name: cleanName };
+  users.push(newUser);
+  localStorage.setItem(USERS_KEY, JSON.stringify(users));
+  setCurrentUserId(id);
+  return newUser;
+}
+
+function loadUserCheckins(userId) {
+  const key = `mindful.checkins.${userId}`;
+  try {
+    const data = JSON.parse(localStorage.getItem(key));
+    if (Array.isArray(data) && data.length > 0) return data;
+  } catch {}
+
+  // Generate initial default sessions for demonstration if empty
+  const mockHistory = [
+    {
+      sessionId: "sess_demo_1",
+      userId,
+      story: "Sherlock Holmes",
+      genre: "Detective & Mystery",
+      storyId: "001_sherlock_holmes",
+      setNumber: 1,
+      questionRange: "Q1–Q6",
+      mood: 62, energy: 60, stress: 58, sleep: 44,
+      mix: { neutral: 30, uneasy: 20, good: 30, happy: 20 },
+      dominant: "Neutral",
+      at: new Date(Date.now() - 3 * 86400000).toISOString(),
+      answersDetailed: [
+        { globalQ: 1, question: "How do you approach the locked study door?", chosenOption: "Examine the handle for recent marks", mix: { neutral: 5, good: 5 } },
+        { globalQ: 2, question: "A clue emerges under the rug.", chosenOption: "Catalog the dust particles methodically", mix: { uneasy: 4, neutral: 6 } }
+      ]
+    },
+    {
+      sessionId: "sess_demo_2",
+      userId,
+      story: "Sherlock Holmes",
+      genre: "Detective & Mystery",
+      storyId: "001_sherlock_holmes",
+      setNumber: 2,
+      questionRange: "Q7–Q12",
+      mood: 74, energy: 70, stress: 42, sleep: 48,
+      mix: { neutral: 20, good: 40, happy: 30, euphoric: 10 },
+      dominant: "Good",
+      at: new Date(Date.now() - 86400000).toISOString(),
+      answersDetailed: [
+        { globalQ: 7, question: "The suspect flees into the fog.", chosenOption: "Signal Watson and cut through the alley", mix: { happy: 6, good: 4 } },
+        { globalQ: 8, question: "Deciphering the coded message.", chosenOption: "Apply chemical solution to reveal hidden text", mix: { good: 5, euphoric: 5 } }
+      ]
+    }
+  ];
+
+  localStorage.setItem(key, JSON.stringify(mockHistory));
+  return mockHistory;
+}
+
+function loadUserProgress(userId) {
+  try {
+    return JSON.parse(localStorage.getItem(`mindful.storyProgress.${userId}`)) || { "001_sherlock_holmes": 2 };
+  } catch {
+    return { "001_sherlock_holmes": 2 };
+  }
+}
+
+/* ---------- Dashboard State ---------- */
+let activeCheckins = [];
+let activeUser = null;
+let selectedSessionId = null;
+
 function animateNumber(el) {
   const target = +el.dataset.count, suffix = el.dataset.suffix || "";
   const start = performance.now(), dur = 1200;
@@ -69,12 +135,13 @@ function animateNumber(el) {
   requestAnimationFrame(step);
 }
 
-function boot() {
+function updateRingsAndBars(latest) {
   document.querySelectorAll("[data-count]").forEach(animateNumber);
   const C = 2 * Math.PI * 34;
-  const sleepPct = Math.min((dashboardData.sleepWellness / 60) * 100, 100);
-  const ringValues = { moodScore: dashboardData.moodScore, sleep: sleepPct };
-  const ringLevels = { moodScore: levelFor(dashboardData.moodScore), sleep: levelFor(sleepPct) };
+  const sleepPct = Math.min((latest.sleep / 60) * 100, 100);
+  const ringValues = { moodScore: latest.mood, sleep: sleepPct };
+  const ringLevels = { moodScore: levelFor(latest.mood), sleep: levelFor(sleepPct) };
+
   document.querySelectorAll(".ring").forEach(r => {
     const pct = ringValues[r.dataset.ring] || 0;
     const lv = ringLevels[r.dataset.ring];
@@ -94,8 +161,7 @@ function boot() {
     requestAnimationFrame(() => { fg.style.strokeDashoffset = C * (1 - pct / 100); });
   });
 
-  /* stress uses the same palette, inverted (more stress = lower mood level) */
-  const stressLv = levelForInverse(dashboardData.stressLevel);
+  const stressLv = levelForInverse(latest.stress);
   const stressFill = $(".fill.coral");
   if (stressFill) {
     stressFill.style.background = `linear-gradient(90deg, ${stressLv.color}, ${stressLv.color}aa)`;
@@ -113,23 +179,26 @@ function boot() {
   });
 }
 
-/* weekly mood wave — gradient bars coloured by mood level */
-function drawChart() {
-  const d = dashboardData.moodTrend;
-  const peak = d.indexOf(Math.max(...d));
-  $("#chart").innerHTML = d.map((v, i) => {
-    const lv = levelFor(v);
+function drawWeeklyWave(checkins) {
+  const recent = checkins.slice(-7);
+  const scores = recent.map(c => c.mood);
+  const peak = scores.indexOf(Math.max(...scores));
+
+  $("#chart").innerHTML = recent.map((c, i) => {
+    const lv = levelFor(c.mood);
+    const d = new Date(c.at);
+    const dayName = DAYS[d.getDay() === 0 ? 6 : d.getDay() - 1] || "S" + (i + 1);
+
     return `
       <div class="wbar${i === peak ? " peak" : ""}" style="--c:${lv.color}">
-        <span class="wval">${v}%</span>
-        <div class="wtrack"><i class="wfill" data-h="${v}"></i></div>
-        <span class="wday">${DAYS[i]}</span>
+        <span class="wval">${c.mood}%</span>
+        <div class="wtrack"><i class="wfill" data-h="${c.mood}"></i></div>
+        <span class="wday">${dayName}</span>
         <span class="wface" aria-hidden="true">${lv.face}</span>
-        <span class="wlabel">${lv.label}</span>
+        <span class="wlabel">${c.story ? c.story.substring(0, 10) : lv.label}</span>
       </div>`;
   }).join("");
-  $("#chart").setAttribute("aria-label",
-    "Weekly mood: " + d.map((v, i) => `${DAYS[i]} ${v}% ${levelFor(v).label}`).join(", "));
+
   requestAnimationFrame(() => {
     $("#chart").querySelectorAll(".wfill").forEach((f, i) => {
       setTimeout(() => { f.style.height = f.dataset.h + "%"; }, i * 80);
@@ -137,128 +206,406 @@ function drawChart() {
   });
 }
 
-/* mood mix — bright, glowing segments */
-function drawMix() {
-  const mix = dashboardData.moodMix;
+function drawMix(mixObj) {
+  const mix = mixObj || {};
   $("#mix").innerHTML = MOOD_LEVELS
-    .map(m => `<i style="--c:${m.color}" data-w="${mix[m.key] || 0}" title="${m.level} · ${m.label} — ${m.note}: ${mix[m.key] || 0}%"></i>`).join("");
+    .map(m => `<i style="--c:${m.color}" data-w="${mix[m.key] || 0}" title="${m.level} · ${m.label}: ${mix[m.key] || 0}%"></i>`).join("");
+
   requestAnimationFrame(() => {
     $("#mix").querySelectorAll("i").forEach(i => { i.style.width = i.dataset.w + "%"; });
   });
-  $("#mix").setAttribute("aria-label",
-    "Mood mix: " + MOOD_LEVELS.map(m => `${m.level} ${m.label} ${mix[m.key] || 0}%`).join(", "));
+
   $("#mixLegend").innerHTML = MOOD_LEVELS
     .map(m => `<li><span class="dot glow" style="--c:${m.color};background:${m.color}"></span>${m.level} · ${m.label} <strong>${mix[m.key] || 0}%</strong></li>`).join("");
 }
 
-/* reports */
-function drawReports() {
-  $("#reportList").innerHTML = dashboardData.questionnaireHistory.map((r, i) => `
-    <li><button type="button" data-i="${i}" aria-label="${r.title}, ${r.date}, ${r.status}">
-      <span class="ico" aria-hidden="true">${r.icon}</span>
-      <span><span class="rtitle">${r.title}</span><br><span class="meta">${r.date} · ${r.status}</span></span>
-      <span class="status">${r.status}</span>
-      <span class="chev" aria-hidden="true">›</span>
-    </button></li>`).join("");
+/* ---------- SESSION-WISE ANALYSIS LINE GRAPH VISUALIZER ---------- */
+let activeGraphMetrics = { mood: true, stress: true, sleep: false };
 
-  $("#reportList").addEventListener("click", e => {
-    const btn = e.target.closest("button[data-i]");
-    if (!btn) return;
-    const r = dashboardData.questionnaireHistory[+btn.dataset.i];
-    openModal(r.title, `${r.date} · ${r.status}`, r.detail);
-  });
+function initSessionVisualizer(checkins) {
+  const select = $("#sessionSelect");
+  if (!select) return;
+
+  if (!checkins || checkins.length === 0) {
+    select.innerHTML = `<option value="">No sessions recorded yet</option>`;
+    $("#sessionWaveChart").innerHTML = `<p class="muted pad" style="padding:24px;text-align:center;">Complete a story check-in to unlock your session line graph visualizer.</p>`;
+    $("#sessionDetailContainer").innerHTML = "";
+    return;
+  }
+
+  // Populate dropdown (Session #1, Session #2 ... Session #N)
+  select.innerHTML = checkins.slice().reverse().map((s, idx) => {
+    const sessionIndex = checkins.length - idx; // 1-based nth session
+    const d = new Date(s.at);
+    const dateStr = d.toLocaleDateString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+    const label = `Session #${sessionIndex}: ${s.story || "Check-in"} (${s.questionRange || `Set ${s.setNumber || 1}`}) — ${dateStr}`;
+    return `<option value="${s.sessionId || idx}">${label}</option>`;
+  }).join("");
+
+  // Default select latest session if not selected
+  if (!selectedSessionId || !checkins.some(c => c.sessionId === selectedSessionId || c.sessionId == selectedSessionId)) {
+    selectedSessionId = checkins[checkins.length - 1].sessionId || (checkins.length - 1);
+  }
+  select.value = selectedSessionId;
+
+  select.onchange = (e) => {
+    selectedSessionId = e.target.value;
+    renderSelectedSessionAnalysis(checkins);
+    drawSessionLineGraph(checkins);
+  };
+
+  drawSessionLineGraph(checkins);
+  renderSelectedSessionAnalysis(checkins);
 }
 
-/* shared modal */
-const modalEl = () => $("#modal");
-function openModal(title, meta, body, steps) {
-  $("#modalTitle").textContent = title;
-  $("#modalMeta").textContent = meta;
-  $("#modalBody").textContent = body;
-  const list = $("#modalSteps");
-  if (list) {
-    if (steps && steps.length) {
-      list.innerHTML = steps.map(s => `<li>${s}</li>`).join("");
-      list.hidden = false;
-    } else {
-      list.innerHTML = "";
-      list.hidden = true;
+function drawSessionLineGraph(checkins) {
+  const container = $("#sessionWaveChart");
+  if (!container) return;
+
+  const total = checkins.length;
+  if (total === 0) return;
+
+  // Dimensions
+  const svgW = Math.max(650, total * 110);
+  const svgH = 220;
+  const padL = 45;
+  const padR = 35;
+  const padT = 25;
+  const padB = 45;
+  const graphW = svgW - padL - padR;
+  const graphH = svgH - padT - padB;
+
+  // Calculate coordinates for each session node (nth time user answered a question set)
+  const points = checkins.map((s, i) => {
+    const x = total === 1 ? padL + graphW / 2 : padL + (i / (total - 1)) * graphW;
+    const yMood = (padT + graphH) - (s.mood / 100) * graphH;
+    const yStress = (padT + graphH) - (s.stress / 100) * graphH;
+    const sleepPct = Math.min(100, (s.sleep / 60) * 100);
+    const ySleep = (padT + graphH) - (sleepPct / 100) * graphH;
+    const isSelected = (s.sessionId && s.sessionId === selectedSessionId) || (selectedSessionId == i);
+
+    return {
+      index: i + 1, // Session #
+      session: s,
+      x, yMood, yStress, ySleep,
+      isSelected
+    };
+  });
+
+  // Helper to generate SVG path string
+  function buildPath(ptArray, key) {
+    if (ptArray.length === 0) return "";
+    if (ptArray.length === 1) return `M ${ptArray[0].x} ${ptArray[0][key]} L ${ptArray[0].x} ${ptArray[0][key]}`;
+
+    let path = `M ${ptArray[0].x} ${ptArray[0][key]}`;
+    for (let i = 0; i < ptArray.length - 1; i++) {
+      const p0 = ptArray[i];
+      const p1 = ptArray[i + 1];
+      const cx = (p0.x + p1.x) / 2;
+      path += ` C ${cx} ${p0[key]}, ${cx} ${p1[key]}, ${p1.x} ${p1[key]}`;
     }
+    return path;
   }
-  modalEl().hidden = false;
-  $("#modalClose").focus();
-}
-function initModal() {
-  const modal = modalEl();
-  $("#modalClose").addEventListener("click", () => { modal.hidden = true; });
-  modal.addEventListener("click", e => { if (e.target === modal) modal.hidden = true; });
-  document.addEventListener("keydown", e => { if (e.key === "Escape") modal.hidden = true; });
-}
 
-/* recommendations — details come from GET /api/recommendations/{recommendationId} */
-const TOKEN_KEY = "mindful.token";
-function userToken() {
-  let t = localStorage.getItem(TOKEN_KEY);
-  if (!t) { t = "demo-user"; localStorage.setItem(TOKEN_KEY, t); }
-  return t;
-}
+  function buildAreaPath(ptArray, key) {
+    if (ptArray.length < 2) return "";
+    const linePath = buildPath(ptArray, key);
+    const firstX = ptArray[0].x;
+    const lastX = ptArray[ptArray.length - 1].x;
+    const bottomY = padT + graphH;
+    return `${linePath} L ${lastX} ${bottomY} L ${firstX} ${bottomY} Z`;
+  }
 
-async function loadRecommendation(id) {
-  const res = await fetch(`/api/recommendations/${encodeURIComponent(id)}`, {
-    headers: { Authorization: `Bearer ${userToken()}` }
+  const moodPath = buildPath(points, "yMood");
+  const moodArea = buildAreaPath(points, "yMood");
+  const stressPath = buildPath(points, "yStress");
+  const stressArea = buildAreaPath(points, "yStress");
+  const sleepPath = buildPath(points, "ySleep");
+
+  container.innerHTML = `
+    <div class="line-graph-legend-bar">
+      <div class="legend-toggle ${activeGraphMetrics.mood ? 'active' : ''}" data-metric="mood">
+        <span class="dot-line teal"></span> <strong>Mood Score (%)</strong>
+      </div>
+      <div class="legend-toggle ${activeGraphMetrics.stress ? 'active' : ''}" data-metric="stress">
+        <span class="dot-line coral"></span> <strong>Stress Level (%)</strong>
+      </div>
+      <div class="legend-toggle ${activeGraphMetrics.sleep ? 'active' : ''}" data-metric="sleep">
+        <span class="dot-line gold"></span> <strong>Sleep Rest (%)</strong>
+      </div>
+      <span class="sess-count-badge">Total User Sessions: ${total}</span>
+    </div>
+
+    <div class="svg-graph-wrapper">
+      <svg class="session-line-svg" viewBox="0 0 ${svgW} ${svgH}" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <linearGradient id="moodGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#42D39A" stop-opacity="0.35"/>
+            <stop offset="100%" stop-color="#42D39A" stop-opacity="0.0"/>
+          </linearGradient>
+          <linearGradient id="stressGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#FF7A45" stop-opacity="0.25"/>
+            <stop offset="100%" stop-color="#FF7A45" stop-opacity="0.0"/>
+          </linearGradient>
+          <filter id="glowTeal" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#42D39A" flood-opacity="0.6"/>
+          </filter>
+          <filter id="glowCoral" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#FF7A45" flood-opacity="0.6"/>
+          </filter>
+        </defs>
+
+        <!-- Horizontal Grid Lines -->
+        ${[0, 25, 50, 75, 100].map(pct => {
+          const y = (padT + graphH) - (pct / 100) * graphH;
+          return `
+            <line x1="${padL}" y1="${y}" x2="${svgW - padR}" y2="${y}" class="grid-line" />
+            <text x="${padL - 8}" y="${y + 4}" class="grid-label" text-anchor="end">${pct}%</text>
+          `;
+        }).join("")}
+
+        <!-- Vertical Session Grid Lines & X-axis Labels -->
+        ${points.map(pt => `
+          <line x1="${pt.x}" y1="${padT}" x2="${pt.x}" y2="${padT + graphH}" class="grid-line-v ${pt.isSelected ? 'selected-grid-v' : ''}" />
+          <text x="${pt.x}" y="${padT + graphH + 20}" class="x-axis-label ${pt.isSelected ? 'active-x-label' : ''}" text-anchor="middle">Sess #${pt.index}</text>
+        `).join("")}
+
+        <!-- Gradient Area Fills -->
+        ${activeGraphMetrics.mood && moodArea ? `<path d="${moodArea}" fill="url(#moodGradient)" />` : ""}
+        ${activeGraphMetrics.stress && stressArea ? `<path d="${stressArea}" fill="url(#stressGradient)" />` : ""}
+
+        <!-- Lines -->
+        ${activeGraphMetrics.sleep ? `<path d="${sleepPath}" fill="none" stroke="#FFD447" stroke-width="2.5" stroke-dasharray="5 4" opacity="0.85"/>` : ""}
+        ${activeGraphMetrics.stress ? `<path d="${stressPath}" fill="none" stroke="#FF7A45" stroke-width="3" filter="url(#glowCoral)" stroke-linecap="round"/>` : ""}
+        ${activeGraphMetrics.mood ? `<path d="${moodPath}" fill="none" stroke="#42D39A" stroke-width="3.5" filter="url(#glowTeal)" stroke-linecap="round"/>` : ""}
+
+        <!-- Interactive Session Nodes (Points) -->
+        ${points.map(pt => {
+          const s = pt.session;
+          const mLv = levelFor(s.mood);
+          return `
+            <g class="graph-node-group ${pt.isSelected ? 'selected-node' : ''}" data-sess-id="${s.sessionId || (pt.index - 1)}">
+              <!-- Active Glow Circle -->
+              ${pt.isSelected ? `
+                <circle cx="${pt.x}" cy="${pt.yMood}" r="14" fill="#42D39A" opacity="0.25" class="pulse-halo"/>
+                <circle cx="${pt.x}" cy="${pt.yMood}" r="9" fill="none" stroke="#42D39A" stroke-width="2"/>
+              ` : ""}
+
+              <!-- Stress Point -->
+              ${activeGraphMetrics.stress ? `
+                <circle cx="${pt.x}" cy="${pt.yStress}" r="4.5" fill="#FF7A45" stroke="#fff" stroke-width="1.5" class="node-dot-stress"/>
+              ` : ""}
+
+              <!-- Mood Point -->
+              ${activeGraphMetrics.mood ? `
+                <circle cx="${pt.x}" cy="${pt.yMood}" r="${pt.isSelected ? 7 : 5.5}" fill="#42D39A" stroke="#fff" stroke-width="2" class="node-dot-mood"/>
+              ` : ""}
+
+              <!-- Invisible Hover Trigger -->
+              <circle cx="${pt.x}" cy="${(pt.yMood + pt.yStress) / 2}" r="24" fill="transparent" class="node-hover-trigger">
+                <title>Session #${pt.index}: ${s.story || "Check-in"} (${s.questionRange || "Set " + (s.setNumber || 1)})&#10;Mood: ${s.mood}% | Stress: ${s.stress}% | Sleep: ${s.sleep} min</title>
+              </circle>
+            </g>
+          `;
+        }).join("")}
+      </svg>
+    </div>
+
+    <!-- Session Quick Pill Selector Bar -->
+    <div class="session-pills-bar">
+      ${checkins.map((s, i) => {
+        const isSel = (s.sessionId && s.sessionId === selectedSessionId) || (selectedSessionId == i);
+        return `
+          <button type="button" class="sess-pill-btn ${isSel ? 'active' : ''}" data-sess-id="${s.sessionId || i}">
+            <span class="p-num">Sess #${i + 1}</span>
+            <span class="p-title">${s.story || "Check-in"}</span>
+            <span class="p-score">${s.mood}%</span>
+          </button>
+        `;
+      }).join("")}
+    </div>
+  `;
+
+  // Attach event handlers
+  container.querySelectorAll(".graph-node-group, .sess-pill-btn").forEach(el => {
+    el.onclick = (e) => {
+      const sessId = el.dataset.sessId;
+      if (sessId !== undefined) {
+        selectedSessionId = sessId;
+        $("#sessionSelect").value = sessId;
+        renderSelectedSessionAnalysis(checkins);
+        drawSessionLineGraph(checkins);
+      }
+    };
   });
-  if (!res.ok) {
-    const msg = res.status === 401 ? "Please sign in again to view this suggestion."
-      : res.status === 403 ? "This suggestion belongs to another account."
-      : res.status === 404 ? "This suggestion is no longer available."
-      : "Something went wrong loading this suggestion.";
-    throw new Error(msg);
-  }
-  return res.json();
+
+  container.querySelectorAll(".legend-toggle").forEach(el => {
+    el.onclick = () => {
+      const metric = el.dataset.metric;
+      activeGraphMetrics[metric] = !activeGraphMetrics[metric];
+      drawSessionLineGraph(checkins);
+    };
+  });
 }
 
-function drawPaths() {
-  $("#paths").innerHTML = dashboardData.recommendations.map(p => {
-    const lv = levelFor(p.progress);
+function renderSelectedSessionAnalysis(checkins) {
+  const container = $("#sessionDetailContainer");
+  if (!container) return;
+
+  const session = checkins.find(c => (c.sessionId && c.sessionId === selectedSessionId) || c.sessionId == selectedSessionId)
+    || checkins[+selectedSessionId]
+    || checkins[checkins.length - 1];
+
+  if (!session) return;
+
+  const d = new Date(session.at);
+  const formattedDate = d.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
+  const mLv = levelFor(session.mood);
+  const mix = session.mix || {};
+
+  container.innerHTML = `
+    <div class="session-detail-card reveal">
+      <div class="sess-detail-header">
+        <div>
+          <span class="eyebrow">${session.genre || "Story Check-in"}</span>
+          <h2>${session.story || "Story Check-in"} — ${session.setNumber ? `Set ${session.setNumber}` : "Set 1"} (${session.questionRange || "Q1–Q6"})</h2>
+          <p class="muted small">Completed on ${formattedDate} by ${activeUser ? activeUser.name : "User"}</p>
+        </div>
+        <div class="sess-score-badge" style="background:${mLv.color}18; border:1px solid ${mLv.color}40; color:${mLv.color}">
+          <span class="big-score">${session.mood}%</span>
+          <span class="score-lbl">${mLv.label} Mood</span>
+        </div>
+      </div>
+
+      <div class="sess-metrics-row">
+        <div class="metric-box">
+          <span class="m-title">Stress Level</span>
+          <strong class="m-value">${session.stress}%</strong>
+          <span class="muted small">${session.stress > 60 ? 'Elevated tension' : 'Balanced calm'}</span>
+        </div>
+        <div class="metric-box">
+          <span class="m-title">Sleep Rest Balance</span>
+          <strong class="m-value">${session.sleep} min</strong>
+          <span class="muted small">Deep rest equivalent</span>
+        </div>
+        <div class="metric-box">
+          <span class="m-title">Dominant Emotion</span>
+          <strong class="m-value">${session.dominant || mLv.label}</strong>
+          <span class="muted small">Primary state vector</span>
+        </div>
+      </div>
+
+      <!-- Session 8-State Mix Breakdown -->
+      <div class="sess-mix-box">
+        <h4>Session Mood Vector Spectrum</h4>
+        <div class="mix" style="margin:10px 0">
+          ${MOOD_LEVELS.map(m => `<i style="--c:${m.color};width:${mix[m.key] || 0}%" title="${m.label}: ${mix[m.key] || 0}%"></i>`).join("")}
+        </div>
+        <ul class="legend">
+          ${MOOD_LEVELS.map(m => `<li><span class="dot glow" style="--c:${m.color};background:${m.color}"></span>${m.label} <strong>${mix[m.key] || 0}%</strong></li>`).join("")}
+        </ul>
+      </div>
+
+      <!-- Question & Choice Log -->
+      ${session.answersDetailed && session.answersDetailed.length > 0 ? `
+      <div class="sess-q-log">
+        <h4>Session Question & Choice Log (${session.questionRange || "Questions"})</h4>
+        <ul class="q-log-list">
+          ${session.answersDetailed.map(a => `
+            <li>
+              <span class="q-num-pill">Q${a.globalQ}</span>
+              <div class="q-log-body">
+                <strong>${a.question}</strong>
+                <p class="chosen-answer">Selected: <em>"${a.chosenOption}"</em></p>
+              </div>
+            </li>
+          `).join("")}
+        </ul>
+      </div>
+      ` : ''}
+    </div>
+  `;
+}
+
+/* ---------- Reports & Recommendations ---------- */
+function drawReports(checkins) {
+  $("#reportList").innerHTML = checkins.slice().reverse().slice(0, 6).map((r, i) => {
+    const mLv = levelFor(r.mood);
+    const d = new Date(r.at);
+    const dateStr = d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
     return `
     <li>
-      <button type="button" class="p-open" data-id="${p.id}" aria-label="Open ${p.title} suggestion">
-        <div class="p-ico" aria-hidden="true">${p.icon}</div>
-        <h3>${p.title}</h3>
-        <p class="muted small">${p.desc}</p>
-        <div class="bar"><i class="fill" style="background:${lv.color};box-shadow:0 0 10px ${lv.color}80" data-width="${p.progress}"></i></div>
-        <span class="small muted">${p.progress}% complete</span>
+      <button type="button" data-i="${i}" aria-label="${r.story}, ${dateStr}">
+        <span class="ico" aria-hidden="true">${mLv.face}</span>
+        <span>
+          <span class="rtitle">${r.story || "Story Check-in"} ${r.setNumber ? `(Set ${r.setNumber})` : ""}</span><br>
+          <span class="meta">${dateStr} · ${r.questionRange || "Q1–Q6"}</span>
+        </span>
+        <span class="status" style="background:${mLv.color}20;color:${mLv.color}">${mLv.label} ${r.mood}%</span>
+        <span class="chev" aria-hidden="true">›</span>
       </button>
     </li>`;
   }).join("");
 
-  $("#paths").addEventListener("click", async e => {
-    const btn = e.target.closest("button[data-id]");
+  $("#reportList").onclick = e => {
+    const btn = e.target.closest("button[data-i]");
     if (!btn) return;
-    openModal("Loading…", "Fetching your suggestion", "");
-    try {
-      const r = await loadRecommendation(btn.dataset.id);
-      openModal(r.activityName, `Detected mood · ${r.detectedMood}`, r.recommendationText, r.instructions);
-    } catch (err) {
-      openModal("Not available", "", err.message);
-    }
-  });
-}
-
-/* countdown */
-function startCountdown() {
-  const end = Date.now() + dashboardData.nextCheckIn.inMinutes * 60000;
-  const el = $("#countdown");
-  const tick = () => {
-    const ms = Math.max(end - Date.now(), 0);
-    const h = Math.floor(ms / 3.6e6), m = Math.floor(ms / 60000) % 60, s = Math.floor(ms / 1000) % 60;
-    el.textContent = `${String(h).padStart(2, "0")}h ${String(m).padStart(2, "0")}m ${String(s).padStart(2, "0")}s`;
+    const r = checkins.slice().reverse()[+btn.dataset.i];
+    openModal(
+      `${r.story || "Check-in"} ${r.setNumber ? `— Set ${r.setNumber}` : ""}`,
+      `${new Date(r.at).toLocaleDateString()} · ${r.questionRange || "Q1–6"}`,
+      `Detected mood: ${r.dominant || levelFor(r.mood).label}. Mood Score ${r.mood}%, Stress Level ${r.stress}%, Sleep Rest ${r.sleep} min.`
+    );
   };
-  tick();
-  setInterval(tick, 1000);
 }
 
-/* ---- live data from the emotional check-in ---- */
+function drawPaths() {
+  const pathsContainer = $("#paths");
+  if (!pathsContainer) return;
+
+  const recommendations = [
+    { id: "rec_1", icon: "🧘", title: "Meditation & Focus", desc: "5 min · Calm nervous system", progress: 75 },
+    { id: "rec_2", icon: "✍️", title: "Journaling Reflection", desc: "10 min · Express mood story", progress: 45 },
+    { id: "rec_3", icon: "✨", title: "Mindful Reset", desc: "5 min · Understand current state", progress: 85 },
+    { id: "rec_4", icon: "🌬", title: "Deep Breath Wave", desc: "3 min · Quick stress release", progress: 30 }
+  ];
+
+  pathsContainer.innerHTML = recommendations.map(p => {
+    const lv = levelFor(p.progress);
+    return `
+    <li>
+      <button type="button" class="p-open" data-title="${p.title}" data-desc="${p.desc}">
+        <div class="p-ico" aria-hidden="true">${p.icon}</div>
+        <h3>${p.title}</h3>
+        <p class="muted small">${p.desc}</p>
+        <div class="bar"><i class="fill" style="background:${lv.color};box-shadow:0 0 10px ${lv.color}80" data-width="${p.progress}"></i></div>
+        <span class="small muted">${p.progress}% completed</span>
+      </button>
+    </li>`;
+  }).join("");
+
+  pathsContainer.onclick = e => {
+    const btn = e.target.closest("button[data-title]");
+    if (!btn) return;
+    openModal(btn.dataset.title, "Personalized Recommendation", btn.dataset.desc + "\n\nFollow this guided activity to align your energy and lower stress after your story check-in.");
+  };
+}
+
+/* ---------- Shared Modal & Header Init ---------- */
+function openModal(title, meta, body) {
+  const modalTitle = $("#modalTitle");
+  const modalMeta = $("#modalMeta");
+  const modalBody = $("#modalBody");
+  const modal = $("#modal");
+  const modalClose = $("#modalClose");
+
+  if (modalTitle) modalTitle.textContent = title;
+  if (modalMeta) modalMeta.textContent = meta;
+  if (modalBody) modalBody.textContent = body;
+  if (modal) modal.hidden = false;
+  if (modalClose) modalClose.focus();
+}
+
 function buildInsight(latest, history) {
   const parts = [];
   parts.push(latest.mood >= 70 ? "Your latest check-in reads bright and motivated."
@@ -266,7 +613,7 @@ function buildInsight(latest, history) {
     : "Your latest check-in reads low — be gentle with yourself today.");
   if (latest.stress >= 65) parts.push("Stress is running high, so a short breathing reset is the highest-value action right now.");
   else if (latest.stress <= 35) parts.push("Stress is comfortably low — a good moment to build momentum on something you care about.");
-  if (history.length > 1) {
+  if (history && history.length > 1) {
     const prev = history[history.length - 2];
     const d = latest.mood - prev.mood;
     parts.push(d > 3 ? `Mood is up ${d} points since your previous check-in.`
@@ -276,75 +623,124 @@ function buildInsight(latest, history) {
   return parts.join(" ");
 }
 
-async function applyCheckins() {
-  const rows = await WellnessAuth.loadCheckins();
-  const history = rows.map(row => ({
-    ...row.results,
-    genre: row.genre,
-    story: row.story,
-    answers: row.answers,
-    at: row.submitted_at
-  }));
-  if (!history.length) return;
-  const latest = history[history.length - 1];
+function initModal() {
+  const modal = $("#modal");
+  const modalClose = $("#modalClose");
+  if (modalClose) modalClose.onclick = () => { if (modal) modal.hidden = true; };
+  if (modal) modal.onclick = e => { if (e.target === modal) modal.hidden = true; };
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && modal) modal.hidden = true; });
+}
 
-  dashboardData.moodScore = latest.mood;
-  dashboardData.stressLevel = latest.stress;
-  dashboardData.sleepWellness = latest.sleep;
-  dashboardData.moodMix = latest.mix;
-  dashboardData.streak = history.length;
-  dashboardData.insight = buildInsight(latest, history);
+function initDashboardUserSessionUI() {
+  const users = getUsers();
+  const uid = getCurrentUserId();
+  activeUser = users.find(u => u.id === uid) || users[0];
 
-  const recent = history.slice(-7).map(h => h.mood);
-  dashboardData.moodTrend = dashboardData.moodTrend.slice(0, Math.max(0, 7 - recent.length)).concat(recent);
+  const select = $("#userSelectDashboard");
+  if (select) {
+    select.innerHTML = users.map(u => 
+      `<option value="${u.id}" ${u.id === uid ? "selected" : ""}>👤 ${u.name}</option>`
+    ).join("");
 
-  dashboardData.questionnaireHistory = history.slice().reverse().slice(0, 6).map((h, i) => {
-    const lv = levelFor(h.mood);
-    const d = new Date(h.at);
-    return {
-      icon: lv.face,
-      title: h.story ? `${h.story} — ${h.genre}` : "Emotional Check-in",
-      date: i === 0 ? "Latest" : d.toLocaleDateString(undefined, { month: "short", day: "numeric" }),
-      status: "Completed",
-      detail: `${h.dominant ? "Detected mood " + h.dominant + ". " : ""}${lv.label} · ${lv.note}. Mood ${h.mood}%, stress ${h.stress}%, sleep wellness ${h.sleep} min.`
+    select.onchange = (e) => {
+      setCurrentUserId(e.target.value);
+      loadDashboard();
     };
-  });
+  }
 
+  const newBtn = $("#newUserBtnDashboard");
+  if (newBtn) {
+    newBtn.onclick = () => {
+      const input = $("#newUserNameInputDashboard");
+      if (input) input.value = "";
+      const modal = $("#newUserModalDashboard");
+      if (modal) modal.hidden = false;
+      if (input) input.focus();
+    };
+  }
 
-  /* keep the animated counters in sync with the check-in */
-  const setCount = (sel, v) => { const el = $(sel); if (el) el.dataset.count = v; };
-  setCount('.ring[data-ring="moodScore"] .ring-val', latest.mood);
-  setCount('.stat-body.wide .big', latest.stress);
-  setCount('.ring[data-ring="sleep"] .ring-val [data-count]', latest.sleep);
-  const sf = $(".fill.coral"); if (sf) sf.dataset.width = latest.stress;
+  const cancelBtn = $("#cancelNewUserBtnDashboard");
+  if (cancelBtn) {
+    cancelBtn.onclick = () => {
+      const modal = $("#newUserModalDashboard");
+      if (modal) modal.hidden = true;
+    };
+  }
 
-  $("#userName").textContent = dashboardData.user.name;
-  $("#streak").textContent = dashboardData.streak;
-  $("#insightText").textContent = dashboardData.insight;
+  const saveBtn = $("#saveNewUserBtnDashboard");
+  if (saveBtn) {
+    saveBtn.onclick = () => {
+      const input = $("#newUserNameInputDashboard");
+      const name = input ? input.value : "";
+      const created = createNewUserSession(name);
+      if (created) {
+        const modal = $("#newUserModalDashboard");
+        if (modal) modal.hidden = true;
+        loadDashboard();
+      }
+    };
+  }
 }
 
-async function initializeDashboard() {
-  const user = await WellnessAuth.getUser();
-  if (!user) { location.replace("login.html"); return; }
-  dashboardData.user.name = user.email.split("@")[0];
-  try { await applyCheckins(); }
-  catch (error) { console.error("Could not load saved check-ins", error); }
+function loadDashboard() {
+  initDashboardUserSessionUI();
+  const uid = getCurrentUserId();
+  const users = getUsers();
+  activeUser = users.find(u => u.id === uid) || users[0];
 
-  $("#userName").textContent = dashboardData.user.name;
-  document.querySelectorAll(".reveal").forEach((el, i) => { el.style.animationDelay = `${i * 90}ms`; });
-  drawChart();
-  drawMix();
-  drawReports();
+  const userNameEl = $("#userName");
+  if (userNameEl) userNameEl.textContent = activeUser.name;
+
+  activeCheckins = loadUserCheckins(uid);
+  const prog = loadUserProgress(uid);
+
+  const latest = activeCheckins[activeCheckins.length - 1];
+  if (!latest) return;
+
+  // Sync rings & metrics
+  updateRingsAndBars(latest);
+  const streakEl = $("#streak");
+  if (streakEl) streakEl.textContent = activeCheckins.length;
+
+  // Insight
+  const insightTextEl = $("#insightText");
+  if (insightTextEl) {
+    insightTextEl.textContent = latest.mood >= 70
+      ? `Great job ${activeUser.name}! Your latest story check-in recorded a bright, resilient mood.`
+      : `Hello ${activeUser.name}, your latest check-in showed elevated stress. A quick reflection session is recommended today.`;
+  }
+
+  // Next story card
+  const lastStoryId = latest.storyId || "001_sherlock_holmes";
+  const completedSets = prog[lastStoryId] || 1;
+  const nextSet = completedSets + 1;
+  const nextQStart = (nextSet - 1) * 6 + 1;
+  const nextQEnd = nextSet * 6;
+
+  const nextTitleEl = $("#nextStoryTitle");
+  if (nextTitleEl) nextTitleEl.textContent = `${latest.story || "Sherlock Holmes"}`;
+  const nextSetEl = $("#nextStorySet");
+  if (nextSetEl) nextSetEl.textContent = `Ready for Set ${nextSet} (Q${nextQStart}–${nextQEnd})`;
+
+  // Charts & Visualizers
+  drawWeeklyWave(activeCheckins);
+  drawMix(latest.mix);
+  initSessionVisualizer(activeCheckins);
+  drawReports(activeCheckins);
   drawPaths();
-  initModal();
-  startCountdown();
-  boot();
 }
 
-$("#signOutButton").addEventListener("click", async () => {
-  await WellnessAuth.signOut();
-  location.replace("login.html");
-});
+/* ---------- Boot ---------- */
+document.querySelectorAll(".reveal").forEach((el, i) => { el.style.animationDelay = `${i * 90}ms`; });
 
-initializeDashboard();
+const menuBtn = $("#menuBtn"), nav = $("#nav");
+if (menuBtn && nav) {
+  menuBtn.onclick = () => {
+    const open = nav.classList.toggle("open");
+    menuBtn.setAttribute("aria-expanded", String(open));
+  };
+  nav.onclick = e => { if (e.target.tagName === "A") nav.classList.remove("open"); };
+}
 
+initModal();
+loadDashboard();

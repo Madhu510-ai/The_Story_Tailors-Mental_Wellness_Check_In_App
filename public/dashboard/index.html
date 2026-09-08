@@ -12,11 +12,17 @@
 
 <header class="site-header">
   <div class="greet">
-    <img class="avatar" src="assets/brain.png" alt="Sara's profile" />
+    <img class="avatar" id="userAvatar" src="assets/brain.png" alt="User profile" />
     <div>
       <h1 class="hello">Hello, <span id="userName">Sara</span> <span aria-hidden="true">👋</span></h1>
       <p class="sub">How are you feeling today?</p>
     </div>
+  </div>
+
+  <div class="user-session-bar" aria-label="User session manager">
+    <span class="user-badge-label">Active User Session:</span>
+    <select id="userSelectDashboard" class="user-select-dropdown" aria-label="Select user session"></select>
+    <button type="button" id="newUserBtnDashboard" class="btn btn-ghost btn-sm" title="Create new user profile">+ New Session</button>
   </div>
 
   <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="nav" aria-label="Open menu">
@@ -26,8 +32,8 @@
   <nav id="nav" class="nav" aria-label="Main">
     <a href="#main" class="active" aria-current="page">Dashboard</a>
     <a href="#trend">Statistics</a>
-    <a href="#reports">Sessions</a>
-    <a href="#insight">Support</a>
+    <a href="#sessionVisualizer">Session Visualizer</a>
+    <a href="#reports">Reports</a>
     <a href="checkin.html" class="cta-link">New check-in</a>
     <button type="button" class="nav-signout" id="signOutButton">Sign out</button>
   </nav>
@@ -40,8 +46,8 @@
       <div class="ring" data-ring="moodScore"><svg viewBox="0 0 80 80" aria-hidden="true"><circle class="ring-bg" cx="40" cy="40" r="34"/><circle class="ring-fg teal" cx="40" cy="40" r="34"/></svg><span class="ring-val" data-count="65" data-suffix="%">0%</span></div>
       <div class="stat-body">
         <h2>Mood Score</h2>
-        <p class="tag tag-teal">Stable</p>
-        <p class="delta up">▲ +4% from last week</p>
+        <p class="tag tag-teal" id="moodTag">Stable</p>
+        <p class="delta up" id="moodDelta">▲ +4% from last week</p>
       </div>
     </article>
 
@@ -50,8 +56,8 @@
         <h2>Stress Level</h2>
         <p class="big" data-count="70" data-suffix="%">0%</p>
         <div class="bar"><i class="fill coral" data-width="70"></i></div>
-        <p class="tag tag-coral">Moderate</p>
-        <p class="delta down">▼ 3% calmer</p>
+        <p class="tag tag-coral" id="stressTag">Moderate</p>
+        <p class="delta down" id="stressDelta">▼ 3% calmer</p>
       </div>
     </article>
 
@@ -59,8 +65,8 @@
       <div class="ring" data-ring="sleep"><svg viewBox="0 0 80 80" aria-hidden="true"><circle class="ring-bg" cx="40" cy="40" r="34"/><circle class="ring-fg gold" cx="40" cy="40" r="34"/></svg><span class="ring-val"><span data-count="42">0</span><small>min</small></span></div>
       <div class="stat-body">
         <h2>Sleep Wellness</h2>
-        <p class="tag tag-gold">Average</p>
-        <p class="delta">Streak · <strong id="streak">7</strong> days active</p>
+        <p class="tag tag-gold" id="sleepTag">Average</p>
+        <p class="delta">Streak · <strong id="streak">7</strong> sessions active</p>
       </div>
     </article>
   </section>
@@ -74,8 +80,7 @@
       </div>
       <div class="brain-stage">
         <div class="brain-glow" aria-hidden="true"></div>
-        <!-- Replace assets/brain.png with the final glossy 3D brain render -->
-        <img id="brain" src="assets/brain.png" alt="Glossy three-dimensional brain illustration lit in teal, gold and coral" width="1024" height="1024" />
+        <img id="brain" src="assets/brain.png" alt="Glossy three-dimensional brain illustration" width="1024" height="1024" />
       </div>
       <ul class="brain-chips">
         <li><span class="dot teal"></span>Calm dominant</li>
@@ -87,8 +92,8 @@
     <div class="stack" id="trend">
       <article class="card reveal">
         <header class="card-head">
-          <div><h2>Weekly Mood Wave</h2><p class="muted">Your emotional pattern over the past 7 days</p></div>
-          <span class="pill">7 days</span>
+          <div><h2>Weekly Mood Wave</h2><p class="muted">Your emotional pattern over recent sessions</p></div>
+          <span class="pill">Recent Sessions</span>
         </header>
         <div class="chart-wrap">
           <div class="wave" id="chart" role="img" aria-label="Weekly mood levels"></div>
@@ -97,27 +102,54 @@
 
       <article class="card reveal">
         <header class="card-head"><div><h2>Mood Mix</h2><p class="muted">Proportion of emotional states</p></div></header>
-        <div class="mix" id="mix" role="img" aria-label="Mood mix: energized 30%, calm 40%, stressed 15%, low 15%"></div>
+        <div class="mix" id="mix" role="img" aria-label="Mood mix breakdown"></div>
         <ul class="legend" id="mixLegend"></ul>
       </article>
     </div>
   </section>
 
+  <!-- Session-Wise Analysis Visualizer -->
+  <section class="card session-vis-card reveal" id="sessionVisualizer" aria-label="Session-Wise Analysis Visualizer">
+    <header class="card-head session-vis-head">
+      <div>
+        <p class="eyebrow">Interactive Analytics</p>
+        <h2>Session-Wise Analysis Visualizer</h2>
+        <p class="muted">Track progressive check-in sessions, story question sets, and detailed emotion metrics.</p>
+      </div>
+      <div class="session-selector-wrap">
+        <label for="sessionSelect" class="muted small">Select Session:</label>
+        <select id="sessionSelect" class="session-dropdown" aria-label="Select session to analyze"></select>
+      </div>
+    </header>
+
+    <!-- Session Comparison Chart -->
+    <div class="vis-chart-section">
+      <div class="vis-chart-head">
+        <h3>Session Progression Line Graph</h3>
+        <p class="muted small">Mood Score vs. Stress Level across successive user sessions (n-th time answering a question set)</p>
+      </div>
+      <div class="session-wave-container" id="sessionWaveChart"></div>
+    </div>
+
+    <!-- Selected Session Detailed Analysis -->
+    <div class="session-detail-container" id="sessionDetailContainer"></div>
+  </section>
+
   <section class="split" id="reports">
     <article class="card reveal">
-      <header class="card-head"><div><h2>Reports &amp; History</h2><p class="muted">Your previous check-ins</p></div></header>
+      <header class="card-head"><div><h2>Reports &amp; History</h2><p class="muted">Your previous check-in sessions</p></div></header>
       <ul class="rows" id="reportList"></ul>
     </article>
 
     <article class="card next reveal">
-      <header class="card-head"><div><h2>Next Check-in</h2><p class="muted">Emotional wellness reflection</p></div></header>
+      <header class="card-head"><div><h2>Next Story Check-in</h2><p class="muted">Continue your active story</p></div></header>
       <p class="countdown" id="countdown" aria-live="polite">--h --m --s</p>
-      <p class="muted small">remaining · Today · 4:30 PM</p>
+      <p class="muted small">remaining until next scheduled check-in</p>
       <div class="coach">
-        <span class="coach-avatar" aria-hidden="true">JA</span>
-        <div><strong>Dr. Jamie Alther</strong><span class="muted small">Guided reflection · 25 min</span></div>
+        <span class="coach-avatar" aria-hidden="true">ST</span>
+        <div><strong id="nextStoryTitle">Sherlock Holmes</strong><span class="muted small" id="nextStorySet">Ready for Set 2 (Q7–12)</span></div>
       </div>
-      <button class="btn btn-primary" type="button">Join session</button>
+      <a class="btn btn-primary" href="checkin.html" id="startNextCheckinBtn">Continue Check-in</a>
     </article>
   </section>
 
@@ -128,11 +160,11 @@
       <span class="pill pill-gold">AI-powered</span>
     </div>
     <p class="insight-text" id="insightText"></p>
-    <button class="btn btn-gold" type="button">Start Evening Reflection</button>
+    <a class="btn btn-gold" href="checkin.html">Start Next Story Session</a>
   </section>
 
   <section class="card reveal" aria-label="Active path">
-    <header class="card-head"><div><h2>Active Path</h2><p class="muted">Personalized for how you have been feeling</p></div></header>
+    <header class="card-head"><div><h2>Active Path &amp; Recommendations</h2><p class="muted">Personalized for your detected session mood</p></div></header>
     <ul class="paths" id="paths"></ul>
   </section>
 
@@ -146,6 +178,19 @@
     <ul class="modal-steps" id="modalSteps" hidden></ul>
 
     <button class="btn btn-primary" type="button" id="modalClose">Close</button>
+  </div>
+</div>
+
+<!-- New User Session Modal -->
+<div class="modal" id="newUserModalDashboard" role="dialog" aria-modal="true" aria-labelledby="modalUserTitleDashboard" hidden>
+  <div class="modal-card">
+    <h3 id="modalUserTitleDashboard">Create New User Session</h3>
+    <p class="muted small">Enter a name to create a new user profile for isolated check-ins and story tracks.</p>
+    <input type="text" id="newUserNameInputDashboard" class="text-input" placeholder="e.g. Alex, Jordan, Sam..." maxlength="24" />
+    <div class="modal-actions">
+      <button type="button" class="btn btn-primary" id="saveNewUserBtnDashboard">Create Session</button>
+      <button type="button" class="btn btn-ghost" id="cancelNewUserBtnDashboard">Cancel</button>
+    </div>
   </div>
 </div>
 
