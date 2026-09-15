@@ -972,11 +972,12 @@ fetch("data/genres.json")
     }
     DATA = d;
     const user = await WellnessAuth.getUser();
-    if (!user) {
-      location.replace("login.html");
-      return;
+    const currentUid = getCurrentUserId();
+    const usersList = getUsers();
+    const activeU = usersList.find((u) => u.id === currentUid);
+    if (user && activeU && !activeU.id.startsWith("user_")) {
+      syncAuthenticatedUser(user);
     }
-    syncAuthenticatedUser(user);
     initUserSessionUI();
     const existingCheckins = loadUserCheckins(getCurrentUserId());
     if (existingCheckins && existingCheckins.length > 0) {
