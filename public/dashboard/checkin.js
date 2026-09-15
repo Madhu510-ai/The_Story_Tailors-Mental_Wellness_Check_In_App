@@ -165,7 +165,7 @@ function getUsers() {
   try {
     const data = JSON.parse(localStorage.getItem(USERS_KEY));
     if (Array.isArray(data) && data.length > 0) return data;
-  } catch (e) {}
+  } catch (e) { }
   localStorage.setItem(USERS_KEY, JSON.stringify(DEFAULT_USERS));
   return DEFAULT_USERS;
 }
@@ -557,7 +557,7 @@ async function loadStoryQuestions(story) {
           return story;
         }
       }
-    } catch (e) {}
+    } catch (e) { }
   }
   return story;
 }
@@ -569,7 +569,7 @@ async function startStory(s, forceSetNum = null) {
   if (s && s.dataUrl) {
     try {
       targetStory = await loadStoryQuestions(s);
-    } catch (e) {}
+    } catch (e) { }
   }
 
   if (!targetStory || !targetStory.questions || targetStory.questions.length === 0) {
