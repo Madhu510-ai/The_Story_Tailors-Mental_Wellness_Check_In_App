@@ -5,7 +5,7 @@
 
 const MOOD_KEYS = ["veryLow", "low", "uneasy", "neutral", "good", "happy", "veryHappy", "euphoric"];
 const MOOD_META = [
-  { label: "Very Low", color: "#171923" },
+  { label: "Very Low", color: "#6ee7b7" },
   { label: "Low", color: "#49307A" },
   { label: "Uneasy", color: "#7B45D6" },
   { label: "Neutral", color: "#48B9E8" },
@@ -19,10 +19,10 @@ const $ = (s, r = document) => r.querySelector(s);
 const clamp = (v, a = 0, b = 100) => Math.min(b, Math.max(a, v));
 
 const MOOD_THEME_META = {
-  veryLow: { key: "veryLow", label: "Very Low", name: "Stormy Slate", icon: "⛈️" },
+  veryLow: { key: "veryLow", label: "Very Low", name: "Misty Shadow Valley", icon: "🏔️" },
   low: { key: "low", label: "Low", name: "Twilight Plum", icon: "🌧️" },
   uneasy: { key: "uneasy", label: "Uneasy", name: "Electric Violet", icon: "🔮" },
-  neutral: { key: "neutral", label: "Neutral", name: "Ocean Cyan", icon: "🌊" },
+  neutral: { key: "neutral", label: "Neutral", name: "Serene Sunset Zen", icon: "🪨" },
   good: { key: "good", label: "Good", name: "Mint Emerald", icon: "🌿" },
   happy: { key: "happy", label: "Happy", name: "Golden Sunshine", icon: "☀️" },
   veryHappy: { key: "veryHappy", label: "Very Happy", name: "Sunrise Coral", icon: "🔥" },
@@ -30,12 +30,6 @@ const MOOD_THEME_META = {
 };
 
 function getDominantMoodKey(mix, moodScore) {
-  if (typeof moodScore === "number" && !isNaN(moodScore)) {
-    const idx = Math.min(7, Math.max(0, Math.floor((moodScore / 100) * 8)));
-    const keys = ["veryLow", "low", "uneasy", "neutral", "good", "happy", "veryHappy", "euphoric"];
-    return keys[idx] || "neutral";
-  }
-
   if (mix && typeof mix === "object") {
     let maxKey = null;
     let maxPct = 0;
@@ -59,6 +53,17 @@ function getDominantMoodKey(mix, moodScore) {
     if (maxKey && maxPct > 0) return maxKey;
   }
 
+  if (typeof moodScore === "number" && !isNaN(moodScore)) {
+    if (moodScore <= 20) return "veryLow";
+    if (moodScore <= 35) return "low";
+    if (moodScore <= 48) return "uneasy";
+    if (moodScore <= 62) return "neutral";
+    if (moodScore <= 75) return "good";
+    if (moodScore <= 86) return "happy";
+    if (moodScore <= 94) return "veryHappy";
+    return "euphoric";
+  }
+
   return "neutral";
 }
 
@@ -79,6 +84,72 @@ function applyDynamicMoodTheme(mixOrKey, moodScore) {
   if (badge) {
     badge.innerHTML = `<span aria-hidden="true">${meta.icon}</span> Theme: ${meta.name} (${meta.label})`;
     badge.title = `Active app theme reflecting dominant mood division: ${meta.label} (${meta.name})`;
+  }
+
+  const euphoricVid = $("#euphoricBgVideo");
+  if (euphoricVid) {
+    if (key === "euphoric") {
+      euphoricVid.style.display = "block";
+      euphoricVid.play().catch(e => console.log("Video autoplay check:", e));
+    } else {
+      euphoricVid.style.display = "none";
+      euphoricVid.pause();
+    }
+  }
+
+  const lowVid = $("#lowBgVideo");
+  if (lowVid) {
+    if (key === "low") {
+      lowVid.style.display = "block";
+      lowVid.play().catch(e => console.log("Video autoplay check:", e));
+    } else {
+      lowVid.style.display = "none";
+      lowVid.pause();
+    }
+  }
+
+  const uneasyVid = $("#uneasyBgVideo");
+  if (uneasyVid) {
+    if (key === "uneasy") {
+      uneasyVid.style.display = "block";
+      uneasyVid.play().catch(e => console.log("Video autoplay check:", e));
+    } else {
+      uneasyVid.style.display = "none";
+      uneasyVid.pause();
+    }
+  }
+
+  const goodVid = $("#goodBgVideo");
+  if (goodVid) {
+    if (key === "good") {
+      goodVid.style.display = "block";
+      goodVid.play().catch(e => console.log("Video autoplay check:", e));
+    } else {
+      goodVid.style.display = "none";
+      goodVid.pause();
+    }
+  }
+
+  const happyVid = $("#happyBgVideo");
+  if (happyVid) {
+    if (key === "happy") {
+      happyVid.style.display = "block";
+      happyVid.play().catch(e => console.log("Video autoplay check:", e));
+    } else {
+      happyVid.style.display = "none";
+      happyVid.pause();
+    }
+  }
+
+  const veryHappyVid = $("#veryHappyBgVideo");
+  if (veryHappyVid) {
+    if (key === "veryHappy") {
+      veryHappyVid.style.display = "block";
+      veryHappyVid.play().catch(e => console.log("Video autoplay check:", e));
+    } else {
+      veryHappyVid.style.display = "none";
+      veryHappyVid.pause();
+    }
   }
 }
 

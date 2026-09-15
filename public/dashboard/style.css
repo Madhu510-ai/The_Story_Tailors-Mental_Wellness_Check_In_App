@@ -111,9 +111,9 @@ p {
   font-size: clamp(1.35rem, 2.6vw, 1.9rem);
 }
 .hello span#userName {
-  color: #ffefa8;
+  color: #ffffff;
   font-weight: 800;
-  text-shadow: 0 2px 10px rgba(255, 239, 168, 0.35);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.85);
 }
 .sub {
   color: var(--mountain-brown);
@@ -562,10 +562,14 @@ main {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: var(--mountain-brown);
+  color: #ffffff;
+  font-weight: 700;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95), 0 2px 8px rgba(0, 0, 0, 0.85);
 }
 .legend strong {
-  color: var(--charcoal);
+  color: #ffffff;
+  font-weight: 900;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95);
 }
 .legend .dot.glow {
   box-shadow:
@@ -588,17 +592,18 @@ main {
   gap: 14px;
   text-align: left;
   cursor: pointer;
-  background: rgba(251, 243, 227, 0.6);
-  border: 1px solid var(--muted-sand);
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 16px;
   padding: 13px 16px;
   font: inherit;
-  color: inherit;
+  color: #ffffff;
+  backdrop-filter: blur(8px);
   transition: 0.25s;
 }
 .rows button:hover {
-  background: #fff;
-  border-color: var(--ocean-teal);
+  background: rgba(255, 255, 255, 0.2);
+  border-color: var(--theme-accent, #6ee7b7);
   transform: translateX(3px);
 }
 .rows .ico {
@@ -742,14 +747,17 @@ main {
   gap: 16px;
 }
 .paths li {
-  border: 1px solid var(--muted-sand);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 18px;
   padding: 18px;
-  background: rgba(251, 243, 227, 0.55);
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(8px);
+  color: #ffffff;
   transition: 0.25s;
 }
 .paths li:hover {
-  background: #fff;
+  background: rgba(255, 255, 255, 0.2);
+  border-color: var(--theme-accent, #6ee7b7);
   transform: translateY(-4px);
 }
 .paths .p-open {
@@ -1146,156 +1154,1638 @@ main {
    DYNAMIC MOOD MIX THEME ENGINE (8 MOOD DIVISIONS)
    ========================================================================== */
 
-/* 1. Very Low — Stormy Slate / Dark Charcoal Atmosphere */
+/* 1. Very Low — Misty Shadow Valley Atmosphere (Custom Background & High-Visibility Typography) */
+/* 1. Very Low — Misty Shadow Valley Atmosphere (Custom Background & Crystal Transparent Glassmorphism) */
 html[data-mood-theme="veryLow"] {
-  --theme-accent: #818cf8;
-  --theme-glow: rgba(129, 140, 248, 0.35);
-  --theme-card-border: rgba(129, 140, 248, 0.32);
-  --theme-card-bg: rgba(15, 23, 42, 0.85);
-  --theme-bg-gradient: radial-gradient(
-    circle at 50% 20%,
-    rgba(30, 41, 59, 0.85) 0%,
-    rgba(8, 12, 22, 0.96) 100%
-  );
-  --theme-badge-bg: rgba(129, 140, 248, 0.2);
-  --theme-badge-color: #cbd5e1;
-  --theme-btn-bg: #475569;
-  --theme-btn-hover: #64748b;
-  --theme-text-accent: #94a3b8;
-  --theme-ambient-shadow: 0 0 45px rgba(129, 140, 248, 0.28);
+  --theme-accent: #6ee7b7;
+  --theme-glow: rgba(110, 231, 183, 0.35);
+  --theme-card-border: rgba(110, 231, 183, 0.25);
+  --theme-card-bg: rgba(6, 18, 14, 0.18);
+  --theme-bg-gradient: none;
+  --theme-badge-bg: rgba(110, 231, 183, 0.18);
+  --theme-badge-color: #a7f3d0;
+  --theme-btn-bg: #154d3d;
+  --theme-btn-hover: #1e6b54;
+  --theme-text-accent: #6ee7b7;
+  --theme-ambient-shadow: 0 0 35px rgba(110, 231, 183, 0.15);
 }
 
-/* 2. Low — Twilight Plum / Deep Amethyst Atmosphere */
+html[data-mood-theme="veryLow"] body::before {
+  display: none !important;
+  opacity: 0 !important;
+  background: none !important;
+}
+
+html[data-mood-theme="veryLow"] body {
+  background: url("assets/very-low-bg.png") center/cover fixed no-repeat #0a1410 !important;
+  color: #f0fdf4 !important;
+}
+
+html[data-mood-theme="veryLow"] h1,
+html[data-mood-theme="veryLow"] h2,
+html[data-mood-theme="veryLow"] h3,
+html[data-mood-theme="veryLow"] h4 {
+  color: #ffffff !important;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.85);
+}
+
+html[data-mood-theme="veryLow"] .hello span#userName {
+  color: #a7f3d0 !important;
+  text-shadow: 0 0 16px rgba(110, 231, 183, 0.6) !important;
+}
+
+html[data-mood-theme="veryLow"] .sub,
+html[data-mood-theme="veryLow"] .muted,
+html[data-mood-theme="veryLow"] .meta,
+html[data-mood-theme="veryLow"] .small,
+html[data-mood-theme="veryLow"] .delta {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.95), 0 2px 10px rgba(0, 0, 0, 0.9) !important;
+}
+
+html[data-mood-theme="veryLow"] .stat-body h2 {
+  color: #a7f3d0 !important;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9) !important;
+}
+
+html[data-mood-theme="veryLow"] .stat .big {
+  color: #ffffff !important;
+  text-shadow: 0 0 14px rgba(110, 231, 183, 0.35), 0 2px 8px rgba(0, 0, 0, 0.9) !important;
+}
+
+html[data-mood-theme="veryLow"] .ring-val small {
+  color: #ffffff !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9) !important;
+}
+
+html[data-mood-theme="veryLow"] .card,
+html[data-mood-theme="veryLow"] .quiz-card,
+html[data-mood-theme="veryLow"] .done-card,
+html[data-mood-theme="veryLow"] .brain-card,
+html[data-mood-theme="veryLow"] .next,
+html[data-mood-theme="veryLow"] .insight {
+  background: rgba(6, 18, 14, 0.18) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(110, 231, 183, 0.25) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35), 0 0 25px rgba(110, 231, 183, 0.12) !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="veryLow"] .nav {
+  background: rgba(6, 18, 14, 0.3) !important;
+  backdrop-filter: blur(14px) !important;
+  border-color: rgba(110, 231, 183, 0.28) !important;
+}
+
+html[data-mood-theme="veryLow"] .nav a {
+  color: #ffffff !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9) !important;
+}
+
+html[data-mood-theme="veryLow"] .nav a.active {
+  background: #154d3d !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 16px rgba(110, 231, 183, 0.35) !important;
+}
+
+html[data-mood-theme="veryLow"] .nav a:hover {
+  color: #ffffff !important;
+  background: rgba(110, 231, 183, 0.18) !important;
+}
+
+html[data-mood-theme="veryLow"] .user-session-bar {
+  background: rgba(6, 18, 14, 0.3) !important;
+  backdrop-filter: blur(12px) !important;
+  border-color: rgba(110, 231, 183, 0.28) !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="veryLow"] .user-select-dropdown {
+  background: rgba(0, 0, 0, 0.4) !important;
+  color: #a7f3d0 !important;
+  border-color: rgba(110, 231, 183, 0.35) !important;
+}
+
+html[data-mood-theme="veryLow"] .lower-dashboard-wrapper {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+html[data-mood-theme="veryLow"] .lower-dashboard-wrapper .card,
+html[data-mood-theme="veryLow"] .session-vis-card {
+  background: rgba(6, 18, 14, 0.18) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(110, 231, 183, 0.25) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35) !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="veryLow"] .lower-dashboard-wrapper h2,
+html[data-mood-theme="veryLow"] .lower-dashboard-wrapper h3,
+html[data-mood-theme="veryLow"] .lower-dashboard-wrapper h4,
+html[data-mood-theme="veryLow"] .lower-dashboard-wrapper .eyebrow {
+  color: #ffffff !important;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.95) !important;
+}
+
+html[data-mood-theme="veryLow"] .lower-dashboard-wrapper .muted {
+  color: #ffffff !important;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.95) !important;
+}
+
+html[data-mood-theme="veryLow"] .session-dropdown {
+  background: rgba(0, 0, 0, 0.35) !important;
+  color: #a7f3d0 !important;
+  border-color: rgba(110, 231, 183, 0.35) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+html[data-mood-theme="veryLow"] .vis-chart-section {
+  background: rgba(0, 0, 0, 0.12) !important;
+  backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(110, 231, 183, 0.2) !important;
+}
+
+html[data-mood-theme="veryLow"] .line-graph-legend-bar {
+  background: rgba(0, 0, 0, 0.25) !important;
+  backdrop-filter: blur(10px) !important;
+  border-color: rgba(110, 231, 183, 0.25) !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="veryLow"] .legend-toggle.active {
+  background: rgba(255, 255, 255, 0.18) !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="veryLow"] .legend-toggle {
+  color: #ffffff !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9) !important;
+}
+
+html[data-mood-theme="veryLow"] .svg-graph-wrapper {
+  background: rgba(0, 0, 0, 0.15) !important;
+  backdrop-filter: blur(8px) !important;
+  border-color: rgba(110, 231, 183, 0.2) !important;
+}
+
+html[data-mood-theme="veryLow"] .grid-line {
+  stroke: rgba(110, 231, 183, 0.15) !important;
+}
+
+html[data-mood-theme="veryLow"] .grid-line-v {
+  stroke: rgba(110, 231, 183, 0.12) !important;
+}
+
+html[data-mood-theme="veryLow"] .grid-label,
+html[data-mood-theme="veryLow"] .x-axis-label {
+  fill: #ffffff !important;
+}
+
+html[data-mood-theme="veryLow"] .active-x-label {
+  fill: #6ee7b7 !important;
+}
+
+html[data-mood-theme="veryLow"] .sess-pill-btn {
+  background: rgba(0, 0, 0, 0.25) !important;
+  border-color: rgba(110, 231, 183, 0.22) !important;
+  color: #ffffff !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+html[data-mood-theme="veryLow"] .sess-pill-btn .p-title {
+  color: #ffffff !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9) !important;
+}
+
+html[data-mood-theme="veryLow"] .sess-pill-btn.active {
+  background: #154d3d !important;
+  border-color: #6ee7b7 !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="veryLow"] .metric-box,
+html[data-mood-theme="veryLow"] .sess-mix-box,
+html[data-mood-theme="veryLow"] .sess-q-log,
+html[data-mood-theme="veryLow"] .rows button,
+html[data-mood-theme="veryLow"] .paths li {
+  background: rgba(0, 0, 0, 0.18) !important;
+  backdrop-filter: blur(8px) !important;
+  border-color: rgba(110, 231, 183, 0.2) !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="veryLow"] .rows button:hover,
+html[data-mood-theme="veryLow"] .paths li:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border-color: rgba(110, 231, 183, 0.45) !important;
+}
+
+html[data-mood-theme="veryLow"] .m-title {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95) !important;
+}
+
+html[data-mood-theme="veryLow"] .legend li {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95), 0 2px 8px rgba(0, 0, 0, 0.85) !important;
+}
+
+html[data-mood-theme="veryLow"] .legend strong {
+  color: #ffffff !important;
+  font-weight: 900 !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95) !important;
+}
+
+html[data-mood-theme="veryLow"] .m-value {
+  color: #6ee7b7 !important;
+  text-shadow: 0 0 10px rgba(110, 231, 183, 0.4) !important;
+}
+
+html[data-mood-theme="veryLow"] .q-log-list li {
+  background: rgba(0, 0, 0, 0.15) !important;
+  border-color: rgba(110, 231, 183, 0.18) !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="veryLow"] .q-log-list strong {
+  color: #ffffff !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9) !important;
+}
+
+html[data-mood-theme="veryLow"] .chosen-answer {
+  color: #6ee7b7 !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9) !important;
+}
+
+
+/* 2. Low — Twilight Plum / Motion Video Background & Crystal Transparent Glassmorphism */
 html[data-mood-theme="low"] {
   --theme-accent: #a78bfa;
-  --theme-glow: rgba(167, 139, 250, 0.4);
-  --theme-card-border: rgba(167, 139, 250, 0.38);
-  --theme-card-bg: rgba(24, 16, 44, 0.82);
-  --theme-bg-gradient: radial-gradient(
-    circle at 50% 20%,
-    rgba(73, 48, 122, 0.6) 0%,
-    rgba(15, 10, 28, 0.95) 100%
-  );
-  --theme-badge-bg: rgba(167, 139, 250, 0.22);
-  --theme-badge-color: #d8b4fe;
+  --theme-glow: rgba(167, 139, 250, 0.5);
+  --theme-card-border: rgba(167, 139, 250, 0.4);
+  --theme-card-bg: rgba(20, 14, 38, 0.28);
+  --theme-bg-gradient: none;
+  --theme-badge-bg: rgba(167, 139, 250, 0.25);
+  --theme-badge-color: #ddd6fe;
   --theme-btn-bg: #7c3aed;
   --theme-btn-hover: #8b5cf6;
   --theme-text-accent: #c4b5fd;
-  --theme-ambient-shadow: 0 0 48px rgba(139, 92, 246, 0.35);
+  --theme-ambient-shadow: 0 0 50px rgba(139, 92, 246, 0.4);
 }
 
-/* 3. Uneasy — Electric Violet / Indigo Atmosphere */
+html[data-mood-theme="low"] body::before {
+  display: none !important;
+  opacity: 0 !important;
+  background: none !important;
+}
+
+html[data-mood-theme="low"] body {
+  background: transparent !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="low"] #lowBgVideo {
+  display: block !important;
+  opacity: 1 !important;
+}
+
+html[data-mood-theme="low"] h1,
+html[data-mood-theme="low"] h2,
+html[data-mood-theme="low"] h3,
+html[data-mood-theme="low"] h4 {
+  color: #ffffff !important;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.85);
+}
+
+html[data-mood-theme="low"] .hello span#userName {
+  color: #ffffff !important;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.95), 0 0 16px rgba(167, 139, 250, 0.7) !important;
+}
+
+html[data-mood-theme="low"] .sub,
+html[data-mood-theme="low"] .muted,
+html[data-mood-theme="low"] .meta,
+html[data-mood-theme="low"] .small,
+html[data-mood-theme="low"] .delta {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.95), 0 2px 10px rgba(0, 0, 0, 0.9) !important;
+}
+
+html[data-mood-theme="low"] .stat-body h2 {
+  color: #ddd6fe !important;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9) !important;
+}
+
+html[data-mood-theme="low"] .card,
+html[data-mood-theme="low"] .quiz-card,
+html[data-mood-theme="low"] .done-card,
+html[data-mood-theme="low"] .brain-card,
+html[data-mood-theme="low"] .next,
+html[data-mood-theme="low"] .insight {
+  background: rgba(20, 14, 38, 0.28) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border: 1px solid rgba(167, 139, 250, 0.4) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), 0 0 25px rgba(167, 139, 250, 0.2) !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="low"] .nav {
+  background: rgba(20, 14, 38, 0.35) !important;
+  backdrop-filter: blur(14px) !important;
+  border-color: rgba(167, 139, 250, 0.4) !important;
+}
+
+html[data-mood-theme="low"] .nav a {
+  color: #ffffff !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9) !important;
+}
+
+html[data-mood-theme="low"] .nav a.active {
+  background: #7c3aed !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 18px rgba(167, 139, 250, 0.5) !important;
+}
+
+html[data-mood-theme="low"] .user-session-bar {
+  background: rgba(20, 14, 38, 0.35) !important;
+  backdrop-filter: blur(12px) !important;
+  border-color: rgba(167, 139, 250, 0.4) !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="low"] .user-select-dropdown {
+  background: rgba(0, 0, 0, 0.45) !important;
+  color: #ddd6fe !important;
+  border-color: rgba(167, 139, 250, 0.4) !important;
+}
+
+html[data-mood-theme="low"] .lower-dashboard-wrapper {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+html[data-mood-theme="low"] .lower-dashboard-wrapper .card,
+html[data-mood-theme="low"] .session-vis-card {
+  background: rgba(20, 14, 38, 0.28) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border: 1px solid rgba(167, 139, 250, 0.4) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4) !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="low"] .lower-dashboard-wrapper h2,
+html[data-mood-theme="low"] .lower-dashboard-wrapper h3,
+html[data-mood-theme="low"] .lower-dashboard-wrapper h4,
+html[data-mood-theme="low"] .lower-dashboard-wrapper .eyebrow {
+  color: #ffffff !important;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.95) !important;
+}
+
+html[data-mood-theme="low"] .lower-dashboard-wrapper .muted {
+  color: #ffffff !important;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.95) !important;
+}
+
+html[data-mood-theme="low"] .sess-pill-btn {
+  background: rgba(0, 0, 0, 0.3) !important;
+  border-color: rgba(167, 139, 250, 0.35) !important;
+  color: #ffffff !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+html[data-mood-theme="low"] .sess-pill-btn .p-title {
+  color: #ffffff !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9) !important;
+}
+
+html[data-mood-theme="low"] .sess-pill-btn.active {
+  background: #7c3aed !important;
+  border-color: #c4b5fd !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="low"] .metric-box,
+html[data-mood-theme="low"] .sess-mix-box,
+html[data-mood-theme="low"] .sess-q-log,
+html[data-mood-theme="low"] .rows button,
+html[data-mood-theme="low"] .paths li {
+  background: rgba(0, 0, 0, 0.25) !important;
+  backdrop-filter: blur(8px) !important;
+  border-color: rgba(167, 139, 250, 0.3) !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="low"] .m-title {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95) !important;
+}
+
+html[data-mood-theme="low"] .legend li {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95) !important;
+}
+
+html[data-mood-theme="low"] .m-value {
+  color: #c4b5fd !important;
+  text-shadow: 0 0 10px rgba(167, 139, 250, 0.5) !important;
+}
+
+html[data-mood-theme="low"] .chosen-answer {
+  color: #c4b5fd !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9) !important;
+}
+
+/* 3. Uneasy — Electric Violet / Motion Video Background & Crystal Transparent Glassmorphism */
 html[data-mood-theme="uneasy"] {
   --theme-accent: #c084fc;
-  --theme-glow: rgba(192, 132, 252, 0.45);
-  --theme-card-border: rgba(192, 132, 252, 0.42);
-  --theme-card-bg: rgba(30, 16, 52, 0.82);
-  --theme-bg-gradient: radial-gradient(
-    circle at 50% 20%,
-    rgba(123, 69, 214, 0.62) 0%,
-    rgba(18, 9, 36, 0.95) 100%
-  );
-  --theme-badge-bg: rgba(192, 132, 252, 0.25);
+  --theme-glow: rgba(192, 132, 252, 0.55);
+  --theme-card-border: rgba(192, 132, 252, 0.45);
+  --theme-card-bg: rgba(26, 12, 42, 0.28);
+  --theme-bg-gradient: none;
+  --theme-badge-bg: rgba(192, 132, 252, 0.28);
   --theme-badge-color: #e9d5ff;
   --theme-btn-bg: #9333ea;
   --theme-btn-hover: #a855f7;
-  --theme-text-accent: #d8b4fe;
-  --theme-ambient-shadow: 0 0 50px rgba(147, 51, 234, 0.42);
+  --theme-text-accent: #e9d5ff;
+  --theme-ambient-shadow: 0 0 50px rgba(147, 51, 234, 0.45);
+}
+
+html[data-mood-theme="uneasy"] body::before {
+  display: none !important;
+  opacity: 0 !important;
+  background: none !important;
+}
+
+html[data-mood-theme="uneasy"] body {
+  background: transparent !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="uneasy"] #uneasyBgVideo {
+  display: block !important;
+  opacity: 1 !important;
+}
+
+html[data-mood-theme="uneasy"] h1,
+html[data-mood-theme="uneasy"] h2,
+html[data-mood-theme="uneasy"] h3,
+html[data-mood-theme="uneasy"] h4 {
+  color: #ffffff !important;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.85);
+}
+
+html[data-mood-theme="uneasy"] .hello span#userName {
+  color: #ffffff !important;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.95), 0 0 16px rgba(192, 132, 252, 0.7) !important;
+}
+
+html[data-mood-theme="uneasy"] .sub,
+html[data-mood-theme="uneasy"] .muted,
+html[data-mood-theme="uneasy"] .meta,
+html[data-mood-theme="uneasy"] .small,
+html[data-mood-theme="uneasy"] .delta {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.95), 0 2px 10px rgba(0, 0, 0, 0.9) !important;
+}
+
+html[data-mood-theme="uneasy"] .stat-body h2 {
+  color: #e9d5ff !important;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9) !important;
+}
+
+html[data-mood-theme="uneasy"] .card,
+html[data-mood-theme="uneasy"] .quiz-card,
+html[data-mood-theme="uneasy"] .done-card,
+html[data-mood-theme="uneasy"] .brain-card,
+html[data-mood-theme="uneasy"] .next,
+html[data-mood-theme="uneasy"] .insight {
+  background: rgba(26, 12, 42, 0.28) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border: 1px solid rgba(192, 132, 252, 0.45) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), 0 0 25px rgba(192, 132, 252, 0.25) !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="uneasy"] .nav {
+  background: rgba(26, 12, 42, 0.35) !important;
+  backdrop-filter: blur(14px) !important;
+  border-color: rgba(192, 132, 252, 0.45) !important;
+}
+
+html[data-mood-theme="uneasy"] .nav a {
+  color: #ffffff !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9) !important;
+}
+
+html[data-mood-theme="uneasy"] .nav a.active {
+  background: #9333ea !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 18px rgba(192, 132, 252, 0.5) !important;
+}
+
+html[data-mood-theme="uneasy"] .user-session-bar {
+  background: rgba(26, 12, 42, 0.35) !important;
+  backdrop-filter: blur(12px) !important;
+  border-color: rgba(192, 132, 252, 0.45) !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="uneasy"] .user-select-dropdown {
+  background: rgba(0, 0, 0, 0.45) !important;
+  color: #e9d5ff !important;
+  border-color: rgba(192, 132, 252, 0.45) !important;
+}
+
+html[data-mood-theme="uneasy"] .lower-dashboard-wrapper {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+html[data-mood-theme="uneasy"] .lower-dashboard-wrapper .card,
+html[data-mood-theme="uneasy"] .session-vis-card {
+  background: rgba(26, 12, 42, 0.28) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border: 1px solid rgba(192, 132, 252, 0.45) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4) !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="uneasy"] .lower-dashboard-wrapper h2,
+html[data-mood-theme="uneasy"] .lower-dashboard-wrapper h3,
+html[data-mood-theme="uneasy"] .lower-dashboard-wrapper h4,
+html[data-mood-theme="uneasy"] .lower-dashboard-wrapper .eyebrow {
+  color: #ffffff !important;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.95) !important;
+}
+
+html[data-mood-theme="uneasy"] .lower-dashboard-wrapper .muted {
+  color: #ffffff !important;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.95) !important;
+}
+
+html[data-mood-theme="uneasy"] .sess-pill-btn {
+  background: rgba(0, 0, 0, 0.3) !important;
+  border-color: rgba(192, 132, 252, 0.35) !important;
+  color: #ffffff !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+html[data-mood-theme="uneasy"] .sess-pill-btn .p-title {
+  color: #ffffff !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9) !important;
+}
+
+html[data-mood-theme="uneasy"] .sess-pill-btn.active {
+  background: #9333ea !important;
+  border-color: #e9d5ff !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="uneasy"] .metric-box,
+html[data-mood-theme="uneasy"] .sess-mix-box,
+html[data-mood-theme="uneasy"] .sess-q-log,
+html[data-mood-theme="uneasy"] .rows button,
+html[data-mood-theme="uneasy"] .paths li {
+  background: rgba(0, 0, 0, 0.25) !important;
+  backdrop-filter: blur(8px) !important;
+  border-color: rgba(192, 132, 252, 0.3) !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="uneasy"] .m-title {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95) !important;
+}
+
+html[data-mood-theme="uneasy"] .legend li {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95) !important;
+}
+
+html[data-mood-theme="uneasy"] .m-value {
+  color: #e9d5ff !important;
+  text-shadow: 0 0 10px rgba(192, 132, 252, 0.5) !important;
+}
+
+html[data-mood-theme="uneasy"] .chosen-answer {
+  color: #e9d5ff !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9) !important;
 }
 
 /* 4. Neutral — Ocean Cyan / Steady Sky Atmosphere */
+/* 4. Neutral — Serene Pebble Sunset Atmosphere (Custom Image Background & Glassmorphism) */
 html[data-mood-theme="neutral"] {
-  --theme-accent: #38bdf8;
-  --theme-glow: rgba(56, 189, 248, 0.38);
-  --theme-card-border: rgba(56, 189, 248, 0.35);
-  --theme-card-bg: rgba(6, 28, 42, 0.8);
-  --theme-bg-gradient: radial-gradient(
-    circle at 50% 20%,
-    rgba(28, 110, 126, 0.55) 0%,
-    rgba(4, 20, 29, 0.95) 100%
-  );
-  --theme-badge-bg: rgba(56, 189, 248, 0.2);
-  --theme-badge-color: #bae6fd;
-  --theme-btn-bg: #1c6e7e;
-  --theme-btn-hover: #228b9f;
-  --theme-text-accent: #7dd3fc;
-  --theme-ambient-shadow: 0 0 45px rgba(56, 189, 248, 0.35);
-}
-
-/* 5. Good — Mint Emerald / Fresh Spring Atmosphere */
-html[data-mood-theme="good"] {
-  --theme-accent: #34d399;
-  --theme-glow: rgba(52, 211, 153, 0.42);
-  --theme-card-border: rgba(52, 211, 153, 0.38);
-  --theme-card-bg: rgba(6, 36, 28, 0.8);
-  --theme-bg-gradient: radial-gradient(
-    circle at 50% 20%,
-    rgba(66, 211, 154, 0.52) 0%,
-    rgba(3, 24, 18, 0.95) 100%
-  );
-  --theme-badge-bg: rgba(52, 211, 153, 0.22);
-  --theme-badge-color: #a7f3d0;
-  --theme-btn-bg: #059669;
-  --theme-btn-hover: #10b981;
-  --theme-text-accent: #6ee7b7;
-  --theme-ambient-shadow: 0 0 48px rgba(16, 185, 129, 0.4);
-}
-
-/* 6. Happy — Golden Sunshine / Bright Radiant Atmosphere */
-html[data-mood-theme="happy"] {
   --theme-accent: #fbbf24;
-  --theme-glow: rgba(251, 191, 36, 0.52);
-  --theme-card-border: rgba(251, 191, 36, 0.48);
-  --theme-card-bg: rgba(38, 28, 6, 0.82);
-  --theme-bg-gradient: radial-gradient(
-    circle at 50% 20%,
-    rgba(255, 212, 71, 0.58) 0%,
-    rgba(28, 18, 2, 0.93) 100%
-  );
-  --theme-badge-bg: rgba(251, 191, 36, 0.25);
+  --theme-glow: rgba(251, 191, 36, 0.45);
+  --theme-card-border: rgba(251, 191, 36, 0.3);
+  --theme-card-bg: rgba(20, 12, 10, 0.32);
+  --theme-bg-gradient: none;
+  --theme-badge-bg: rgba(251, 191, 36, 0.22);
   --theme-badge-color: #fef08a;
   --theme-btn-bg: #d97706;
   --theme-btn-hover: #f59e0b;
   --theme-text-accent: #fde047;
-  --theme-ambient-shadow: 0 0 55px rgba(245, 158, 11, 0.48);
+  --theme-ambient-shadow: 0 0 45px rgba(251, 191, 36, 0.3);
 }
 
-/* 7. Very Happy — Sunrise Coral / Vibrant Flame Atmosphere */
+html[data-mood-theme="neutral"] body::before {
+  display: none !important;
+  opacity: 0 !important;
+  background: none !important;
+}
+
+html[data-mood-theme="neutral"] body {
+  background: url("assets/neutral-bg.png") center/cover fixed no-repeat #1a1005 !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="neutral"] h1,
+html[data-mood-theme="neutral"] h2,
+html[data-mood-theme="neutral"] h3,
+html[data-mood-theme="neutral"] h4 {
+  color: #ffffff !important;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.85);
+}
+
+html[data-mood-theme="neutral"] .hello span#userName {
+  color: #ffffff !important;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.95), 0 0 16px rgba(0, 0, 0, 0.8) !important;
+}
+
+html[data-mood-theme="neutral"] .sub,
+html[data-mood-theme="neutral"] .muted,
+html[data-mood-theme="neutral"] .meta,
+html[data-mood-theme="neutral"] .small,
+html[data-mood-theme="neutral"] .delta {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.95), 0 2px 10px rgba(0, 0, 0, 0.9) !important;
+}
+
+html[data-mood-theme="neutral"] .stat-body h2 {
+  color: #fef08a !important;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9) !important;
+}
+
+html[data-mood-theme="neutral"] .card,
+html[data-mood-theme="neutral"] .quiz-card,
+html[data-mood-theme="neutral"] .done-card,
+html[data-mood-theme="neutral"] .brain-card,
+html[data-mood-theme="neutral"] .next,
+html[data-mood-theme="neutral"] .insight {
+  background: rgba(20, 12, 10, 0.32) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border: 1px solid rgba(251, 191, 36, 0.3) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.38), 0 0 25px rgba(251, 191, 36, 0.15) !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="neutral"] .nav {
+  background: rgba(20, 12, 10, 0.4) !important;
+  backdrop-filter: blur(14px) !important;
+  border-color: rgba(251, 191, 36, 0.35) !important;
+}
+
+html[data-mood-theme="neutral"] .nav a {
+  color: #ffffff !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9) !important;
+}
+
+html[data-mood-theme="neutral"] .nav a.active {
+  background: #d97706 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 16px rgba(251, 191, 36, 0.4) !important;
+}
+
+html[data-mood-theme="neutral"] .user-session-bar {
+  background: rgba(20, 12, 10, 0.4) !important;
+  backdrop-filter: blur(12px) !important;
+  border-color: rgba(251, 191, 36, 0.35) !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="neutral"] .user-select-dropdown {
+  background: rgba(0, 0, 0, 0.4) !important;
+  color: #fef08a !important;
+  border-color: rgba(251, 191, 36, 0.35) !important;
+}
+
+html[data-mood-theme="neutral"] .lower-dashboard-wrapper {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+html[data-mood-theme="neutral"] .lower-dashboard-wrapper .card,
+html[data-mood-theme="neutral"] .session-vis-card {
+  background: rgba(20, 12, 10, 0.32) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border: 1px solid rgba(251, 191, 36, 0.3) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.38) !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="neutral"] .lower-dashboard-wrapper h2,
+html[data-mood-theme="neutral"] .lower-dashboard-wrapper h3,
+html[data-mood-theme="neutral"] .lower-dashboard-wrapper h4,
+html[data-mood-theme="neutral"] .lower-dashboard-wrapper .eyebrow {
+  color: #ffffff !important;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.95) !important;
+}
+
+html[data-mood-theme="neutral"] .lower-dashboard-wrapper .muted {
+  color: #ffffff !important;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.95) !important;
+}
+
+html[data-mood-theme="neutral"] .sess-pill-btn {
+  background: rgba(0, 0, 0, 0.3) !important;
+  border-color: rgba(251, 191, 36, 0.3) !important;
+  color: #ffffff !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+html[data-mood-theme="neutral"] .sess-pill-btn .p-title {
+  color: #ffffff !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9) !important;
+}
+
+html[data-mood-theme="neutral"] .sess-pill-btn.active {
+  background: #d97706 !important;
+  border-color: #fef08a !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="neutral"] .metric-box,
+html[data-mood-theme="neutral"] .sess-mix-box,
+html[data-mood-theme="neutral"] .sess-q-log,
+html[data-mood-theme="neutral"] .rows button,
+html[data-mood-theme="neutral"] .paths li {
+  background: rgba(0, 0, 0, 0.25) !important;
+  backdrop-filter: blur(8px) !important;
+  border-color: rgba(251, 191, 36, 0.25) !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="neutral"] .m-title {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95) !important;
+}
+
+html[data-mood-theme="neutral"] .legend li {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95) !important;
+}
+
+html[data-mood-theme="neutral"] .m-value {
+  color: #fef08a !important;
+  text-shadow: 0 0 10px rgba(251, 191, 36, 0.5) !important;
+}
+
+html[data-mood-theme="neutral"] .chosen-answer {
+  color: #fef08a !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9) !important;
+}
+
+/* 5. Good — Mint Emerald / Motion Video Background & Crystal Transparent Glassmorphism */
+html[data-mood-theme="good"] {
+  --theme-accent: #34d399;
+  --theme-glow: rgba(52, 211, 153, 0.55);
+  --theme-card-border: rgba(52, 211, 153, 0.42);
+  --theme-card-bg: rgba(6, 32, 24, 0.28);
+  --theme-bg-gradient: none;
+  --theme-badge-bg: rgba(52, 211, 153, 0.25);
+  --theme-badge-color: #a7f3d0;
+  --theme-btn-bg: #059669;
+  --theme-btn-hover: #10b981;
+  --theme-text-accent: #a7f3d0;
+  --theme-ambient-shadow: 0 0 50px rgba(16, 185, 129, 0.45);
+}
+
+html[data-mood-theme="good"] body::before {
+  display: none !important;
+  opacity: 0 !important;
+  background: none !important;
+}
+
+html[data-mood-theme="good"] body {
+  background: transparent !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="good"] #goodBgVideo {
+  display: block !important;
+  opacity: 1 !important;
+}
+
+html[data-mood-theme="good"] h1,
+html[data-mood-theme="good"] h2,
+html[data-mood-theme="good"] h3,
+html[data-mood-theme="good"] h4 {
+  color: #ffffff !important;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.85);
+}
+
+html[data-mood-theme="good"] .hello span#userName {
+  color: #ffffff !important;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.95), 0 0 16px rgba(52, 211, 153, 0.7) !important;
+}
+
+html[data-mood-theme="good"] .sub,
+html[data-mood-theme="good"] .muted,
+html[data-mood-theme="good"] .meta,
+html[data-mood-theme="good"] .small,
+html[data-mood-theme="good"] .delta {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.95), 0 2px 10px rgba(0, 0, 0, 0.9) !important;
+}
+
+html[data-mood-theme="good"] .stat-body h2 {
+  color: #a7f3d0 !important;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9) !important;
+}
+
+html[data-mood-theme="good"] .card,
+html[data-mood-theme="good"] .quiz-card,
+html[data-mood-theme="good"] .done-card,
+html[data-mood-theme="good"] .brain-card,
+html[data-mood-theme="good"] .next,
+html[data-mood-theme="good"] .insight {
+  background: rgba(6, 32, 24, 0.28) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border: 1px solid rgba(52, 211, 153, 0.42) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), 0 0 25px rgba(52, 211, 153, 0.25) !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="good"] .nav {
+  background: rgba(6, 32, 24, 0.35) !important;
+  backdrop-filter: blur(14px) !important;
+  border-color: rgba(52, 211, 153, 0.42) !important;
+}
+
+html[data-mood-theme="good"] .nav a {
+  color: #ffffff !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9) !important;
+}
+
+html[data-mood-theme="good"] .nav a.active {
+  background: #059669 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 18px rgba(52, 211, 153, 0.5) !important;
+}
+
+html[data-mood-theme="good"] .user-session-bar {
+  background: rgba(6, 32, 24, 0.35) !important;
+  backdrop-filter: blur(12px) !important;
+  border-color: rgba(52, 211, 153, 0.42) !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="good"] .user-select-dropdown {
+  background: rgba(0, 0, 0, 0.45) !important;
+  color: #a7f3d0 !important;
+  border-color: rgba(52, 211, 153, 0.42) !important;
+}
+
+html[data-mood-theme="good"] .lower-dashboard-wrapper {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+html[data-mood-theme="good"] .lower-dashboard-wrapper .card,
+html[data-mood-theme="good"] .session-vis-card {
+  background: rgba(6, 32, 24, 0.28) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border: 1px solid rgba(52, 211, 153, 0.42) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4) !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="good"] .lower-dashboard-wrapper h2,
+html[data-mood-theme="good"] .lower-dashboard-wrapper h3,
+html[data-mood-theme="good"] .lower-dashboard-wrapper h4,
+html[data-mood-theme="good"] .lower-dashboard-wrapper .eyebrow {
+  color: #ffffff !important;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.95) !important;
+}
+
+html[data-mood-theme="good"] .lower-dashboard-wrapper .muted {
+  color: #ffffff !important;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.95) !important;
+}
+
+html[data-mood-theme="good"] .sess-pill-btn {
+  background: rgba(0, 0, 0, 0.3) !important;
+  border-color: rgba(52, 211, 153, 0.35) !important;
+  color: #ffffff !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+html[data-mood-theme="good"] .sess-pill-btn .p-title {
+  color: #ffffff !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9) !important;
+}
+
+html[data-mood-theme="good"] .sess-pill-btn.active {
+  background: #059669 !important;
+  border-color: #a7f3d0 !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="good"] .metric-box,
+html[data-mood-theme="good"] .sess-mix-box,
+html[data-mood-theme="good"] .sess-q-log,
+html[data-mood-theme="good"] .rows button,
+html[data-mood-theme="good"] .paths li {
+  background: rgba(0, 0, 0, 0.25) !important;
+  backdrop-filter: blur(8px) !important;
+  border-color: rgba(52, 211, 153, 0.3) !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="good"] .m-title {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95) !important;
+}
+
+html[data-mood-theme="good"] .legend li {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95) !important;
+}
+
+html[data-mood-theme="good"] .m-value {
+  color: #a7f3d0 !important;
+  text-shadow: 0 0 10px rgba(52, 211, 153, 0.5) !important;
+}
+
+html[data-mood-theme="good"] .chosen-answer {
+  color: #a7f3d0 !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9) !important;
+}
+
+/* 6. Happy — Golden Sunshine / Motion Video Background & Crystal Transparent Glassmorphism */
+html[data-mood-theme="happy"] {
+  --theme-accent: #fbbf24;
+  --theme-glow: rgba(251, 191, 36, 0.58);
+  --theme-card-border: rgba(251, 191, 36, 0.45);
+  --theme-card-bg: rgba(36, 24, 6, 0.28);
+  --theme-bg-gradient: none;
+  --theme-badge-bg: rgba(251, 191, 36, 0.28);
+  --theme-badge-color: #fef08a;
+  --theme-btn-bg: #d97706;
+  --theme-btn-hover: #f59e0b;
+  --theme-text-accent: #fef08a;
+  --theme-ambient-shadow: 0 0 50px rgba(245, 158, 11, 0.45);
+}
+
+html[data-mood-theme="happy"] body::before {
+  display: none !important;
+  opacity: 0 !important;
+  background: none !important;
+}
+
+html[data-mood-theme="happy"] body {
+  background: transparent !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="happy"] #happyBgVideo {
+  display: block !important;
+  opacity: 1 !important;
+}
+
+html[data-mood-theme="happy"] h1,
+html[data-mood-theme="happy"] h2,
+html[data-mood-theme="happy"] h3,
+html[data-mood-theme="happy"] h4 {
+  color: #ffffff !important;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.85);
+}
+
+html[data-mood-theme="happy"] .hello span#userName {
+  color: #ffffff !important;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.95), 0 0 16px rgba(251, 191, 36, 0.7) !important;
+}
+
+html[data-mood-theme="happy"] .sub,
+html[data-mood-theme="happy"] .muted,
+html[data-mood-theme="happy"] .meta,
+html[data-mood-theme="happy"] .small,
+html[data-mood-theme="happy"] .delta {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.95), 0 2px 10px rgba(0, 0, 0, 0.9) !important;
+}
+
+html[data-mood-theme="happy"] .stat-body h2 {
+  color: #fef08a !important;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9) !important;
+}
+
+html[data-mood-theme="happy"] .card,
+html[data-mood-theme="happy"] .quiz-card,
+html[data-mood-theme="happy"] .done-card,
+html[data-mood-theme="happy"] .brain-card,
+html[data-mood-theme="happy"] .next,
+html[data-mood-theme="happy"] .insight {
+  background: rgba(36, 24, 6, 0.28) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border: 1px solid rgba(251, 191, 36, 0.45) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), 0 0 25px rgba(251, 191, 36, 0.25) !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="happy"] .nav {
+  background: rgba(36, 24, 6, 0.35) !important;
+  backdrop-filter: blur(14px) !important;
+  border-color: rgba(251, 191, 36, 0.45) !important;
+}
+
+html[data-mood-theme="happy"] .nav a {
+  color: #ffffff !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9) !important;
+}
+
+html[data-mood-theme="happy"] .nav a.active {
+  background: #d97706 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 18px rgba(251, 191, 36, 0.5) !important;
+}
+
+html[data-mood-theme="happy"] .user-session-bar {
+  background: rgba(36, 24, 6, 0.35) !important;
+  backdrop-filter: blur(12px) !important;
+  border-color: rgba(251, 191, 36, 0.45) !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="happy"] .user-select-dropdown {
+  background: rgba(0, 0, 0, 0.45) !important;
+  color: #fef08a !important;
+  border-color: rgba(251, 191, 36, 0.45) !important;
+}
+
+html[data-mood-theme="happy"] .lower-dashboard-wrapper {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+html[data-mood-theme="happy"] .lower-dashboard-wrapper .card,
+html[data-mood-theme="happy"] .session-vis-card {
+  background: rgba(36, 24, 6, 0.28) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border: 1px solid rgba(251, 191, 36, 0.45) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4) !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="happy"] .lower-dashboard-wrapper h2,
+html[data-mood-theme="happy"] .lower-dashboard-wrapper h3,
+html[data-mood-theme="happy"] .lower-dashboard-wrapper h4,
+html[data-mood-theme="happy"] .lower-dashboard-wrapper .eyebrow {
+  color: #ffffff !important;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.95) !important;
+}
+
+html[data-mood-theme="happy"] .lower-dashboard-wrapper .muted {
+  color: #ffffff !important;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.95) !important;
+}
+
+html[data-mood-theme="happy"] .sess-pill-btn {
+  background: rgba(0, 0, 0, 0.3) !important;
+  border-color: rgba(251, 191, 36, 0.35) !important;
+  color: #ffffff !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+html[data-mood-theme="happy"] .sess-pill-btn .p-title {
+  color: #ffffff !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9) !important;
+}
+
+html[data-mood-theme="happy"] .sess-pill-btn.active {
+  background: #d97706 !important;
+  border-color: #fef08a !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="happy"] .metric-box,
+html[data-mood-theme="happy"] .sess-mix-box,
+html[data-mood-theme="happy"] .sess-q-log,
+html[data-mood-theme="happy"] .rows button,
+html[data-mood-theme="happy"] .paths li {
+  background: rgba(0, 0, 0, 0.25) !important;
+  backdrop-filter: blur(8px) !important;
+  border-color: rgba(251, 191, 36, 0.3) !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="happy"] .m-title {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95) !important;
+}
+
+html[data-mood-theme="happy"] .legend li {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95) !important;
+}
+
+html[data-mood-theme="happy"] .m-value {
+  color: #fef08a !important;
+  text-shadow: 0 0 10px rgba(251, 191, 36, 0.5) !important;
+}
+
+html[data-mood-theme="happy"] .chosen-answer {
+  color: #fef08a !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9) !important;
+}
+
+/* 7. Very Happy — Sunrise Coral / Motion Video Background & Crystal Transparent Glassmorphism */
 html[data-mood-theme="veryHappy"] {
   --theme-accent: #fb923c;
-  --theme-glow: rgba(251, 146, 60, 0.52);
-  --theme-card-border: rgba(251, 146, 60, 0.48);
-  --theme-card-bg: rgba(42, 18, 8, 0.82);
-  --theme-bg-gradient: radial-gradient(
-    circle at 50% 20%,
-    rgba(255, 122, 69, 0.58) 0%,
-    rgba(28, 9, 3, 0.93) 100%
-  );
-  --theme-badge-bg: rgba(251, 146, 60, 0.25);
-  --theme-badge-color: #fed7aa;
+  --theme-glow: rgba(251, 146, 60, 0.58);
+  --theme-card-border: rgba(251, 146, 60, 0.45);
+  --theme-card-bg: rgba(40, 16, 6, 0.28);
+  --theme-bg-gradient: none;
+  --theme-badge-bg: rgba(251, 146, 60, 0.35);
+  --theme-badge-color: #ffffff;
   --theme-btn-bg: #ea580c;
   --theme-btn-hover: #f97316;
-  --theme-text-accent: #ffedd5;
-  --theme-ambient-shadow: 0 0 55px rgba(249, 115, 22, 0.48);
+  --theme-text-accent: #ffffff;
+  --theme-ambient-shadow: 0 0 50px rgba(249, 115, 22, 0.45);
 }
 
-/* 8. Euphoric — Neon Magenta / Electric Pink Atmosphere */
+html[data-mood-theme="veryHappy"] body::before {
+  display: none !important;
+  opacity: 0 !important;
+  background: none !important;
+}
+
+html[data-mood-theme="veryHappy"] body {
+  background: transparent !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="veryHappy"] #veryHappyBgVideo {
+  display: block !important;
+  opacity: 1 !important;
+}
+
+html[data-mood-theme="veryHappy"] h1,
+html[data-mood-theme="veryHappy"] h2,
+html[data-mood-theme="veryHappy"] h3,
+html[data-mood-theme="veryHappy"] h4,
+html[data-mood-theme="veryHappy"] h5,
+html[data-mood-theme="veryHappy"] h6 {
+  color: #ffffff !important;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95) !important;
+}
+
+html[data-mood-theme="veryHappy"] .hello span#userName {
+  color: #ffffff !important;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.95), 0 0 18px rgba(255, 255, 255, 0.9) !important;
+}
+
+html[data-mood-theme="veryHappy"] .sub,
+html[data-mood-theme="veryHappy"] .muted,
+html[data-mood-theme="veryHappy"] .meta,
+html[data-mood-theme="veryHappy"] .small,
+html[data-mood-theme="veryHappy"] .delta,
+html[data-mood-theme="veryHappy"] .eyebrow {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.95), 0 2px 12px rgba(0, 0, 0, 0.9) !important;
+}
+
+html[data-mood-theme="veryHappy"] .stat-body h2,
+html[data-mood-theme="veryHappy"] .stat h2 {
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95) !important;
+}
+
+html[data-mood-theme="veryHappy"] .stat .big,
+html[data-mood-theme="veryHappy"] #stressValue,
+html[data-mood-theme="veryHappy"] #moodValue,
+html[data-mood-theme="veryHappy"] #sleepValue,
+html[data-mood-theme="veryHappy"] .ring-val,
+html[data-mood-theme="veryHappy"] .ring-val span,
+html[data-mood-theme="veryHappy"] .ring-val small {
+  color: #ffffff !important;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.95), 0 0 20px rgba(251, 146, 60, 0.7) !important;
+}
+
+html[data-mood-theme="veryHappy"] .tag,
+html[data-mood-theme="veryHappy"] .tag-teal,
+html[data-mood-theme="veryHappy"] .tag-coral,
+html[data-mood-theme="veryHappy"] .tag-gold,
+html[data-mood-theme="veryHappy"] .tag-purple,
+html[data-mood-theme="veryHappy"] .tag-mint,
+html[data-mood-theme="veryHappy"] .tag-magenta {
+  color: #ffffff !important;
+  background: rgba(234, 88, 12, 0.5) !important;
+  border: 1px solid rgba(254, 215, 170, 0.6) !important;
+  font-weight: 700 !important;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.95) !important;
+}
+
+html[data-mood-theme="veryHappy"] .card,
+html[data-mood-theme="veryHappy"] .quiz-card,
+html[data-mood-theme="veryHappy"] .done-card,
+html[data-mood-theme="veryHappy"] .brain-card,
+html[data-mood-theme="veryHappy"] .next,
+html[data-mood-theme="veryHappy"] .insight {
+  background: rgba(40, 16, 6, 0.28) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border: 1px solid rgba(251, 146, 60, 0.45) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), 0 0 25px rgba(251, 146, 60, 0.25) !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="veryHappy"] .nav {
+  background: rgba(40, 16, 6, 0.35) !important;
+  backdrop-filter: blur(14px) !important;
+  border-color: rgba(251, 146, 60, 0.45) !important;
+}
+
+html[data-mood-theme="veryHappy"] .nav a {
+  color: #ffffff !important;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.95) !important;
+}
+
+html[data-mood-theme="veryHappy"] .nav a.active {
+  background: #ea580c !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 18px rgba(251, 146, 60, 0.5) !important;
+}
+
+html[data-mood-theme="veryHappy"] .user-session-bar {
+  background: rgba(40, 16, 6, 0.35) !important;
+  backdrop-filter: blur(12px) !important;
+  border-color: rgba(251, 146, 60, 0.45) !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="veryHappy"] .user-select-dropdown {
+  background: rgba(0, 0, 0, 0.6) !important;
+  color: #ffffff !important;
+  border-color: rgba(251, 146, 60, 0.5) !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9) !important;
+}
+
+html[data-mood-theme="veryHappy"] .theme-mood-pill,
+html[data-mood-theme="veryHappy"] #activeThemeBadge {
+  color: #ffffff !important;
+  background: rgba(234, 88, 12, 0.45) !important;
+  border: 1px solid rgba(254, 215, 170, 0.6) !important;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9) !important;
+}
+
+html[data-mood-theme="veryHappy"] .lower-dashboard-wrapper {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+html[data-mood-theme="veryHappy"] .lower-dashboard-wrapper .card,
+html[data-mood-theme="veryHappy"] .session-vis-card {
+  background: rgba(40, 16, 6, 0.28) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border: 1px solid rgba(251, 146, 60, 0.45) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4) !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="veryHappy"] .lower-dashboard-wrapper h2,
+html[data-mood-theme="veryHappy"] .lower-dashboard-wrapper h3,
+html[data-mood-theme="veryHappy"] .lower-dashboard-wrapper h4,
+html[data-mood-theme="veryHappy"] .lower-dashboard-wrapper .eyebrow {
+  color: #ffffff !important;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.95) !important;
+}
+
+html[data-mood-theme="veryHappy"] .lower-dashboard-wrapper .muted {
+  color: #ffffff !important;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.95) !important;
+}
+
+html[data-mood-theme="veryHappy"] .sess-pill-btn {
+  background: rgba(0, 0, 0, 0.3) !important;
+  border-color: rgba(251, 146, 60, 0.35) !important;
+  color: #ffffff !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+html[data-mood-theme="veryHappy"] .sess-pill-btn .p-title,
+html[data-mood-theme="veryHappy"] .sess-pill-btn .p-sub,
+html[data-mood-theme="veryHappy"] .sess-pill-btn .p-date {
+  color: #ffffff !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9) !important;
+}
+
+html[data-mood-theme="veryHappy"] .sess-pill-btn.active {
+  background: #ea580c !important;
+  border-color: #ffffff !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="veryHappy"] .metric-box,
+html[data-mood-theme="veryHappy"] .sess-mix-box,
+html[data-mood-theme="veryHappy"] .sess-q-log,
+html[data-mood-theme="veryHappy"] .rows button,
+html[data-mood-theme="veryHappy"] .paths li {
+  background: rgba(0, 0, 0, 0.25) !important;
+  backdrop-filter: blur(8px) !important;
+  border-color: rgba(251, 146, 60, 0.3) !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="veryHappy"] .m-title {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95) !important;
+}
+
+html[data-mood-theme="veryHappy"] .legend li {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95) !important;
+}
+
+html[data-mood-theme="veryHappy"] .m-value {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  text-shadow: 0 0 10px rgba(251, 146, 60, 0.8) !important;
+}
+
+html[data-mood-theme="veryHappy"] .chosen-answer {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95) !important;
+}
+
+/* Motion Video Background Base Styling */
+.bg-motion-video {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  z-index: -2;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.8s ease-in-out;
+}
+
+/* 8. Euphoric — Neon Magenta / Motion Video Background & Crystal Transparent Glassmorphism */
 html[data-mood-theme="euphoric"] {
-  --theme-accent: #f43f5e;
-  --theme-glow: rgba(255, 63, 142, 0.58);
-  --theme-card-border: rgba(255, 63, 142, 0.52);
-  --theme-card-bg: rgba(42, 8, 26, 0.82);
-  --theme-bg-gradient: radial-gradient(
-    circle at 50% 20%,
-    rgba(255, 63, 142, 0.62) 0%,
-    rgba(28, 3, 15, 0.93) 100%
-  );
-  --theme-badge-bg: rgba(255, 63, 142, 0.28);
+  --theme-accent: #ff3f8e;
+  --theme-glow: rgba(255, 63, 142, 0.6);
+  --theme-card-border: rgba(255, 63, 142, 0.45);
+  --theme-card-bg: rgba(28, 4, 18, 0.22);
+  --theme-bg-gradient: none;
+  --theme-badge-bg: rgba(255, 63, 142, 0.3);
   --theme-badge-color: #fecdd3;
   --theme-btn-bg: #e11d48;
   --theme-btn-hover: #f43f5e;
-  --theme-text-accent: #ffe4e6;
-  --theme-ambient-shadow: 0 0 60px rgba(244, 63, 94, 0.55);
+  --theme-text-accent: #ff75ac;
+  --theme-ambient-shadow: 0 0 50px rgba(255, 63, 142, 0.4);
+}
+
+html[data-mood-theme="euphoric"] body::before {
+  display: none !important;
+  opacity: 0 !important;
+  background: none !important;
+}
+
+html[data-mood-theme="euphoric"] body {
+  background: transparent !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="euphoric"] .bg-motion-video {
+  display: block !important;
+  opacity: 1 !important;
+}
+
+html[data-mood-theme="euphoric"] h1,
+html[data-mood-theme="euphoric"] h2,
+html[data-mood-theme="euphoric"] h3,
+html[data-mood-theme="euphoric"] h4 {
+  color: #ffffff !important;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.85);
+}
+
+html[data-mood-theme="euphoric"] .hello span#userName {
+  color: #ff75ac !important;
+  text-shadow: 0 0 16px rgba(255, 63, 142, 0.8) !important;
+}
+
+html[data-mood-theme="euphoric"] .sub,
+html[data-mood-theme="euphoric"] .muted,
+html[data-mood-theme="euphoric"] .meta,
+html[data-mood-theme="euphoric"] .small,
+html[data-mood-theme="euphoric"] .delta {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.95), 0 2px 10px rgba(0, 0, 0, 0.9) !important;
+}
+
+html[data-mood-theme="euphoric"] .stat-body h2 {
+  color: #fecdd3 !important;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9) !important;
+}
+
+html[data-mood-theme="euphoric"] .stat .big {
+  color: #ffffff !important;
+  text-shadow: 0 0 18px rgba(255, 63, 142, 0.6) !important;
+}
+
+html[data-mood-theme="euphoric"] .card,
+html[data-mood-theme="euphoric"] .quiz-card,
+html[data-mood-theme="euphoric"] .done-card,
+html[data-mood-theme="euphoric"] .brain-card,
+html[data-mood-theme="euphoric"] .next,
+html[data-mood-theme="euphoric"] .insight {
+  background: rgba(28, 4, 18, 0.22) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border: 1px solid rgba(255, 63, 142, 0.45) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 63, 142, 0.25) !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="euphoric"] .nav {
+  background: rgba(28, 4, 18, 0.35) !important;
+  backdrop-filter: blur(14px) !important;
+  border-color: rgba(255, 63, 142, 0.4) !important;
+}
+
+html[data-mood-theme="euphoric"] .nav a {
+  color: #ffffff !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9) !important;
+}
+
+html[data-mood-theme="euphoric"] .nav a.active {
+  background: #e11d48 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 18px rgba(255, 63, 142, 0.6) !important;
+}
+
+html[data-mood-theme="euphoric"] .user-session-bar {
+  background: rgba(28, 4, 18, 0.35) !important;
+  backdrop-filter: blur(12px) !important;
+  border-color: rgba(255, 63, 142, 0.4) !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="euphoric"] .user-select-dropdown {
+  background: rgba(0, 0, 0, 0.45) !important;
+  color: #fecdd3 !important;
+  border-color: rgba(255, 63, 142, 0.45) !important;
+}
+
+html[data-mood-theme="euphoric"] .lower-dashboard-wrapper {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+html[data-mood-theme="euphoric"] .lower-dashboard-wrapper .card,
+html[data-mood-theme="euphoric"] .session-vis-card {
+  background: rgba(28, 4, 18, 0.22) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border: 1px solid rgba(255, 63, 142, 0.45) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4) !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="euphoric"] .lower-dashboard-wrapper h2,
+html[data-mood-theme="euphoric"] .lower-dashboard-wrapper h3,
+html[data-mood-theme="euphoric"] .lower-dashboard-wrapper h4,
+html[data-mood-theme="euphoric"] .lower-dashboard-wrapper .eyebrow {
+  color: #ffffff !important;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.95) !important;
+}
+
+html[data-mood-theme="euphoric"] .lower-dashboard-wrapper .muted {
+  color: #ffffff !important;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.95) !important;
+}
+
+html[data-mood-theme="euphoric"] .sess-pill-btn {
+  background: rgba(0, 0, 0, 0.3) !important;
+  border-color: rgba(255, 63, 142, 0.35) !important;
+  color: #ffffff !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+html[data-mood-theme="euphoric"] .sess-pill-btn .p-title {
+  color: #ffffff !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9) !important;
+}
+
+html[data-mood-theme="euphoric"] .sess-pill-btn.active {
+  background: #e11d48 !important;
+  border-color: #ff75ac !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="euphoric"] .metric-box,
+html[data-mood-theme="euphoric"] .sess-mix-box,
+html[data-mood-theme="euphoric"] .sess-q-log,
+html[data-mood-theme="euphoric"] .rows button,
+html[data-mood-theme="euphoric"] .paths li {
+  background: rgba(0, 0, 0, 0.25) !important;
+  backdrop-filter: blur(8px) !important;
+  border-color: rgba(255, 63, 142, 0.3) !important;
+  color: #ffffff !important;
+}
+
+html[data-mood-theme="euphoric"] .m-title {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95) !important;
+}
+
+html[data-mood-theme="euphoric"] .legend li {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95) !important;
+}
+
+html[data-mood-theme="euphoric"] .m-value {
+  color: #ff75ac !important;
+  text-shadow: 0 0 12px rgba(255, 63, 142, 0.6) !important;
+}
+
+html[data-mood-theme="euphoric"] .chosen-answer {
+  color: #ff75ac !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9) !important;
 }
 
 /* ---------- Glassmorphic Container Dynamic Theme Bindings ---------- */
@@ -2124,45 +3614,47 @@ html[data-mood-theme="euphoric"] {
   width: 100%;
 }
 
-/* ---------- Lower Dashboard Watercolor Section ---------- */
+/* ---------- Lower Dashboard Container (Transparent Glass) ---------- */
 .lower-dashboard-wrapper {
   grid-column: 1 / -1;
   display: grid;
   gap: 24px;
-  background: url("assets/analytics-bg.png") center/cover no-repeat !important;
-  border-radius: 28px;
-  padding: 32px 28px;
-  border: 1px solid rgba(140, 200, 220, 0.45);
-  box-shadow: 0 20px 50px -15px rgba(35, 90, 110, 0.22);
+  background: transparent !important;
+  border-radius: 0;
+  padding: 0;
+  border: none !important;
+  box-shadow: none !important;
 }
 .lower-dashboard-wrapper .card {
-  background: rgba(255, 255, 255, 0.74) !important;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.88) !important;
-  box-shadow: 0 10px 30px rgba(28, 110, 126, 0.08) !important;
-  color: #123844 !important;
+  background: var(--theme-card-bg, rgba(10, 22, 18, 0.45)) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--theme-card-border, rgba(255, 255, 255, 0.22)) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45) !important;
+  color: #ffffff !important;
 }
 .lower-dashboard-wrapper h2,
 .lower-dashboard-wrapper h3,
 .lower-dashboard-wrapper h4,
 .lower-dashboard-wrapper .eyebrow {
-  color: #0b3240 !important;
+  color: #ffffff !important;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.75);
 }
 .lower-dashboard-wrapper .muted {
-  color: rgba(18, 56, 68, 0.82) !important;
+  color: #b8d1c4 !important;
 }
 
-/* ---------- Session-Wise Analysis Visualizer ---------- */
+/* ---------- Session-Wise Analysis Visualizer (Transparent Glass Theme) ---------- */
 .session-vis-card {
   grid-column: 1/-1;
-  background: rgba(255, 255, 255, 0.74) !important;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.88) !important;
+  background: var(--theme-card-bg, rgba(10, 22, 18, 0.45)) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--theme-card-border, rgba(255, 255, 255, 0.22)) !important;
   border-radius: 24px !important;
   padding: 28px 32px !important;
-  box-shadow: 0 10px 30px rgba(28, 110, 126, 0.08) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45) !important;
+  color: #ffffff !important;
 }
 .session-vis-head {
   display: flex;
@@ -2180,32 +3672,37 @@ html[data-mood-theme="euphoric"] {
 .session-dropdown {
   padding: 8px 16px;
   border-radius: 14px;
-  border: 1px solid rgba(63, 166, 184, 0.4);
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(8px);
+  border: 1px solid var(--theme-card-border, rgba(255, 255, 255, 0.3));
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(10px);
   font: inherit;
   font-weight: 700;
   font-size: 0.88rem;
-  color: var(--deep-teal);
+  color: var(--theme-accent, #6ee7b7);
   cursor: pointer;
+}
+.session-dropdown option {
+  background: #0a1410;
+  color: #ffffff;
 }
 
 .vis-chart-section {
-  background: rgba(255, 255, 255, 0.65) !important;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.85) !important;
+  background: rgba(0, 0, 0, 0.28) !important;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
   border-radius: 18px;
   padding: 18px;
   margin: 16px 0 22px;
-  box-shadow: 0 8px 24px rgba(28, 110, 126, 0.08);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
 }
 .vis-chart-head {
   margin-bottom: 14px;
 }
 .vis-chart-head h3 {
   font-size: 1.05rem;
-  color: var(--charcoal);
+  color: #ffffff;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
 }
 
 .session-wave-container {
@@ -2221,11 +3718,13 @@ html[data-mood-theme="euphoric"] {
   align-items: center;
   gap: 16px;
   flex-wrap: wrap;
-  padding: 8px 12px;
-  background: rgba(251, 243, 227, 0.7);
-  border: 1px solid rgba(217, 203, 163, 0.6);
+  padding: 8px 14px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 14px;
   font-size: 0.82rem;
+  color: #ffffff;
+  backdrop-filter: blur(10px);
 }
 .legend-toggle {
   display: flex;
@@ -2235,15 +3734,15 @@ html[data-mood-theme="euphoric"] {
   padding: 4px 10px;
   border-radius: 999px;
   user-select: none;
-  opacity: 0.5;
-  transition:
-    opacity 0.2s,
-    background 0.2s;
+  opacity: 0.65;
+  transition: opacity 0.2s, background 0.2s;
+  color: #b8d1c4;
 }
 .legend-toggle.active {
   opacity: 1;
-  background: #fff;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 .dot-line {
   width: 12px;
@@ -2263,18 +3762,19 @@ html[data-mood-theme="euphoric"] {
   margin-left: auto;
   font-weight: 700;
   font-size: 0.78rem;
-  color: var(--deep-teal);
+  color: var(--theme-accent, #6ee7b7);
 }
 
 .svg-graph-wrapper {
   width: 100%;
   overflow-x: auto;
-  background: #fff;
-  border: 1px solid var(--muted-sand);
+  background: rgba(0, 0, 0, 0.25) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 16px;
   padding: 12px 6px;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.03);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
   scrollbar-width: thin;
+  backdrop-filter: blur(10px);
 }
 .session-line-svg {
   width: 100%;
@@ -2284,31 +3784,31 @@ html[data-mood-theme="euphoric"] {
 }
 
 .grid-line {
-  stroke: rgba(217, 203, 163, 0.4);
+  stroke: rgba(255, 255, 255, 0.16);
   stroke-width: 1;
   stroke-dasharray: 4 4;
 }
 .grid-line-v {
-  stroke: rgba(217, 203, 163, 0.3);
+  stroke: rgba(255, 255, 255, 0.12);
   stroke-width: 1;
 }
 .selected-grid-v {
-  stroke: var(--deep-teal);
+  stroke: var(--theme-accent, #6ee7b7);
   stroke-width: 1.5;
   stroke-dasharray: 3 3;
 }
 .grid-label {
-  fill: var(--mountain-brown);
+  fill: #b8d1c4;
   font-size: 11px;
   font-weight: 600;
 }
 .x-axis-label {
-  fill: var(--mountain-brown);
+  fill: #b8d1c4;
   font-size: 11px;
   font-weight: 700;
 }
 .active-x-label {
-  fill: var(--deep-teal);
+  fill: var(--theme-accent, #6ee7b7);
   font-size: 12px;
   font-weight: 800;
 }
@@ -2350,59 +3850,63 @@ html[data-mood-theme="euphoric"] {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(251, 243, 227, 0.7);
-  border: 1px solid var(--muted-sand);
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 999px;
   padding: 6px 14px;
   font: inherit;
   cursor: pointer;
+  color: #ffffff;
+  backdrop-filter: blur(8px);
   transition: all 0.2s;
 }
 .sess-pill-btn:hover {
-  background: #fff;
-  border-color: var(--ocean-teal);
+  background: rgba(255, 255, 255, 0.2);
+  border-color: var(--theme-accent, #6ee7b7);
   transform: translateY(-2px);
 }
 .sess-pill-btn.active {
-  background: var(--deep-teal);
-  color: #fff;
-  border-color: var(--deep-teal);
-  box-shadow: 0 4px 12px rgba(28, 110, 126, 0.3);
+  background: var(--theme-btn-bg, #154d3d);
+  color: #ffffff;
+  border-color: var(--theme-accent, #6ee7b7);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
 }
 .sess-pill-btn.active .p-title,
 .sess-pill-btn.active .p-num {
-  color: #fff;
+  color: #ffffff;
 }
 .p-num {
   font-size: 0.72rem;
   font-weight: 800;
-  color: var(--deep-teal);
+  color: var(--theme-accent, #6ee7b7);
   text-transform: uppercase;
 }
 .p-title {
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--charcoal);
+  color: #ffffff;
 }
 .p-score {
   font-size: 0.78rem;
   font-weight: 800;
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.2);
   padding: 2px 7px;
   border-radius: 999px;
+  color: #ffffff;
 }
 
-/* Detailed Session Breakdown Card */
+/* Detailed Session Breakdown Card (Transparent Glass) */
 .session-detail-card {
-  background: rgba(255, 255, 255, 0.72) !important;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.85) !important;
+  background: var(--theme-card-bg, rgba(10, 22, 18, 0.45)) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--theme-card-border, rgba(255, 255, 255, 0.22)) !important;
   border-radius: 20px;
   padding: 24px;
   display: grid;
   gap: 20px;
-  box-shadow: 0 10px 30px rgba(28, 110, 126, 0.08);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  color: #ffffff !important;
 }
 .sess-detail-header {
   display: flex;
@@ -2435,45 +3939,49 @@ html[data-mood-theme="euphoric"] {
   gap: 14px;
 }
 .metric-box {
-  background: rgba(251, 243, 227, 0.6);
-  border: 1px solid var(--muted-sand);
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 16px;
   padding: 14px;
   display: flex;
   flex-direction: column;
   gap: 4px;
+  backdrop-filter: blur(10px);
 }
 .m-title {
   font-size: 0.78rem;
-  color: var(--mountain-brown);
+  color: #b8d1c4;
   font-weight: 600;
 }
 .m-value {
   font-size: 1.4rem;
-  color: var(--deep-teal);
+  color: var(--theme-accent, #6ee7b7);
 }
 
 .sess-mix-box {
-  background: rgba(251, 243, 227, 0.4);
-  border: 1px solid rgba(217, 203, 163, 0.5);
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 16px;
   padding: 16px;
+  backdrop-filter: blur(10px);
 }
 .sess-mix-box h4 {
   font-size: 0.95rem;
   margin-bottom: 8px;
+  color: #ffffff;
 }
 
 .sess-q-log {
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid var(--muted-sand);
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 16px;
   padding: 16px;
+  backdrop-filter: blur(10px);
 }
 .sess-q-log h4 {
   font-size: 0.95rem;
   margin-bottom: 12px;
-  color: var(--charcoal);
+  color: #ffffff;
 }
 .q-log-list {
   list-style: none;
@@ -2487,13 +3995,14 @@ html[data-mood-theme="euphoric"] {
   gap: 12px;
   align-items: flex-start;
   padding: 10px 14px;
-  background: rgba(251, 243, 227, 0.5);
+  background: rgba(0, 0, 0, 0.25);
   border-radius: 12px;
-  border: 1px solid rgba(217, 203, 163, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
 }
 .q-num-pill {
-  background: var(--deep-teal);
-  color: #fff;
+  background: var(--theme-btn-bg, #154d3d);
+  color: #ffffff;
   font-size: 0.7rem;
   font-weight: 800;
   padding: 3px 8px;
@@ -2506,9 +4015,10 @@ html[data-mood-theme="euphoric"] {
   flex-direction: column;
   gap: 3px;
   font-size: 0.88rem;
+  color: #ffffff;
 }
 .chosen-answer {
-  color: var(--deep-teal);
+  color: var(--theme-accent, #6ee7b7);
   font-size: 0.82rem;
   margin-top: 2px;
 }

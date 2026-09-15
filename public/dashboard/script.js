@@ -4,7 +4,7 @@
    - Synchronizes mood trends, mood mix, story progression, and session breakdown. */
 
 const MOOD_LEVELS = [
-  { key: "veryLow",   level: 1, label: "Very Low",   note: "Overwhelmed",        color: "#171923", face: "😞" },
+  { key: "veryLow",   level: 1, label: "Very Low",   note: "Overwhelmed",        color: "#6ee7b7", face: "😞" },
   { key: "low",       level: 2, label: "Low",        note: "Sad / withdrawn",    color: "#49307A", face: "🙁" },
   { key: "uneasy",    level: 3, label: "Uneasy",     note: "Worried / anxious",  color: "#7B45D6", face: "😟" },
   { key: "neutral",   level: 4, label: "Neutral",    note: "Steady / okay",      color: "#48B9E8", face: "😐" },
@@ -14,14 +14,23 @@ const MOOD_LEVELS = [
   { key: "euphoric",  level: 8, label: "Euphoric",   note: "Feel like flying",   color: "#FF3F8E", face: "🤩" }
 ];
 
-const levelFor = score => MOOD_LEVELS[Math.min(MOOD_LEVELS.length - 1, Math.max(0, Math.floor((score / 100) * MOOD_LEVELS.length)))];
+const levelFor = score => {
+  if (score <= 20) return MOOD_LEVELS[0];
+  if (score <= 35) return MOOD_LEVELS[1];
+  if (score <= 48) return MOOD_LEVELS[2];
+  if (score <= 62) return MOOD_LEVELS[3];
+  if (score <= 75) return MOOD_LEVELS[4];
+  if (score <= 86) return MOOD_LEVELS[5];
+  if (score <= 94) return MOOD_LEVELS[6];
+  return MOOD_LEVELS[7];
+};
 const levelForInverse = score => levelFor(100 - score);
 
 const MOOD_THEME_META = {
-  veryLow:   { key: "veryLow",   label: "Very Low",   name: "Stormy Slate",     icon: "⛈️" },
+  veryLow:   { key: "veryLow",   label: "Very Low",   name: "Misty Shadow Valley", icon: "🏔️" },
   low:       { key: "low",       label: "Low",        name: "Twilight Plum",    icon: "🌧️" },
   uneasy:    { key: "uneasy",    label: "Uneasy",     name: "Electric Violet",  icon: "🔮" },
-  neutral:   { key: "neutral",   label: "Neutral",    name: "Ocean Cyan",       icon: "🌊" },
+  neutral:   { key: "neutral",   label: "Neutral",    name: "Serene Sunset Zen", icon: "🪨" },
   good:      { key: "good",      label: "Good",       name: "Mint Emerald",     icon: "🌿" },
   happy:     { key: "happy",     label: "Happy",      name: "Golden Sunshine",  icon: "☀️" },
   veryHappy: { key: "veryHappy", label: "Very Happy", name: "Sunrise Coral",    icon: "🔥" },
@@ -29,11 +38,6 @@ const MOOD_THEME_META = {
 };
 
 function getDominantMoodKey(mix, moodScore) {
-  if (typeof moodScore === "number" && !isNaN(moodScore)) {
-    const lv = levelFor(moodScore);
-    if (lv && lv.key) return lv.key;
-  }
-
   if (mix && typeof mix === "object") {
     let maxKey = null;
     let maxPct = 0;
@@ -46,6 +50,11 @@ function getDominantMoodKey(mix, moodScore) {
       }
     });
     if (maxKey && maxPct > 0) return maxKey;
+  }
+
+  if (typeof moodScore === "number" && !isNaN(moodScore)) {
+    const lv = levelFor(moodScore);
+    if (lv && lv.key) return lv.key;
   }
 
   return "neutral";
@@ -69,6 +78,72 @@ function applyDynamicMoodTheme(mixOrKey, moodScore) {
     badge.innerHTML = `<span aria-hidden="true">${meta.icon}</span> Theme: ${meta.name} (${meta.label})`;
     badge.title = `Active app theme reflecting dominant mood division: ${meta.label} (${meta.name})`;
   }
+
+  const euphoricVid = $("#euphoricBgVideo");
+  if (euphoricVid) {
+    if (key === "euphoric") {
+      euphoricVid.style.display = "block";
+      euphoricVid.play().catch(e => console.log("Video autoplay check:", e));
+    } else {
+      euphoricVid.style.display = "none";
+      euphoricVid.pause();
+    }
+  }
+
+  const lowVid = $("#lowBgVideo");
+  if (lowVid) {
+    if (key === "low") {
+      lowVid.style.display = "block";
+      lowVid.play().catch(e => console.log("Video autoplay check:", e));
+    } else {
+      lowVid.style.display = "none";
+      lowVid.pause();
+    }
+  }
+
+  const uneasyVid = $("#uneasyBgVideo");
+  if (uneasyVid) {
+    if (key === "uneasy") {
+      uneasyVid.style.display = "block";
+      uneasyVid.play().catch(e => console.log("Video autoplay check:", e));
+    } else {
+      uneasyVid.style.display = "none";
+      uneasyVid.pause();
+    }
+  }
+
+  const goodVid = $("#goodBgVideo");
+  if (goodVid) {
+    if (key === "good") {
+      goodVid.style.display = "block";
+      goodVid.play().catch(e => console.log("Video autoplay check:", e));
+    } else {
+      goodVid.style.display = "none";
+      goodVid.pause();
+    }
+  }
+
+  const happyVid = $("#happyBgVideo");
+  if (happyVid) {
+    if (key === "happy") {
+      happyVid.style.display = "block";
+      happyVid.play().catch(e => console.log("Video autoplay check:", e));
+    } else {
+      happyVid.style.display = "none";
+      happyVid.pause();
+    }
+  }
+
+  const veryHappyVid = $("#veryHappyBgVideo");
+  if (veryHappyVid) {
+    if (key === "veryHappy") {
+      veryHappyVid.style.display = "block";
+      veryHappyVid.play().catch(e => console.log("Video autoplay check:", e));
+    } else {
+      veryHappyVid.style.display = "none";
+      veryHappyVid.pause();
+    }
+  }
 }
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -79,13 +154,44 @@ const USERS_KEY = "mindful.users";
 const CURRENT_USER_KEY = "mindful.currentUser";
 const DEFAULT_USERS = [
   { id: "user_sara", name: "Sara" },
-  { id: "user_alex", name: "Alex" }
+  { id: "user_alex", name: "Alex" },
+  { id: "user_elena_low", name: "Elena (Very Low Mood)" },
+  { id: "user_kai_low", name: "Kai (Low Mood)" },
+  { id: "user_rowan_uneasy", name: "Rowan (Uneasy Mood)" },
+  { id: "user_oliver_good", name: "Oliver (Good Mood)" },
+  { id: "user_sunny_happy", name: "Sunny (Happy Mood)" },
+  { id: "user_blaze_veryhappy", name: "Blaze (Very Happy Mood)" },
+  { id: "user_spark_euphoric", name: "Spark (Euphoric Mood)" }
 ];
 
 function getUsers() {
   try {
     const data = JSON.parse(localStorage.getItem(USERS_KEY));
-    if (Array.isArray(data) && data.length > 0) return data;
+    if (Array.isArray(data) && data.length > 0) {
+      if (!data.some(u => u.id === "user_elena_low")) {
+        data.push({ id: "user_elena_low", name: "Elena (Very Low Mood)" });
+      }
+      if (!data.some(u => u.id === "user_kai_low")) {
+        data.push({ id: "user_kai_low", name: "Kai (Low Mood)" });
+      }
+      if (!data.some(u => u.id === "user_rowan_uneasy")) {
+        data.push({ id: "user_rowan_uneasy", name: "Rowan (Uneasy Mood)" });
+      }
+      if (!data.some(u => u.id === "user_oliver_good")) {
+        data.push({ id: "user_oliver_good", name: "Oliver (Good Mood)" });
+      }
+      if (!data.some(u => u.id === "user_sunny_happy")) {
+        data.push({ id: "user_sunny_happy", name: "Sunny (Happy Mood)" });
+      }
+      if (!data.some(u => u.id === "user_blaze_veryhappy")) {
+        data.push({ id: "user_blaze_veryhappy", name: "Blaze (Very Happy Mood)" });
+      }
+      if (!data.some(u => u.id === "user_spark_euphoric")) {
+        data.push({ id: "user_spark_euphoric", name: "Spark (Euphoric Mood)" });
+      }
+      localStorage.setItem(USERS_KEY, JSON.stringify(data));
+      return data;
+    }
   } catch (e) {}
   localStorage.setItem(USERS_KEY, JSON.stringify(DEFAULT_USERS));
   return DEFAULT_USERS;
@@ -127,6 +233,191 @@ function syncAuthenticatedUser(user) {
 }
 
 function loadUserCheckins(userId) {
+  if (userId === "user_elena_low") {
+    const lowHistory = [
+      {
+        sessionId: "sess_low_1",
+        userId: "user_elena_low",
+        story: "Misty Shadow Valley Journal",
+        genre: "Atmospheric Reflections",
+        storyId: "002_misty_valley",
+        setNumber: 1,
+        questionRange: "Q1–Q6",
+        mood: 10, energy: 15, stress: 88, sleep: 30,
+        mix: { veryLow: 85, low: 15 },
+        dominant: "Very Low",
+        at: new Date(Date.now() - 2 * 86400000).toISOString(),
+        answersDetailed: [
+          { globalQ: 1, question: "Dense fog covers the mountain paths.", chosenOption: "Pause by the solitary cabin in the valley", mix: { veryLow: 8, low: 2 } },
+          { globalQ: 2, question: "Cold wind echoes through the pass.", chosenOption: "Sit quietly and listen to the stillness", mix: { veryLow: 7, low: 3 } }
+        ]
+      },
+      {
+        sessionId: "sess_low_2",
+        userId: "user_elena_low",
+        story: "Misty Shadow Valley Journal",
+        genre: "Atmospheric Reflections",
+        storyId: "002_misty_valley",
+        setNumber: 2,
+        questionRange: "Q7–Q12",
+        mood: 12, energy: 18, stress: 85, sleep: 35,
+        mix: { veryLow: 80, low: 20 },
+        dominant: "Very Low",
+        at: new Date(Date.now() - 86400000).toISOString(),
+        answersDetailed: [
+          { globalQ: 7, question: "Faint light emerges over the dark ridges.", chosenOption: "Watch the mist swirl gently around the trees", mix: { veryLow: 8, low: 2 } },
+          { globalQ: 8, question: "Navigating the silent slope.", chosenOption: "Take small slow steps forward", mix: { veryLow: 7, low: 3 } }
+        ]
+      }
+    ];
+    localStorage.setItem(`mindful.checkins.${userId}`, JSON.stringify(lowHistory));
+    return lowHistory;
+  }
+
+  if (userId === "user_kai_low") {
+    const kaiHistory = [
+      {
+        sessionId: "sess_kai_low_1",
+        userId: "user_kai_low",
+        story: "Twilight Amethyst Sanctuary",
+        genre: "Gentle Reflections",
+        storyId: "004_low_kai",
+        setNumber: 1,
+        questionRange: "Q1–Q6",
+        mood: 32, energy: 35, stress: 68, sleep: 50,
+        mix: { low: 80, uneasy: 20 },
+        dominant: "Low",
+        at: new Date(Date.now() - 86400000).toISOString(),
+        answersDetailed: [
+          { globalQ: 1, question: "Twilight settles softly over the quiet garden.", chosenOption: "Sit beneath the purple shadows and breathe slowly", mix: { low: 8, uneasy: 2 } },
+          { globalQ: 2, question: "A light breeze rustles through dark plum leaves.", chosenOption: "Listen to the tranquil evening breeze", mix: { low: 8, uneasy: 2 } }
+        ]
+      }
+    ];
+    localStorage.setItem(`mindful.checkins.${userId}`, JSON.stringify(kaiHistory));
+    return kaiHistory;
+  }
+
+  if (userId === "user_rowan_uneasy") {
+    const uneasyHistory = [
+      {
+        sessionId: "sess_rowan_uneasy_1",
+        userId: "user_rowan_uneasy",
+        story: "Electric Violet Echoes",
+        genre: "Intensive Reflections",
+        storyId: "005_uneasy_rowan",
+        setNumber: 1,
+        questionRange: "Q1–Q6",
+        mood: 42, energy: 45, stress: 75, sleep: 55,
+        mix: { uneasy: 85, low: 15 },
+        dominant: "Uneasy",
+        at: new Date(Date.now() - 86400000).toISOString(),
+        answersDetailed: [
+          { globalQ: 1, question: "Uncertain pulses echo through the corridor.", chosenOption: "Observe the shifting neon currents carefully", mix: { uneasy: 8, low: 2 } },
+          { globalQ: 2, question: "Static hums softly in the background.", chosenOption: "Focus on steady calm thoughts", mix: { uneasy: 8, low: 2 } }
+        ]
+      }
+    ];
+    localStorage.setItem(`mindful.checkins.${userId}`, JSON.stringify(uneasyHistory));
+    return uneasyHistory;
+  }
+
+  if (userId === "user_oliver_good") {
+    const goodHistory = [
+      {
+        sessionId: "sess_oliver_good_1",
+        userId: "user_oliver_good",
+        story: "Mint Emerald Meadow Sanctuary",
+        genre: "Nature & Renewal",
+        storyId: "006_good_oliver",
+        setNumber: 1,
+        questionRange: "Q1–Q6",
+        mood: 68, energy: 72, stress: 25, sleep: 80,
+        mix: { good: 85, happy: 15 },
+        dominant: "Good",
+        at: new Date(Date.now() - 86400000).toISOString(),
+        answersDetailed: [
+          { globalQ: 1, question: "Morning sunlight illuminates the dew on fresh leaves.", chosenOption: "Walk along the lush green forest path with a light heart", mix: { good: 8, happy: 2 } },
+          { globalQ: 2, question: "Clear stream water flows past smooth stones.", chosenOption: "Breathe in the crisp invigorating air", mix: { good: 8, happy: 2 } }
+        ]
+      }
+    ];
+    localStorage.setItem(`mindful.checkins.${userId}`, JSON.stringify(goodHistory));
+    return goodHistory;
+  }
+
+  if (userId === "user_sunny_happy") {
+    const happyHistory = [
+      {
+        sessionId: "sess_sunny_happy_1",
+        userId: "user_sunny_happy",
+        story: "Golden Sunshine Horizon",
+        genre: "Radiant Joy & Celebration",
+        storyId: "007_happy_sunny",
+        setNumber: 1,
+        questionRange: "Q1–Q6",
+        mood: 82, energy: 85, stress: 15, sleep: 88,
+        mix: { happy: 85, good: 15 },
+        dominant: "Happy",
+        at: new Date(Date.now() - 86400000).toISOString(),
+        answersDetailed: [
+          { globalQ: 1, question: "Warm golden rays illuminate the expansive horizon.", chosenOption: "Celebrate with bright enthusiasm and gratitude", mix: { happy: 8, good: 2 } },
+          { globalQ: 2, question: "Lively cheerful music fills the warm air.", chosenOption: "Share smiles and laughter with everyone around", mix: { happy: 8, good: 2 } }
+        ]
+      }
+    ];
+    localStorage.setItem(`mindful.checkins.${userId}`, JSON.stringify(happyHistory));
+    return happyHistory;
+  }
+
+  if (userId === "user_blaze_veryhappy") {
+    const veryHappyHistory = [
+      {
+        sessionId: "sess_veryhappy_1",
+        userId: "user_blaze_veryhappy",
+        story: "Golden Horizon Celebration",
+        genre: "Exuberant Energy & Fulfillment",
+        storyId: "008_veryhappy_blaze",
+        setNumber: 1,
+        questionRange: "Q1–Q6",
+        mood: 92, energy: 90, stress: 10, sleep: 90,
+        mix: { veryHappy: 85, euphoric: 15 },
+        dominant: "Very Happy",
+        at: new Date(Date.now() - 86400000).toISOString(),
+        answersDetailed: [
+          { globalQ: 1, question: "A magnificent sunset lights up the golden peak.", chosenOption: "Celebrate with bright enthusiasm and gratitude", mix: { veryHappy: 8, euphoric: 2 } },
+          { globalQ: 2, question: "Vibrant energy fills the air.", chosenOption: "Share warm joy and positivity with everyone", mix: { veryHappy: 8, euphoric: 2 } }
+        ]
+      }
+    ];
+    localStorage.setItem(`mindful.checkins.${userId}`, JSON.stringify(veryHappyHistory));
+    return veryHappyHistory;
+  }
+
+  if (userId === "user_spark_euphoric") {
+    const euphoricHistory = [
+      {
+        sessionId: "sess_euphoric_1",
+        userId: "user_spark_euphoric",
+        story: "Cosmic Horizons & Starlight Revelry",
+        genre: "Sci-Fi & Cosmic Wonder",
+        storyId: "003_euphoric_spark",
+        setNumber: 1,
+        questionRange: "Q1–Q6",
+        mood: 98, energy: 95, stress: 10, sleep: 92,
+        mix: { euphoric: 88, happy: 12 },
+        dominant: "Euphoric",
+        at: new Date(Date.now() - 86400000).toISOString(),
+        answersDetailed: [
+          { globalQ: 1, question: "The starlight glows intensely across the nebula.", chosenOption: "Soar through the luminous stellar stream with boundless energy", mix: { euphoric: 9, happy: 1 } },
+          { globalQ: 2, question: "Pure vibrant rhythm resonates through the spacecraft.", chosenOption: "Dance to the pulse of cosmic energy", mix: { euphoric: 9, happy: 1 } }
+        ]
+      }
+    ];
+    localStorage.setItem(`mindful.checkins.${userId}`, JSON.stringify(euphoricHistory));
+    return euphoricHistory;
+  }
+
   const key = `mindful.checkins.${userId}`;
   try {
     const data = JSON.parse(localStorage.getItem(key));
@@ -789,6 +1080,111 @@ function initDashboardUserSessionUI() {
     };
   }
 
+  const veryLowBtn = $("#loadVeryLowUserBtn");
+  if (veryLowBtn) {
+    veryLowBtn.onclick = () => {
+      let uList = getUsers();
+      let elena = uList.find(u => u.id === "user_elena_low");
+      if (!elena) {
+        elena = { id: "user_elena_low", name: "Elena (Very Low Mood)" };
+        uList.push(elena);
+        localStorage.setItem(USERS_KEY, JSON.stringify(uList));
+      }
+      setCurrentUserId("user_elena_low");
+      loadDashboard();
+    };
+  }
+
+  const lowBtn = $("#loadLowUserBtn");
+  if (lowBtn) {
+    lowBtn.onclick = () => {
+      let uList = getUsers();
+      let kai = uList.find(u => u.id === "user_kai_low");
+      if (!kai) {
+        kai = { id: "user_kai_low", name: "Kai (Low Mood)" };
+        uList.push(kai);
+        localStorage.setItem(USERS_KEY, JSON.stringify(uList));
+      }
+      setCurrentUserId("user_kai_low");
+      loadDashboard();
+    };
+  }
+
+  const uneasyBtn = $("#loadUneasyUserBtn");
+  if (uneasyBtn) {
+    uneasyBtn.onclick = () => {
+      let uList = getUsers();
+      let rowan = uList.find(u => u.id === "user_rowan_uneasy");
+      if (!rowan) {
+        rowan = { id: "user_rowan_uneasy", name: "Rowan (Uneasy Mood)" };
+        uList.push(rowan);
+        localStorage.setItem(USERS_KEY, JSON.stringify(uList));
+      }
+      setCurrentUserId("user_rowan_uneasy");
+      loadDashboard();
+    };
+  }
+
+  const goodBtn = $("#loadGoodUserBtn");
+  if (goodBtn) {
+    goodBtn.onclick = () => {
+      let uList = getUsers();
+      let oliver = uList.find(u => u.id === "user_oliver_good");
+      if (!oliver) {
+        oliver = { id: "user_oliver_good", name: "Oliver (Good Mood)" };
+        uList.push(oliver);
+        localStorage.setItem(USERS_KEY, JSON.stringify(uList));
+      }
+      setCurrentUserId("user_oliver_good");
+      loadDashboard();
+    };
+  }
+
+  const happyBtn = $("#loadHappyUserBtn");
+  if (happyBtn) {
+    happyBtn.onclick = () => {
+      let uList = getUsers();
+      let sunny = uList.find(u => u.id === "user_sunny_happy");
+      if (!sunny) {
+        sunny = { id: "user_sunny_happy", name: "Sunny (Happy Mood)" };
+        uList.push(sunny);
+        localStorage.setItem(USERS_KEY, JSON.stringify(uList));
+      }
+      setCurrentUserId("user_sunny_happy");
+      loadDashboard();
+    };
+  }
+
+  const veryHappyBtn = $("#loadVeryHappyUserBtn");
+  if (veryHappyBtn) {
+    veryHappyBtn.onclick = () => {
+      let uList = getUsers();
+      let blaze = uList.find(u => u.id === "user_blaze_veryhappy");
+      if (!blaze) {
+        blaze = { id: "user_blaze_veryhappy", name: "Blaze (Very Happy Mood)" };
+        uList.push(blaze);
+        localStorage.setItem(USERS_KEY, JSON.stringify(uList));
+      }
+      setCurrentUserId("user_blaze_veryhappy");
+      loadDashboard();
+    };
+  }
+
+  const euphoricBtn = $("#loadEuphoricUserBtn");
+  if (euphoricBtn) {
+    euphoricBtn.onclick = () => {
+      let uList = getUsers();
+      let spark = uList.find(u => u.id === "user_spark_euphoric");
+      if (!spark) {
+        spark = { id: "user_spark_euphoric", name: "Spark (Euphoric Mood)" };
+        uList.push(spark);
+        localStorage.setItem(USERS_KEY, JSON.stringify(uList));
+      }
+      setCurrentUserId("user_spark_euphoric");
+      loadDashboard();
+    };
+  }
+
   const newBtn = $("#newUserBtnDashboard");
   if (newBtn) {
     newBtn.onclick = () => {
@@ -824,24 +1220,33 @@ function initDashboardUserSessionUI() {
 }
 
 async function loadDashboard() {
-  let remote;
+  let remote = { user: null, checkins: [] };
   try {
-    remote = await loadAuthenticatedCheckins();
+    const authUser = await WellnessAuth.getUser();
+    if (authUser) {
+      const rows = await WellnessAuth.loadCheckins();
+      remote = { user: authUser, checkins: rows.map(normalizeRemoteCheckin) };
+    }
   } catch (error) {
     console.error("Failed to load check-ins from Supabase:", error);
-    remote = { user: null, checkins: [] };
   }
-  if (!remote.user) return;
 
-  activeUser = syncAuthenticatedUser(remote.user);
-  initDashboardUserSessionUI();
+  const users = getUsers();
   const uid = getCurrentUserId();
+  activeUser = users.find(u => u.id === uid) || users[0];
+
+  initDashboardUserSessionUI();
+
+  if (remote.user && activeUser.id !== "user_elena_low" && !activeUser.id.startsWith("user_")) {
+    activeUser = syncAuthenticatedUser(remote.user);
+    activeCheckins = remote.checkins;
+  } else {
+    activeCheckins = loadUserCheckins(activeUser.id);
+  }
 
   const userNameEl = $("#userName");
-  if (userNameEl) userNameEl.textContent = remote.user.user_metadata?.username || remote.user.email || activeUser.name;
+  if (userNameEl) userNameEl.textContent = activeUser.name;
 
-  // Never replace an authenticated user's empty account with demo data.
-  activeCheckins = remote.checkins;
   if (activeCheckins.length === 0) {
     const emptyState = $("#insightText");
     if (emptyState) emptyState.textContent = "Complete your first story check-in to start your personal wellness history.";
@@ -849,6 +1254,7 @@ async function loadDashboard() {
     initSessionVisualizer([]);
     return;
   }
+
   const prog = progressFromRemoteCheckins(activeCheckins);
 
   const latest = activeCheckins[activeCheckins.length - 1];
@@ -865,7 +1271,9 @@ async function loadDashboard() {
   // Insight
   const insightTextEl = $("#insightText");
   if (insightTextEl) {
-    insightTextEl.textContent = latest.mood >= 70
+    insightTextEl.textContent = latest.mood <= 25
+      ? `Be extra gentle with yourself today, ${activeUser.name}. Your check-in recorded a Very Low mood (${latest.mood}%) — Misty Shadow Valley theme active.`
+      : latest.mood >= 70
       ? `Great job ${activeUser.name}! Your latest story check-in recorded a bright, resilient mood.`
       : `Hello ${activeUser.name}, your latest check-in showed elevated stress. A quick reflection session is recommended today.`;
   }

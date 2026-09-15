@@ -8,6 +8,24 @@
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+<video id="euphoricBgVideo" class="bg-motion-video" autoplay loop muted playsinline style="display:none;">
+  <source src="assets/euphoric-motion-bg.mp4" type="video/mp4" />
+</video>
+<video id="lowBgVideo" class="bg-motion-video" autoplay loop muted playsinline style="display:none;">
+  <source src="assets/low-motion-bg.mp4" type="video/mp4" />
+</video>
+<video id="uneasyBgVideo" class="bg-motion-video" autoplay loop muted playsinline style="display:none;">
+  <source src="assets/uneasy-motion-bg.mp4" type="video/mp4" />
+</video>
+<video id="goodBgVideo" class="bg-motion-video" autoplay loop muted playsinline style="display:none;">
+  <source src="assets/good-motion-bg.mp4" type="video/mp4" />
+</video>
+<video id="happyBgVideo" class="bg-motion-video" autoplay loop muted playsinline style="display:none;">
+  <source src="assets/happy-motion-bg.mp4" type="video/mp4" />
+</video>
+<video id="veryHappyBgVideo" class="bg-motion-video" autoplay loop muted playsinline style="display:none;">
+  <source src="assets/veryhappy-motion-bg.mp4" type="video/mp4" />
+</video>
 <a class="skip-link" href="#main">Skip to content</a>
 
 <header class="site-header">
@@ -17,7 +35,7 @@
       <h1 class="hello">Hello, <span id="userName">Sara</span> <span aria-hidden="true">👋</span></h1>
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:4px;">
         <p class="sub">How are you feeling today?</p>
-        <span id="activeThemeBadge" class="theme-mood-pill">🌊 Theme: Ocean Cyan (Neutral)</span>
+        <span id="activeThemeBadge" class="theme-mood-pill">🪨 Theme: Serene Sunset Zen (Neutral)</span>
       </div>
     </div>
   </div>
@@ -25,6 +43,13 @@
   <div class="user-session-bar" aria-label="User session manager">
     <span class="user-badge-label">Active User Session:</span>
     <select id="userSelectDashboard" class="user-select-dropdown" aria-label="Select user session"></select>
+    <button type="button" id="loadVeryLowUserBtn" class="btn btn-ghost btn-sm" style="background: rgba(110, 231, 183, 0.2); color: #a7f3d0; border: 1px solid rgba(110, 231, 183, 0.4);" title="Switch to Very Low Mood Test Profile">🏔️ Very Low Demo User</button>
+    <button type="button" id="loadLowUserBtn" class="btn btn-ghost btn-sm" style="background: rgba(167, 139, 250, 0.2); color: #ddd6fe; border: 1px solid rgba(167, 139, 250, 0.4);" title="Switch to Low Mood Test Profile">🌧️ Low Demo User</button>
+    <button type="button" id="loadUneasyUserBtn" class="btn btn-ghost btn-sm" style="background: rgba(192, 132, 252, 0.2); color: #e9d5ff; border: 1px solid rgba(192, 132, 252, 0.4);" title="Switch to Uneasy Mood Test Profile">🔮 Uneasy Demo User</button>
+    <button type="button" id="loadGoodUserBtn" class="btn btn-ghost btn-sm" style="background: rgba(52, 211, 153, 0.2); color: #a7f3d0; border: 1px solid rgba(52, 211, 153, 0.4);" title="Switch to Good Mood Test Profile">🌿 Good Demo User</button>
+    <button type="button" id="loadHappyUserBtn" class="btn btn-ghost btn-sm" style="background: rgba(251, 191, 36, 0.2); color: #fef08a; border: 1px solid rgba(251, 191, 36, 0.4);" title="Switch to Happy Mood Test Profile">☀️ Happy Demo User</button>
+    <button type="button" id="loadVeryHappyUserBtn" class="btn btn-ghost btn-sm" style="background: rgba(251, 146, 60, 0.2); color: #fed7aa; border: 1px solid rgba(251, 146, 60, 0.4);" title="Switch to Very Happy Mood Test Profile">🔥 Very Happy Demo User</button>
+    <button type="button" id="loadEuphoricUserBtn" class="btn btn-ghost btn-sm" style="background: rgba(255, 63, 142, 0.2); color: #fecdd3; border: 1px solid rgba(255, 63, 142, 0.4);" title="Switch to Euphoric Mood Test Profile">✨ Euphoric Demo User</button>
     <button type="button" id="newUserBtnDashboard" class="btn btn-ghost btn-sm" title="Create new user profile">+ New Session</button>
   </div>
 
