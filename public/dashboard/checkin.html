@@ -1,118 +1,185 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Story Check-in — Mindful</title>
-<meta name="description" content="Pick a genre, live a short story and let six choices update your mood score, stress level and weekly mood wave." />
-<link rel="stylesheet" href="style.css" />
-</head>
-<body class="checkin-page">
-<a class="skip-link" href="#pickCard">Skip to the check-in</a>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Story Check-in — Mindful</title>
+    <meta
+      name="description"
+      content="Pick a genre, live a short story and let six choices update your mood score, stress level and weekly mood wave."
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="checkin-page">
+    <a class="skip-link" href="#pickCard">Skip to the check-in</a>
 
-<header class="site-header">
-  <div class="greet">
-    <img class="avatar" id="headerAvatar" src="assets/brain.png" alt="Mindful Profile" />
-    <div>
-      <h1 class="hello">Story check-in</h1>
-      <p class="sub">Choose a world, make 6 choices — resume where you left off!</p>
-    </div>
-  </div>
-
-  <div class="user-session-bar" aria-label="User session manager">
-    <span class="user-badge-label">Active User Session:</span>
-    <select id="userSelect" class="user-select-dropdown" aria-label="Select user profile"></select>
-    <button type="button" id="newUserBtn" class="btn btn-ghost btn-sm" title="Create a new user profile">+ New User Session</button>
-  </div>
-
-  <nav class="nav" aria-label="Main">
-    <a href="index.html">Skip to dashboard</a>
-  </nav>
-</header>
-
-<main id="main" class="quiz-main">
-  <div class="q-progress" role="progressbar" aria-label="Check-in progress" aria-valuemin="0" aria-valuemax="100">
-    <i id="qProgressFill"></i>
-  </div>
-
-  <section class="card quiz-card reveal" id="pickCard" aria-live="polite">
-    <div class="pick-header-flex">
-      <div>
-        <p class="eyebrow" id="pickStep">Step 1 of 2</p>
-        <h2 class="q-text" id="pickTitle">Choose a genre</h2>
+    <header class="site-header">
+      <div class="greet">
+        <img class="avatar" id="headerAvatar" src="assets/brain.png" alt="Mindful Profile" />
+        <div>
+          <h1 class="hello">Story check-in</h1>
+          <div
+            style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 4px"
+          >
+            <p class="sub">Choose a world, make 6 choices — resume where you left off!</p>
+            <span id="activeThemeBadge" class="theme-mood-pill"
+              >🌊 Theme: Ocean Cyan (Neutral)</span
+            >
+          </div>
+        </div>
       </div>
-      <div id="userProgressSummary" class="user-prog-pill"></div>
-    </div>
-    <p class="muted small" id="pickHint">Each world tells a different story about how you feel today.</p>
-    <div class="bookflow-shell" id="bookflowShell">
-      <button type="button" class="bookflow-arrow bookflow-prev" id="flowPrev" aria-label="Previous choice">‹</button>
-      <div class="bookflow-viewport" id="bookflowViewport" tabindex="0" role="region" aria-label="Genre choices">
-        <ul class="bookflow-track" id="pickGrid"></ul>
+
+      <div class="user-session-bar" aria-label="User session manager">
+        <span class="user-badge-label">Active User Session:</span>
+        <select
+          id="userSelect"
+          class="user-select-dropdown"
+          aria-label="Select user profile"
+        ></select>
+        <button
+          type="button"
+          id="newUserBtn"
+          class="btn btn-ghost btn-sm"
+          title="Create a new user profile"
+        >
+          + New User Session
+        </button>
       </div>
-      <button type="button" class="bookflow-arrow bookflow-next" id="flowNext" aria-label="Next choice">›</button>
-    </div>
-    <div class="bookflow-footer">
-      <p class="bookflow-status" id="flowStatus" aria-live="polite"></p>
-      <div class="bookflow-dots" id="flowDots" aria-hidden="true"></div>
-    </div>
-    <div class="q-actions picker-actions">
-      <button type="button" class="btn btn-ghost" id="pickBack" hidden>Back to genres</button>
-      <button type="button" class="btn btn-primary" id="flowChoose">Explore this genre</button>
-    </div>
-  </section>
 
-  <section class="card quiz-card reveal" id="quizCard" hidden aria-live="polite">
-    <div class="set-banner" id="setBanner">
-      <span class="set-badge" id="setBadge">Set 1</span>
-      <span class="set-range" id="setRange">Questions 1–6</span>
-      <span class="set-continuity" id="setContinuity">First Session</span>
-    </div>
-    <p class="eyebrow" id="qStep">Question 1 of 6</p>
-    <p class="q-signal" id="qSignal"></p>
-    <p class="q-scenario" id="qScenario"></p>
-    <h2 class="q-text" id="qText"></h2>
-    <ul class="q-options" id="qOptions"></ul>
-    <div class="q-actions">
-      <button type="button" class="btn btn-ghost" id="qBack">Back</button>
-      <button type="button" class="btn btn-primary" id="qNext">Next</button>
-    </div>
-  </section>
+      <nav class="nav" aria-label="Main">
+        <a href="index.html">Skip to dashboard</a>
+      </nav>
+    </header>
 
-  <section class="card done-card reveal" id="doneCard" hidden tabindex="-1" aria-live="polite">
-    <p class="eyebrow">Check-in complete</p>
-    <h2 id="doneSetHeader">Here's how today looks</h2>
-    <p class="muted small" id="resMoodLabel"></p>
-    <ul class="done-stats">
-      <li><span class="muted small">Mood score</span><strong id="resMood">—</strong></li>
-      <li><span class="muted small">Stress level</span><strong id="resStress">—</strong></li>
-      <li><span class="muted small">Sleep wellness</span><strong id="resSleep">—</strong></li>
-    </ul>
-    <div class="mix" id="resMix" role="img" aria-label="Detected mood mix"></div>
-    <div id="nextSetPrompt" class="next-set-prompt-card"></div>
-    <p class="muted" id="saveStatus">Your dashboard has been updated with this check-in session.</p>
-    <div class="done-actions">
-      <a class="btn btn-primary" href="index.html">Open my dashboard</a>
-      <button type="button" class="btn btn-ghost" id="continueNextSetBtn">Continue Next Question Set</button>
-    </div>
-  </section>
-</main>
+    <main id="main" class="quiz-main">
+      <div
+        class="q-progress"
+        role="progressbar"
+        aria-label="Check-in progress"
+        aria-valuemin="0"
+        aria-valuemax="100"
+      >
+        <i id="qProgressFill"></i>
+      </div>
 
-<!-- New User Session Modal -->
-<div class="modal" id="newUserModal" role="dialog" aria-modal="true" aria-labelledby="modalUserTitle" hidden>
-  <div class="modal-card">
-    <h3 id="modalUserTitle">Create New User Session</h3>
-    <p class="muted small">Enter a name to start an isolated check-in session and story progression track.</p>
-    <input type="text" id="newUserNameInput" class="text-input" placeholder="e.g. Alex, Jordan, Sam..." maxlength="24" />
-    <div class="modal-actions">
-      <button type="button" class="btn btn-primary" id="saveNewUserBtn">Create Session</button>
-      <button type="button" class="btn btn-ghost" id="cancelNewUserBtn">Cancel</button>
-    </div>
-  </div>
-</div>
+      <section class="card quiz-card reveal" id="pickCard" aria-live="polite">
+        <div class="pick-header-flex">
+          <div>
+            <p class="eyebrow" id="pickStep">Step 1 of 2</p>
+            <h2 class="q-text" id="pickTitle">Choose a genre</h2>
+          </div>
+          <div id="userProgressSummary" class="user-prog-pill"></div>
+        </div>
+        <p class="muted small" id="pickHint">
+          Each world tells a different story about how you feel today.
+        </p>
+        <div class="bookflow-shell" id="bookflowShell">
+          <button
+            type="button"
+            class="bookflow-arrow bookflow-prev"
+            id="flowPrev"
+            aria-label="Previous choice"
+          >
+            ‹
+          </button>
+          <div
+            class="bookflow-viewport"
+            id="bookflowViewport"
+            tabindex="0"
+            role="region"
+            aria-label="Genre choices"
+          >
+            <ul class="bookflow-track" id="pickGrid"></ul>
+          </div>
+          <button
+            type="button"
+            class="bookflow-arrow bookflow-next"
+            id="flowNext"
+            aria-label="Next choice"
+          >
+            ›
+          </button>
+        </div>
+        <div class="bookflow-footer">
+          <p class="bookflow-status" id="flowStatus" aria-live="polite"></p>
+          <div class="bookflow-dots" id="flowDots" aria-hidden="true"></div>
+        </div>
+        <div class="q-actions picker-actions">
+          <button type="button" class="btn btn-ghost" id="pickBack" hidden>Back to genres</button>
+          <button type="button" class="btn btn-primary" id="flowChoose">Explore this genre</button>
+        </div>
+      </section>
 
-<script src="auth-config.js"></script>
-<script src="auth.js"></script>
-<script src="checkin.js"></script>
-</body>
+      <section class="card quiz-card reveal" id="quizCard" hidden aria-live="polite">
+        <div class="set-banner" id="setBanner">
+          <span class="set-badge" id="setBadge">Set 1</span>
+          <span class="set-range" id="setRange">Questions 1–6</span>
+          <span class="set-continuity" id="setContinuity">First Session</span>
+        </div>
+        <p class="eyebrow" id="qStep">Question 1 of 6</p>
+        <p class="q-signal" id="qSignal"></p>
+        <p class="q-scenario" id="qScenario"></p>
+        <h2 class="q-text" id="qText"></h2>
+        <ul class="q-options" id="qOptions"></ul>
+        <div class="q-actions">
+          <button type="button" class="btn btn-ghost" id="qBack">Back</button>
+          <button type="button" class="btn btn-primary" id="qNext">Next</button>
+        </div>
+      </section>
+
+      <section class="card done-card reveal" id="doneCard" hidden tabindex="-1" aria-live="polite">
+        <p class="eyebrow">Check-in complete</p>
+        <h2 id="doneSetHeader">Here's how today looks</h2>
+        <p class="muted small" id="resMoodLabel"></p>
+        <ul class="done-stats">
+          <li><span class="muted small">Mood score</span><strong id="resMood">—</strong></li>
+          <li><span class="muted small">Stress level</span><strong id="resStress">—</strong></li>
+          <li><span class="muted small">Sleep wellness</span><strong id="resSleep">—</strong></li>
+        </ul>
+        <div class="mix" id="resMix" role="img" aria-label="Detected mood mix"></div>
+        <div id="nextSetPrompt" class="next-set-prompt-card"></div>
+        <p class="muted" id="saveStatus">
+          Your dashboard has been updated with this check-in session.
+        </p>
+        <div class="done-actions">
+          <a class="btn btn-primary" href="index.html">Open my dashboard</a>
+          <button type="button" class="btn btn-ghost" id="continueNextSetBtn">
+            Continue Next Question Set
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <!-- New User Session Modal -->
+    <div
+      class="modal"
+      id="newUserModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modalUserTitle"
+      hidden
+    >
+      <div class="modal-card">
+        <h3 id="modalUserTitle">Create New User Session</h3>
+        <p class="muted small">
+          Enter a name to start an isolated check-in session and story progression track.
+        </p>
+        <input
+          type="text"
+          id="newUserNameInput"
+          class="text-input"
+          placeholder="e.g. Alex, Jordan, Sam..."
+          maxlength="24"
+        />
+        <div class="modal-actions">
+          <button type="button" class="btn btn-primary" id="saveNewUserBtn">Create Session</button>
+          <button type="button" class="btn btn-ghost" id="cancelNewUserBtn">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="auth-config.js"></script>
+    <script src="auth.js"></script>
+    <script src="checkin.js"></script>
+  </body>
 </html>
-

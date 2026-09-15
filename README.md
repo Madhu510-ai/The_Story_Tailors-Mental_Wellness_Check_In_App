@@ -120,53 +120,53 @@ The overall hierarchy should be:
 
 ┌────────────────────────────────────────────────────────────┐
 
-│ HEADER                                                     │
+│ HEADER │
 
-│ Avatar  Hello, Sara 👋                     Navigation       │
+│ Avatar Hello, Sara 👋 Navigation │
 
 └────────────────────────────────────────────────────────────┘
 
 ┌────────────────────────────────────────────────────────────┐
 
-│  STAT 1       │  STAT 2       │  STAT 3                  │
+│ STAT 1 │ STAT 2 │ STAT 3 │
 
 └────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────┬──────────────────────────────┐
 
-│                             │                              │
+│ │ │
 
-│                             │  WEEKLY MOOD WAVE            │
+│ │ WEEKLY MOOD WAVE │
 
-│      3D BRAIN               │  Chart                       │
+│ 3D BRAIN │ Chart │
 
-│                             │                              │
+│ │ │
 
-│                             │  MOOD MIX                    │
+│ │ MOOD MIX │
 
-│                             │  Emotional states            │
+│ │ Emotional states │
 
 └─────────────────────────────┴──────────────────────────────┘
 
 ┌─────────────────────────────┬──────────────────────────────┐
 
-│                             │                              │
+│ │ │
 
-│ REPORTS / HISTORY           │ UPCOMING / NEXT ACTION       │
+│ REPORTS / HISTORY │ UPCOMING / NEXT ACTION │
 
-│                             │                              │
+│ │ │
 
 └─────────────────────────────┴──────────────────────────────┘
 
 ┌────────────────────────────────────────────────────────────┐
 
-│ AI / SMART INSIGHT                                         │
+│ AI / SMART INSIGHT │
 
 └────────────────────────────────────────────────────────────┘
 
 ┌────────────────────────────────────────────────────────────┐
 
-│ ACTIVE PATH / PERSONALIZED SUGGESTIONS                     │
+│ ACTIVE PATH / PERSONALIZED SUGGESTIONS │
 
 └────────────────────────────────────────────────────────────┘
 
@@ -332,7 +332,7 @@ Your emotional pattern over the past 7 days
 
 Display:
 
-Mon  Tue  Wed  Thu  Fri  Sat  Sun
+Mon Tue Wed Thu Fri Sat Sun
 
 Create a smooth animated line/sparkline chart.
 
@@ -380,13 +380,13 @@ Mood Mix
 
 Show the proportion of emotional states:
 
-Energized   30%
+Energized 30%
 
-Calm        40%
+Calm 40%
 
-Stressed    15%
+Stressed 15%
 
-Low         15%
+Low 15%
 
 Represent this using a horizontal segmented bar.
 
@@ -414,19 +414,19 @@ Example rows:
 
 Emotional Check-in
 
-Today · Completed                         >
+Today · Completed >
 
 Stress Management
 
-Yesterday · Completed                     >
+Yesterday · Completed >
 
 Sleep Tracking
 
-Aug 31 · Completed                        >
+Aug 31 · Completed >
 
 Mood Reflection
 
-Aug 30 · Completed                        >
+Aug 30 · Completed >
 
 Every row should include:
 
@@ -556,21 +556,21 @@ Use this exact brand palette throughout the dashboard:
 
 :root {
 
-  --deep-teal: #1C6E7E;
+--deep-teal: #1C6E7E;
 
-  --ocean-teal: #3FA6B8;
+--ocean-teal: #3FA6B8;
 
-  --sunset-gold: #F2B84B;
+--sunset-gold: #F2B84B;
 
-  --warm-coral: #E89B6B;
+--warm-coral: #E89B6B;
 
-  --charcoal: #2B2B2E;
+--charcoal: #2B2B2E;
 
-  --sand-cream: #FBF3E3;
+--sand-cream: #FBF3E3;
 
-  --muted-sand: #D9CBA3;
+--muted-sand: #D9CBA3;
 
-  --mountain-brown: #8C7A5E;
+--mountain-brown: #8C7A5E;
 
 }
 

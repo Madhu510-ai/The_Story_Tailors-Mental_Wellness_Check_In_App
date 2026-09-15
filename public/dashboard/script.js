@@ -16,6 +16,61 @@ const MOOD_LEVELS = [
 
 const levelFor = score => MOOD_LEVELS[Math.min(MOOD_LEVELS.length - 1, Math.max(0, Math.floor((score / 100) * MOOD_LEVELS.length)))];
 const levelForInverse = score => levelFor(100 - score);
+
+const MOOD_THEME_META = {
+  veryLow:   { key: "veryLow",   label: "Very Low",   name: "Stormy Slate",     icon: "⛈️" },
+  low:       { key: "low",       label: "Low",        name: "Twilight Plum",    icon: "🌧️" },
+  uneasy:    { key: "uneasy",    label: "Uneasy",     name: "Electric Violet",  icon: "🔮" },
+  neutral:   { key: "neutral",   label: "Neutral",    name: "Ocean Cyan",       icon: "🌊" },
+  good:      { key: "good",      label: "Good",       name: "Mint Emerald",     icon: "🌿" },
+  happy:     { key: "happy",     label: "Happy",      name: "Golden Sunshine",  icon: "☀️" },
+  veryHappy: { key: "veryHappy", label: "Very Happy", name: "Sunrise Coral",    icon: "🔥" },
+  euphoric:  { key: "euphoric",  label: "Euphoric",   name: "Neon Magenta",     icon: "✨" }
+};
+
+function getDominantMoodKey(mix, moodScore) {
+  if (typeof moodScore === "number" && !isNaN(moodScore)) {
+    const lv = levelFor(moodScore);
+    if (lv && lv.key) return lv.key;
+  }
+
+  if (mix && typeof mix === "object") {
+    let maxKey = null;
+    let maxPct = 0;
+    const moodKeys = ["veryLow", "low", "uneasy", "neutral", "good", "happy", "veryHappy", "euphoric"];
+    moodKeys.forEach(k => {
+      const val = Number(mix[k] || 0);
+      if (val > maxPct) {
+        maxPct = val;
+        maxKey = k;
+      }
+    });
+    if (maxKey && maxPct > 0) return maxKey;
+  }
+
+  return "neutral";
+}
+
+function applyDynamicMoodTheme(mixOrKey, moodScore) {
+  let key = "neutral";
+  if (typeof mixOrKey === "string" && MOOD_THEME_META[mixOrKey]) {
+    key = mixOrKey;
+  } else if (typeof mixOrKey === "number") {
+    key = getDominantMoodKey(null, mixOrKey);
+  } else {
+    key = getDominantMoodKey(mixOrKey, moodScore);
+  }
+
+  const meta = MOOD_THEME_META[key] || MOOD_THEME_META.neutral;
+  document.documentElement.dataset.moodTheme = key;
+
+  const badge = $("#activeThemeBadge");
+  if (badge) {
+    badge.innerHTML = `<span aria-hidden="true">${meta.icon}</span> Theme: ${meta.name} (${meta.label})`;
+    badge.title = `Active app theme reflecting dominant mood division: ${meta.label} (${meta.name})`;
+  }
+}
+
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const $ = (s, r = document) => r.querySelector(s);
 
@@ -179,6 +234,7 @@ function animateNumber(el) {
 }
 
 function updateRingsAndBars(latest, previous) {
+  if (!latest) return;
   const moodValue = $("#moodValue");
   const stressValue = $("#stressValue");
   const sleepValue = $("#sleepValue");
@@ -216,10 +272,11 @@ function updateRingsAndBars(latest, previous) {
     const pct = ringValues[r.dataset.ring] || 0;
     const lv = ringLevels[r.dataset.ring];
     const fg = r.querySelector(".ring-fg");
+    if (!fg) return;
     if (lv) {
       fg.style.stroke = lv.color;
       fg.style.filter = `drop-shadow(0 0 8px ${lv.color}88)`;
-      const tag = r.parentElement.querySelector(".tag");
+      const tag = r.parentElement ? r.parentElement.querySelector(".tag") : null;
       if (tag) {
         tag.textContent = `${lv.label} · ${lv.note}`;
         tag.style.background = lv.color + "22";
@@ -237,7 +294,8 @@ function updateRingsAndBars(latest, previous) {
     stressFill.dataset.width = latest.stress;
     stressFill.style.background = `linear-gradient(90deg, ${stressLv.color}, ${stressLv.color}aa)`;
     stressFill.style.boxShadow = `0 0 14px ${stressLv.color}80`;
-    const stressTag = stressFill.closest(".stat-body").querySelector(".tag");
+    const statBody = stressFill.closest(".stat-body");
+    const stressTag = statBody ? statBody.querySelector(".tag") : null;
     if (stressTag) {
       stressTag.textContent = `${stressLv.label} · ${stressLv.note}`;
       stressTag.style.background = stressLv.color + "22";
@@ -251,11 +309,13 @@ function updateRingsAndBars(latest, previous) {
 }
 
 function drawWeeklyWave(checkins) {
+  const chartEl = $("#chart");
+  if (!chartEl || !checkins || checkins.length === 0) return;
   const recent = checkins.slice(-7);
   const scores = recent.map(c => c.mood);
   const peak = scores.indexOf(Math.max(...scores));
 
-  $("#chart").innerHTML = recent.map((c, i) => {
+  chartEl.innerHTML = recent.map((c, i) => {
     const lv = levelFor(c.mood);
     const d = new Date(c.at);
     const dayName = DAYS[d.getDay() === 0 ? 6 : d.getDay() - 1] || "S" + (i + 1);
@@ -271,23 +331,30 @@ function drawWeeklyWave(checkins) {
   }).join("");
 
   requestAnimationFrame(() => {
-    $("#chart").querySelectorAll(".wfill").forEach((f, i) => {
+    chartEl.querySelectorAll(".wfill").forEach((f, i) => {
       setTimeout(() => { f.style.height = f.dataset.h + "%"; }, i * 80);
     });
   });
 }
 
 function drawMix(mixObj) {
+  const mixContainer = $("#mix");
+  const mixLegend = $("#mixLegend");
   const mix = mixObj || {};
-  $("#mix").innerHTML = MOOD_LEVELS
-    .map(m => `<i style="--c:${m.color}" data-w="${mix[m.key] || 0}" title="${m.level} · ${m.label}: ${mix[m.key] || 0}%"></i>`).join("");
 
-  requestAnimationFrame(() => {
-    $("#mix").querySelectorAll("i").forEach(i => { i.style.width = i.dataset.w + "%"; });
-  });
+  if (mixContainer) {
+    mixContainer.innerHTML = MOOD_LEVELS
+      .map(m => `<i style="--c:${m.color}" data-w="${mix[m.key] || 0}" title="${m.level} · ${m.label}: ${mix[m.key] || 0}%"></i>`).join("");
 
-  $("#mixLegend").innerHTML = MOOD_LEVELS
-    .map(m => `<li><span class="dot glow" style="--c:${m.color};background:${m.color}"></span>${m.level} · ${m.label} <strong>${mix[m.key] || 0}%</strong></li>`).join("");
+    requestAnimationFrame(() => {
+      mixContainer.querySelectorAll("i").forEach(i => { i.style.width = i.dataset.w + "%"; });
+    });
+  }
+
+  if (mixLegend) {
+    mixLegend.innerHTML = MOOD_LEVELS
+      .map(m => `<li><span class="dot glow" style="--c:${m.color};background:${m.color}"></span>${m.level} · ${m.label} <strong>${mix[m.key] || 0}%</strong></li>`).join("");
+  }
 }
 
 /* ---------- SESSION-WISE ANALYSIS LINE GRAPH VISUALIZER ---------- */
@@ -528,6 +595,9 @@ function renderSelectedSessionAnalysis(checkins) {
     || checkins[checkins.length - 1];
 
   if (!session) return;
+
+  // Dynamically transform whole app theme to match selected session's dominant mood mix
+  applyDynamicMoodTheme(session.mix, session.mood);
 
   const d = new Date(session.at);
   const formattedDate = d.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
@@ -783,6 +853,9 @@ async function loadDashboard() {
 
   const latest = activeCheckins[activeCheckins.length - 1];
   if (!latest) return;
+
+  // Transform whole app theme according to highest percentage mood in latest check-in's mood mix
+  applyDynamicMoodTheme(latest.mix, latest.mood);
 
   // Sync rings & metrics
   updateRingsAndBars(latest, activeCheckins[activeCheckins.length - 2]);

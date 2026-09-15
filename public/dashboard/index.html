@@ -15,7 +15,10 @@
     <img class="avatar" id="userAvatar" src="assets/brain.png" alt="User profile" />
     <div>
       <h1 class="hello">Hello, <span id="userName">Sara</span> <span aria-hidden="true">👋</span></h1>
-      <p class="sub">How are you feeling today?</p>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:4px;">
+        <p class="sub">How are you feeling today?</p>
+        <span id="activeThemeBadge" class="theme-mood-pill">🌊 Theme: Ocean Cyan (Neutral)</span>
+      </div>
     </div>
   </div>
 
@@ -108,67 +111,70 @@
     </div>
   </section>
 
-  <!-- Session-Wise Analysis Visualizer -->
-  <section class="card session-vis-card reveal" id="sessionVisualizer" aria-label="Session-Wise Analysis Visualizer">
-    <header class="card-head session-vis-head">
-      <div>
-        <p class="eyebrow">Interactive Analytics</p>
-        <h2>Session-Wise Analysis Visualizer</h2>
-        <p class="muted">Track progressive check-in sessions, story question sets, and detailed emotion metrics.</p>
+  <!-- Lower Dashboard Wrapper with Watercolor Sky Background -->
+  <div class="lower-dashboard-wrapper">
+    <!-- Session-Wise Analysis Visualizer -->
+    <section class="card session-vis-card reveal" id="sessionVisualizer" aria-label="Session-Wise Analysis Visualizer">
+      <header class="card-head session-vis-head">
+        <div>
+          <p class="eyebrow">Interactive Analytics</p>
+          <h2>Session-Wise Analysis Visualizer</h2>
+          <p class="muted">Track progressive check-in sessions, story question sets, and detailed emotion metrics.</p>
+        </div>
+        <div class="session-selector-wrap">
+          <label for="sessionSelect" class="muted small">Select Session:</label>
+          <select id="sessionSelect" class="session-dropdown" aria-label="Select session to analyze"></select>
+        </div>
+      </header>
+
+      <!-- Session Comparison Chart -->
+      <div class="vis-chart-section">
+        <div class="vis-chart-head">
+          <h3>Session Progression Line Graph</h3>
+          <p class="muted small">Mood Score vs. Stress Level across successive user sessions (n-th time answering a question set)</p>
+        </div>
+        <div class="session-wave-container" id="sessionWaveChart"></div>
       </div>
-      <div class="session-selector-wrap">
-        <label for="sessionSelect" class="muted small">Select Session:</label>
-        <select id="sessionSelect" class="session-dropdown" aria-label="Select session to analyze"></select>
+
+      <!-- Selected Session Detailed Analysis -->
+      <div class="session-detail-container" id="sessionDetailContainer"></div>
+    </section>
+
+    <section class="split" id="reports">
+      <article class="card reveal">
+        <header class="card-head"><div><h2>Reports &amp; History</h2><p class="muted">Your previous check-in sessions</p></div></header>
+        <ul class="rows" id="reportList"></ul>
+      </article>
+
+      <article class="card next reveal">
+        <header class="card-head"><div><h2>Next Story Check-in</h2><p class="muted">Continue your active story</p></div></header>
+        <div class="coming-soon-art">
+          <img src="assets/Gemini_Generated_Image_pcvi34pcvi34pcvi.png" alt="Coming soon" />
+        </div>
+        <p class="muted small">remaining until next scheduled check-in</p>
+        <div class="coach">
+          <span class="coach-avatar" aria-hidden="true">ST</span>
+          <div><strong id="nextStoryTitle">Sherlock Holmes</strong><span class="muted small" id="nextStorySet">Ready for Set 2 (Q7–12)</span></div>
+        </div>
+        <a class="btn btn-primary" href="checkin.html" id="startNextCheckinBtn">Continue Check-in</a>
+      </article>
+    </section>
+
+    <section class="card insight reveal" id="insight" aria-label="Smart insight">
+      <div class="insight-head">
+        <span class="spark" aria-hidden="true">✦</span>
+        <h2>Your weekly insight</h2>
+        <span class="pill pill-gold">AI-powered</span>
       </div>
-    </header>
+      <p class="insight-text" id="insightText"></p>
+      <a class="btn btn-gold" href="checkin.html">Start Next Story Session</a>
+    </section>
 
-    <!-- Session Comparison Chart -->
-    <div class="vis-chart-section">
-      <div class="vis-chart-head">
-        <h3>Session Progression Line Graph</h3>
-        <p class="muted small">Mood Score vs. Stress Level across successive user sessions (n-th time answering a question set)</p>
-      </div>
-      <div class="session-wave-container" id="sessionWaveChart"></div>
-    </div>
-
-    <!-- Selected Session Detailed Analysis -->
-    <div class="session-detail-container" id="sessionDetailContainer"></div>
-  </section>
-
-  <section class="split" id="reports">
-    <article class="card reveal">
-      <header class="card-head"><div><h2>Reports &amp; History</h2><p class="muted">Your previous check-in sessions</p></div></header>
-      <ul class="rows" id="reportList"></ul>
-    </article>
-
-    <article class="card next reveal">
-      <header class="card-head"><div><h2>Next Story Check-in</h2><p class="muted">Continue your active story</p></div></header>
-      <div class="coming-soon-art">
-        <img src="assets/Gemini_Generated_Image_pcvi34pcvi34pcvi.png" alt="Coming soon" />
-      </div>
-      <p class="muted small">remaining until next scheduled check-in</p>
-      <div class="coach">
-        <span class="coach-avatar" aria-hidden="true">ST</span>
-        <div><strong id="nextStoryTitle">Sherlock Holmes</strong><span class="muted small" id="nextStorySet">Ready for Set 2 (Q7–12)</span></div>
-      </div>
-      <a class="btn btn-primary" href="checkin.html" id="startNextCheckinBtn">Continue Check-in</a>
-    </article>
-  </section>
-
-  <section class="card insight reveal" id="insight" aria-label="Smart insight">
-    <div class="insight-head">
-      <span class="spark" aria-hidden="true">✦</span>
-      <h2>Your weekly insight</h2>
-      <span class="pill pill-gold">AI-powered</span>
-    </div>
-    <p class="insight-text" id="insightText"></p>
-    <a class="btn btn-gold" href="checkin.html">Start Next Story Session</a>
-  </section>
-
-  <section class="card reveal" aria-label="Active path">
-    <header class="card-head"><div><h2>Active Path &amp; Recommendations</h2><p class="muted">Personalized for your detected session mood</p></div></header>
-    <ul class="paths" id="paths"></ul>
-  </section>
+    <section class="card reveal" aria-label="Active path">
+      <header class="card-head"><div><h2>Active Path &amp; Recommendations</h2><p class="muted">Personalized for your detected session mood</p></div></header>
+      <ul class="paths" id="paths"></ul>
+    </section>
+  </div>
 
 </main>
 

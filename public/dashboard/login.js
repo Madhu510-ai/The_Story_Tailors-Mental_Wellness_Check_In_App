@@ -7,25 +7,39 @@ const usernameInput = document.querySelector("#username");
 let creating = false;
 
 if (!WellnessAuth.configured()) document.querySelector("#setupNote").hidden = false;
-WellnessAuth.getUser().then(user => { if (user) location.replace("checkin.html"); });
+WellnessAuth.getUser().then((user) => {
+  if (user) location.replace("checkin.html");
+});
 
 modeButton.addEventListener("click", () => {
   creating = !creating;
-  document.querySelector("#authEyebrow").textContent = creating ? "Create your private space" : "Welcome back";
-  document.querySelector("#authTitle").textContent = creating ? "Create an account" : "Sign in to continue";
-  document.querySelector("#authDescription").textContent = creating ? "Your check-ins are stored only under your account." : "Use your email and password to open your dashboard.";
+  document.querySelector("#authEyebrow").textContent = creating
+    ? "Create your private space"
+    : "Welcome back";
+  document.querySelector("#authTitle").textContent = creating
+    ? "Create an account"
+    : "Sign in to continue";
+  document.querySelector("#authDescription").textContent = creating
+    ? "Your check-ins are stored only under your account."
+    : "Use your email and password to open your dashboard.";
   submitButton.textContent = creating ? "Create account" : "Sign in";
-  modeButton.textContent = creating ? "Already have an account? Sign in" : "New here? Create an account";
+  modeButton.textContent = creating
+    ? "Already have an account? Sign in"
+    : "New here? Create an account";
   document.querySelector("#password").autocomplete = creating ? "new-password" : "current-password";
   usernameField.hidden = !creating;
   usernameInput.required = creating;
   message.textContent = "";
 });
 
-form.addEventListener("submit", async event => {
+form.addEventListener("submit", async (event) => {
   event.preventDefault();
-  if (!WellnessAuth.configured()) { message.textContent = "The database connection has not been configured yet."; return; }
-  submitButton.disabled = true; message.textContent = creating ? "Creating your account…" : "Signing you in…";
+  if (!WellnessAuth.configured()) {
+    message.textContent = "The database connection has not been configured yet.";
+    return;
+  }
+  submitButton.disabled = true;
+  message.textContent = creating ? "Creating your account…" : "Signing you in…";
   try {
     const email = document.querySelector("#email").value.trim();
     const password = document.querySelector("#password").value;
@@ -41,6 +55,9 @@ form.addEventListener("submit", async event => {
       return;
     }
     location.replace("checkin.html");
-  } catch (error) { message.textContent = error.message; }
-  finally { submitButton.disabled = false; }
+  } catch (error) {
+    message.textContent = error.message;
+  } finally {
+    submitButton.disabled = false;
+  }
 });
