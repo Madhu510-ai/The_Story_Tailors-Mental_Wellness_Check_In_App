@@ -198,7 +198,7 @@ function createNewUserSession(name) {
 
 //: Use the authenticated account as the active check-in session.
 function syncAuthenticatedUser(user) {
-  const name = user.user_metadata?.username || user.email || "User";
+  const name = user.user_metadata?.username || user.email?.split("@")[0] || "User";
   const authenticatedUser = { id: user.id, name };
   localStorage.setItem(USERS_KEY, JSON.stringify([authenticatedUser]));
   setCurrentUserId(user.id);
@@ -972,13 +972,12 @@ fetch("data/genres.json")
     }
     DATA = d;
     const user = await WellnessAuth.getUser();
-    const currentUid = getCurrentUserId();
-    const usersList = getUsers();
-    const activeU = usersList.find((u) => u.id === currentUid);
-    if (user && activeU && !activeU.id.startsWith("user_")) {
+    if (user) {
       syncAuthenticatedUser(user);
     }
-    initUserSessionUI();
+    const activeUser = getUsers().find((candidate) => candidate.id === getCurrentUserId());
+    const userName = $("#userName");
+    if (userName) userName.textContent = activeUser?.name || "User";
     const existingCheckins = loadUserCheckins(getCurrentUserId());
     if (existingCheckins && existingCheckins.length > 0) {
       const latestCheckin = existingCheckins[existingCheckins.length - 1];

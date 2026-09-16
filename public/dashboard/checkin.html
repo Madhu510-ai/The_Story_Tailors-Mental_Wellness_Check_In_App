@@ -35,7 +35,7 @@
       <div class="greet">
         <img class="avatar" id="headerAvatar" src="assets/brain.png" alt="Mindful Profile" />
         <div>
-          <h1 class="hello">Story check-in</h1>
+          <h1 class="hello">Hello <span id="userName">User</span></h1>
           <div
             style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 4px"
           >
@@ -45,30 +45,6 @@
             >
           </div>
         </div>
-      </div>
-
-      <div class="user-session-bar" aria-label="User session manager">
-        <span class="user-badge-label">Active User Session:</span>
-        <select
-          id="userSelect"
-          class="user-select-dropdown"
-          aria-label="Select user profile"
-        ></select>
-        <button type="button" id="loadVeryLowUserBtn" class="btn btn-ghost btn-sm" style="background: rgba(110, 231, 183, 0.2); color: #a7f3d0; border: 1px solid rgba(110, 231, 183, 0.4);" title="Switch to Very Low Mood Test Profile">🏔️ Very Low</button>
-        <button type="button" id="loadLowUserBtn" class="btn btn-ghost btn-sm" style="background: rgba(167, 139, 250, 0.2); color: #ddd6fe; border: 1px solid rgba(167, 139, 250, 0.4);" title="Switch to Low Mood Test Profile">🌧️ Low</button>
-        <button type="button" id="loadUneasyUserBtn" class="btn btn-ghost btn-sm" style="background: rgba(192, 132, 252, 0.2); color: #e9d5ff; border: 1px solid rgba(192, 132, 252, 0.4);" title="Switch to Uneasy Mood Test Profile">🔮 Uneasy</button>
-        <button type="button" id="loadGoodUserBtn" class="btn btn-ghost btn-sm" style="background: rgba(52, 211, 153, 0.2); color: #a7f3d0; border: 1px solid rgba(52, 211, 153, 0.4);" title="Switch to Good Mood Test Profile">🌿 Good</button>
-        <button type="button" id="loadHappyUserBtn" class="btn btn-ghost btn-sm" style="background: rgba(251, 191, 36, 0.2); color: #fef08a; border: 1px solid rgba(251, 191, 36, 0.4);" title="Switch to Happy Mood Test Profile">☀️ Happy</button>
-        <button type="button" id="loadVeryHappyUserBtn" class="btn btn-ghost btn-sm" style="background: rgba(251, 146, 60, 0.2); color: #fed7aa; border: 1px solid rgba(251, 146, 60, 0.4);" title="Switch to Very Happy Mood Test Profile">🔥 Very Happy</button>
-        <button type="button" id="loadEuphoricUserBtn" class="btn btn-ghost btn-sm" style="background: rgba(255, 63, 142, 0.2); color: #fecdd3; border: 1px solid rgba(255, 63, 142, 0.4);" title="Switch to Euphoric Mood Test Profile">✨ Euphoric</button>
-        <button
-          type="button"
-          id="newUserBtn"
-          class="btn btn-ghost btn-sm"
-          title="Create a new user profile"
-        >
-          + New User Session
-        </button>
       </div>
 
       <nav class="nav" aria-label="Main">

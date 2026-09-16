@@ -225,7 +225,7 @@ function createNewUserSession(name) {
 
 // Keep the visible session selector aligned with the signed-in Supabase account.
 function syncAuthenticatedUser(user) {
-  const name = user.user_metadata?.username || user.email || "User";
+  const name = user.user_metadata?.username || user.email?.split("@")[0] || "User";
   const authenticatedUser = { id: user.id, name };
   localStorage.setItem(USERS_KEY, JSON.stringify([authenticatedUser]));
   setCurrentUserId(user.id);
@@ -1235,14 +1235,14 @@ async function loadDashboard() {
   const uid = getCurrentUserId();
   activeUser = users.find(u => u.id === uid) || users[0];
 
-  initDashboardUserSessionUI();
-
-  if (remote.user && activeUser.id !== "user_elena_low" && !activeUser.id.startsWith("user_")) {
+  if (remote.user) {
     activeUser = syncAuthenticatedUser(remote.user);
     activeCheckins = remote.checkins;
   } else {
     activeCheckins = loadUserCheckins(activeUser.id);
   }
+
+  initDashboardUserSessionUI();
 
   const userNameEl = $("#userName");
   if (userNameEl) userNameEl.textContent = activeUser.name;
