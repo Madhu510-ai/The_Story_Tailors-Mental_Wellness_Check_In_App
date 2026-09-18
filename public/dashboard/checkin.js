@@ -79,6 +79,9 @@ function applyDynamicMoodTheme(mixOrKey, moodScore) {
 
   const meta = MOOD_THEME_META[key] || MOOD_THEME_META.neutral;
   document.documentElement.dataset.moodTheme = key;
+  if (document.body) {
+    document.body.dataset.moodTheme = key;
+  }
 
   const badge = $("#activeThemeBadge");
   if (badge) {
@@ -86,71 +89,36 @@ function applyDynamicMoodTheme(mixOrKey, moodScore) {
     badge.title = `Active app theme reflecting dominant mood division: ${meta.label} (${meta.name})`;
   }
 
-  const euphoricVid = $("#euphoricBgVideo");
-  if (euphoricVid) {
-    if (key === "euphoric") {
-      euphoricVid.style.display = "block";
-      euphoricVid.play().catch(e => console.log("Video autoplay check:", e));
-    } else {
-      euphoricVid.style.display = "none";
-      euphoricVid.pause();
-    }
-  }
+  const videoMap = {
+    euphoric: $("#euphoricBgVideo"),
+    veryHappy: $("#veryHappyBgVideo"),
+    happy: $("#happyBgVideo"),
+    good: $("#goodBgVideo"),
+    uneasy: $("#uneasyBgVideo"),
+    low: $("#lowBgVideo")
+  };
 
-  const lowVid = $("#lowBgVideo");
-  if (lowVid) {
-    if (key === "low") {
-      lowVid.style.display = "block";
-      lowVid.play().catch(e => console.log("Video autoplay check:", e));
+  Object.entries(videoMap).forEach(([moodKey, vid]) => {
+    if (!vid) return;
+    if (moodKey === key) {
+      vid.style.display = "block";
+      vid.style.opacity = "1";
+      vid.muted = true;
+      vid.loop = true;
+      vid.playsInline = true;
+      const playPromise = vid.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          vid.muted = true;
+          vid.play().catch(() => {});
+        });
+      }
     } else {
-      lowVid.style.display = "none";
-      lowVid.pause();
+      vid.style.display = "none";
+      vid.style.opacity = "0";
+      vid.pause();
     }
-  }
-
-  const uneasyVid = $("#uneasyBgVideo");
-  if (uneasyVid) {
-    if (key === "uneasy") {
-      uneasyVid.style.display = "block";
-      uneasyVid.play().catch(e => console.log("Video autoplay check:", e));
-    } else {
-      uneasyVid.style.display = "none";
-      uneasyVid.pause();
-    }
-  }
-
-  const goodVid = $("#goodBgVideo");
-  if (goodVid) {
-    if (key === "good") {
-      goodVid.style.display = "block";
-      goodVid.play().catch(e => console.log("Video autoplay check:", e));
-    } else {
-      goodVid.style.display = "none";
-      goodVid.pause();
-    }
-  }
-
-  const happyVid = $("#happyBgVideo");
-  if (happyVid) {
-    if (key === "happy") {
-      happyVid.style.display = "block";
-      happyVid.play().catch(e => console.log("Video autoplay check:", e));
-    } else {
-      happyVid.style.display = "none";
-      happyVid.pause();
-    }
-  }
-
-  const veryHappyVid = $("#veryHappyBgVideo");
-  if (veryHappyVid) {
-    if (key === "veryHappy") {
-      veryHappyVid.style.display = "block";
-      veryHappyVid.play().catch(e => console.log("Video autoplay check:", e));
-    } else {
-      veryHappyVid.style.display = "none";
-      veryHappyVid.pause();
-    }
-  }
+  });
 }
 
 /* ---------- User Session Management ---------- */
@@ -196,11 +164,19 @@ function createNewUserSession(name) {
   return newUser;
 }
 
-//: Use the authenticated account as the active check-in session.
+// Keep the visible session selector aligned with the signed-in Supabase account.
 function syncAuthenticatedUser(user) {
-  const name = user.user_metadata?.username || user.email?.split("@")[0] || "User";
-  const authenticatedUser = { id: user.id, name };
-  localStorage.setItem(USERS_KEY, JSON.stringify([authenticatedUser]));
+  const storedName = localStorage.getItem("mindful.authUsername");
+  const name = user.user_metadata?.username || user.user_metadata?.name || storedName || user.email?.split("@")[0] || "User";
+  const authenticatedUser = { id: user.id, name: name };
+  const users = getUsers();
+  const existingIdx = users.findIndex(u => u.id === user.id);
+  if (existingIdx >= 0) {
+    users[existingIdx] = authenticatedUser;
+  } else {
+    users.unshift(authenticatedUser);
+  }
+  localStorage.setItem(USERS_KEY, JSON.stringify(users));
   setCurrentUserId(user.id);
   return authenticatedUser;
 }
@@ -751,7 +727,18 @@ function render() {
 $("#qOptions").addEventListener("click", (e) => {
   const btn = e.target.closest("button[data-i]");
   if (!btn) return;
-  answers[index] = +btn.dataset.i;
+  const chosenIdx = +btn.dataset.i;
+  answers[index] = chosenIdx;
+
+  // Real-time emotional feedback: Update theme/background as choices are pressed!
+  const currentQ = questions[index];
+  if (currentQ && currentQ.options && currentQ.options[chosenIdx]) {
+    const optMix = currentQ.options[chosenIdx].mix;
+    if (optMix) {
+      applyDynamicMoodTheme(optMix);
+    }
+  }
+
   render();
   setTimeout(() => {
     if (answers[index] !== null) next();
@@ -854,16 +841,10 @@ async function finish() {
   const result = scoreAnswers();
   const uid = getCurrentUserId();
 
-  // Check-ins require the same authenticated account used by the dashboard.
-  if (typeof WellnessAuth === "undefined" || !(await WellnessAuth.getUser())) {
-    location.replace("login.html");
-    return;
-  }
-
   // Save progress for story set
   saveUserProgress(uid, currentStory.id, currentSetNumber);
 
-  // Save session to user checkins
+  // Save session to user checkins locally
   const history = loadUserCheckins(uid);
   history.push(result);
   localStorage.setItem(getCheckinsKey(uid), JSON.stringify(history.slice(-50)));
@@ -942,14 +923,20 @@ async function finish() {
 
   if (typeof WellnessAuth !== "undefined") {
     try {
-      await WellnessAuth.saveCheckin(databaseRecord(result));
-      const saveStatus = $("#saveStatus");
-      if (saveStatus)
-        saveStatus.textContent = "Saved securely to your account. Your dashboard is ready.";
-      location.replace("index.html");
+      const user = await WellnessAuth.getUser();
+      if (user) {
+        await WellnessAuth.saveCheckin(databaseRecord(result));
+        const saveStatus = $("#saveStatus");
+        if (saveStatus)
+          saveStatus.textContent = "Saved securely to your account. Your dashboard has been updated.";
+      } else {
+        const saveStatus = $("#saveStatus");
+        if (saveStatus)
+          saveStatus.textContent = "Check-in saved locally to your current session.";
+      }
     } catch (error) {
       const saveStatus = $("#saveStatus");
-      if (saveStatus) saveStatus.textContent = `Could not save this check-in: ${error.message}`;
+      if (saveStatus) saveStatus.textContent = `Saved locally (Cloud note: ${error.message})`;
     }
   }
 }

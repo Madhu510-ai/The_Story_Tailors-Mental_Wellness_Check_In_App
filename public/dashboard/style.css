@@ -145,19 +145,34 @@ p {
   color: #fff;
 }
 .nav-signout {
-  border: 0;
-  background: transparent;
-  color: var(--mountain-brown);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1.5px solid rgba(225, 29, 72, 0.45);
+  background: linear-gradient(135deg, rgba(244, 63, 94, 0.15), rgba(225, 29, 72, 0.25));
+  color: #e11d48;
   font: inherit;
-  font-size: 0.9rem;
-  font-weight: 600;
-  padding: 9px 14px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  padding: 8px 16px;
   border-radius: 999px;
   cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 8px rgba(225, 29, 72, 0.15);
+}
+.nav-signout .signout-ico {
+  font-size: 1rem;
+  line-height: 1;
 }
 .nav-signout:hover {
-  color: #a8562a;
-  background: rgba(232, 155, 107, 0.14);
+  color: #ffffff;
+  background: linear-gradient(135deg, #f43f5e, #be123c);
+  border-color: #f43f5e;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(225, 29, 72, 0.45);
+}
+.nav-signout:active {
+  transform: translateY(1px);
 }
 .menu-btn {
   display: none;
@@ -2597,6 +2612,14 @@ html[data-mood-theme="veryHappy"] .chosen-answer {
   transition: opacity 0.8s ease-in-out;
 }
 
+/* Active Profile Button Glow & Highlight */
+.user-session-bar .btn.active-profile-btn {
+  transform: translateY(-1px) scale(1.04);
+  box-shadow: 0 0 16px var(--theme-glow, rgba(255, 255, 255, 0.5)), inset 0 0 8px rgba(255, 255, 255, 0.2) !important;
+  border-color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
 /* 8. Euphoric — Neon Magenta / Motion Video Background & Crystal Transparent Glassmorphism */
 html[data-mood-theme="euphoric"] {
   --theme-accent: #ff3f8e;
@@ -3510,12 +3533,13 @@ html[data-mood-theme="euphoric"] .chosen-answer {
 .user-session-bar {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   background: rgba(255, 253, 248, 0.85);
   border: 1px solid var(--muted-sand);
   padding: 6px 14px;
   border-radius: 999px;
   box-shadow: 0 4px 12px rgba(43, 43, 46, 0.06);
+  flex-wrap: wrap;
 }
 .user-badge-label {
   font-size: 0.78rem;
@@ -3537,6 +3561,66 @@ html[data-mood-theme="euphoric"] .chosen-answer {
 .user-select-dropdown:focus {
   border-color: var(--ocean-teal);
   box-shadow: 0 0 0 2px rgba(63, 166, 184, 0.2);
+}
+.user-session-bar .btn.active-profile-btn {
+  transform: scale(1.05);
+  box-shadow: 0 0 12px currentColor, inset 0 0 8px rgba(255, 255, 255, 0.3);
+  font-weight: 800;
+  filter: brightness(1.25);
+  border-width: 2px !important;
+}
+[data-mood-theme] .user-session-bar {
+  background: rgba(0, 0, 0, 0.45);
+  border-color: rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+[data-mood-theme] .user-badge-label {
+  color: #ffffff;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+}
+[data-mood-theme] .user-select-dropdown {
+  background: rgba(10, 20, 16, 0.7);
+  color: var(--theme-accent, #6ee7b7);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+[data-mood-theme] .user-select-dropdown option {
+  background: #0d1a15;
+  color: #ffffff;
+}
+[data-mood-theme] .nav {
+  background: rgba(0, 0, 0, 0.52) !important;
+  border: 1px solid rgba(255, 255, 255, 0.24) !important;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45) !important;
+}
+[data-mood-theme] .nav a {
+  color: #ffffff !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.85);
+}
+[data-mood-theme] .nav a:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: var(--theme-accent, #6ee7b7) !important;
+}
+[data-mood-theme] .nav a.active {
+  background: var(--theme-btn-bg, #154d3d) !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+[data-mood-theme] .nav-signout {
+  background: linear-gradient(135deg, rgba(244, 63, 94, 0.38), rgba(225, 29, 72, 0.52)) !important;
+  border: 1.5px solid rgba(255, 120, 145, 0.9) !important;
+  color: #ffffff !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95) !important;
+  box-shadow: 0 4px 14px rgba(225, 29, 72, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.4) !important;
+}
+[data-mood-theme] .nav-signout:hover {
+  background: linear-gradient(135deg, #f43f5e, #be123c) !important;
+  border-color: #ffe4e6 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 22px rgba(244, 63, 94, 0.9), inset 0 1px 3px rgba(255, 255, 255, 0.6) !important;
+  transform: translateY(-2px) scale(1.03);
 }
 .btn-sm {
   padding: 5px 12px;
