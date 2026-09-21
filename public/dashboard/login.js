@@ -44,6 +44,10 @@ form.addEventListener("submit", async (event) => {
     const email = document.querySelector("#email").value.trim();
     const password = document.querySelector("#password").value;
     const username = usernameInput.value.trim();
+    const savedName = username || email.split("@")[0];
+    if (savedName) {
+      localStorage.setItem("mindful.authUsername", savedName);
+    }
     const data = creating
       ? await WellnessAuth.signUp(email, password, username)
       : await WellnessAuth.signIn(email, password);
