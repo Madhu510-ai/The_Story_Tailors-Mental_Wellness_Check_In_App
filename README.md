@@ -915,8 +915,10 @@ npm run dev
 
 The dashboard uses Supabase Auth (email/password) and a `wellness_checkins` table. Each saved row contains the user's selected answer for every question plus the calculated mood, stress, sleep, and mood-mix result.
 
-1. Create a Supabase project and run [the migration](supabase/migrations/20260907_create_wellness_checkins.sql) in its SQL Editor.
+1. Create a Supabase project and run the migrations in order: [check-ins](supabase/migrations/20260907_create_wellness_checkins.sql), then [username validation](supabase/migrations/20260921_validate_auth_username.sql). The latter adds a database-side format check for the name stored in auth metadata. It cannot prove an identity is a person's legal/actual name.
 2. In `public/dashboard/auth-config.js`, set the project URL and **anon/public** key from Supabase Settings → API. Never use a `service_role` key in a browser file.
 3. In Supabase Auth, enable Email authentication and configure the site URL used for this app. If email confirmation is enabled, new users must confirm their email before signing in.
+4. In Supabase Auth → URL Configuration, add `https://your-app-host/dashboard/reset-password.html` to Redirect URLs. In Supabase Auth → Email Templates, keep the **Reset Password** template enabled. The app sends recovery links through Supabase and never exposes a password-reset token to a custom backend.
+5. Configure Supabase's Password Security policy to require at least 8 characters, uppercase, lowercase, a number, and a special character. The UI enforces the same policy before it submits, but the Supabase policy remains the server-side authority. Email recovery is implemented; add an SMS provider and phone sign-in in Supabase if SMS OTP recovery is required. Set `recoverySupportUrl` in `auth-config.js` (for example, a `mailto:` support address or secure help-desk URL) to expose the alternative recovery option.
 
 Row Level Security in the migration limits read and write access to the signed-in user, so one person's answers cannot be retrieved by another account.

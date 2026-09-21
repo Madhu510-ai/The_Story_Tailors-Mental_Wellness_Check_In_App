@@ -959,9 +959,11 @@ fetch("data/genres.json")
     }
     DATA = d;
     const user = await WellnessAuth.getUser();
-    if (user) {
-      syncAuthenticatedUser(user);
+    if (!user) {
+      location.replace("login.html");
+      return;
     }
+    syncAuthenticatedUser(user);
     const activeUser = getUsers().find((candidate) => candidate.id === getCurrentUserId());
     const userName = $("#userName");
     if (userName) userName.textContent = activeUser?.name || "User";

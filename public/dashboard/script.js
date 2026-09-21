@@ -1132,20 +1132,24 @@ async function loadDashboard() {
   let remote = { user: null, checkins: [] };
   try {
     const authUser = await WellnessAuth.getUser();
-    if (authUser) {
-      const rows = await WellnessAuth.loadCheckins();
-      remote = { user: authUser, checkins: rows.map(normalizeRemoteCheckin) };
-      syncAuthenticatedUser(authUser);
+    if (!authUser) {
+      location.replace("login.html");
+      return;
     }
+    const rows = await WellnessAuth.loadCheckins();
+    remote = { user: authUser, checkins: rows.map(normalizeRemoteCheckin) };
+    syncAuthenticatedUser(authUser);
+    // A dashboard is always bound to the authenticated Supabase account.
+    setCurrentUserId(authUser.id);
   } catch (error) {
     console.error("Failed to load check-ins from Supabase:", error);
+    location.replace("login.html");
+    return;
   }
 
   const users = getUsers();
   const rawUid = localStorage.getItem(CURRENT_USER_KEY);
-  if (remote.user && (!rawUid || rawUid === "user_sara" || rawUid === "user_alex")) {
-    setCurrentUserId(remote.user.id);
-  }
+  if (remote.user && (!rawUid || rawUid === "user_sara" || rawUid === "user_alex")) setCurrentUserId(remote.user.id);
   const uid = getCurrentUserId();
   activeUser = users.find(u => u.id === uid) || users[0];
 

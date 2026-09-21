@@ -5,4 +5,7 @@
 window.WELLNESS_SUPABASE_CONFIG = {
   url: "https://cxgbazadbebyftrvhbey.supabase.co",
   anonKey: "sb_publishable_d4Ms_sZKVmhuD4rWwU7k7A_XVzBmPOL",
+  // Optional: a mailto: or HTTPS support route used when email recovery is unavailable.
+  // Example: "mailto:support@your-domain.com"
+  recoverySupportUrl: "",
 };

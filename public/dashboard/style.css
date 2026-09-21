@@ -3063,6 +3063,27 @@ html[data-mood-theme="euphoric"] .chosen-answer {
   outline: 3px solid rgba(63, 166, 184, 0.3);
   border-color: var(--deep-teal);
 }
+.password-input {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: stretch;
+}
+.password-input input {
+  min-width: 0;
+  border-radius: 12px 0 0 12px;
+}
+.password-toggle {
+  width: 46px;
+  border: 1px solid var(--muted-sand);
+  border-left: 0;
+  border-radius: 0 12px 12px 0;
+  background: #fff;
+  color: var(--deep-teal);
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+.password-toggle:hover { background: rgba(63, 166, 184, 0.1); }
+.field-help { color: var(--mountain-brown); font-size: 0.78rem; font-weight: 500; }
 .form-message {
   min-height: 1.5em;
   color: #a8562a;

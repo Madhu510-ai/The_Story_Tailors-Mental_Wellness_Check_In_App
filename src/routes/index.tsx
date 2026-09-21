@@ -2,7 +2,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
   beforeLoad: () => {
-    throw redirect({ href: "/dashboard/login.html" });
+    throw redirect({ href: "/dashboard/index.html" });
   },
   component: () => null,
 });

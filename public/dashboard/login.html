@@ -22,21 +22,25 @@
         </p>
         <form id="authForm" class="auth-form">
           <label id="usernameField" hidden
-            >Username <input id="username" type="text" autocomplete="username" maxlength="32"
-          /></label>
+            >Your name
+            <input id="username" type="text" autocomplete="name" maxlength="50" aria-describedby="usernameHelp" />
+            <span class="field-help" id="usernameHelp">Use your real name. Letters and spaces only.</span>
+          </label>
           <label>Email <input id="email" type="email" autocomplete="email" required /></label>
-          <label
-            >Password
-            <input
-              id="password"
-              type="password"
-              autocomplete="current-password"
-              minlength="8"
-              required
-          /></label>
+          <label>Password
+            <span class="password-input">
+              <input id="password" type="password" autocomplete="current-password" minlength="8" required aria-describedby="passwordHelp" />
+              <button class="password-toggle" type="button" data-password-toggle="password" aria-label="Show password" aria-pressed="false">
+                <span aria-hidden="true">◉</span>
+              </button>
+            </span>
+            <span class="field-help" id="passwordHelp">At least 8 characters, with uppercase, lowercase, number, and special character.</span>
+          </label>
           <p class="form-message" id="formMessage" role="status"></p>
           <button class="btn btn-primary" id="submitButton" type="submit">Sign in</button>
         </form>
+        <button class="link-button" id="forgotPasswordButton" type="button">Forgot password?</button>
+        <a class="link-button" id="recoverySupportLink" href="#" hidden>Contact support for account recovery</a>
         <button class="link-button" id="modeButton" type="button">
           New here? Create an account
         </button>
