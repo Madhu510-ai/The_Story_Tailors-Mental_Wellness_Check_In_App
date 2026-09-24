@@ -1831,13 +1831,15 @@ html[data-mood-theme="neutral"] {
   --theme-ambient-shadow: 0 0 45px rgba(251, 191, 36, 0.3);
 }
 
-html[data-mood-theme="neutral"] body::before {
+html[data-mood-theme="neutral"] body::before,
+body[data-mood-theme="neutral"]::before {
   display: none !important;
   opacity: 0 !important;
   background: none !important;
 }
 
-html[data-mood-theme="neutral"] body {
+html[data-mood-theme="neutral"] body,
+body[data-mood-theme="neutral"] {
   background: url("assets/neutral-bg.png") center/cover fixed no-repeat #1a1005 !important;
   color: #ffffff !important;
 }

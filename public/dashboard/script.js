@@ -292,6 +292,29 @@ function getMoodPreviewCheckins(moodKey, user) {
         ]
       }
     ],
+    neutral: [
+      {
+        sessionId: `sess_${moodKey}_1`,
+        userId,
+        story: "Serene Sunset Zen Sanctuary",
+        genre: "Mindful Balance & Calmness",
+        storyId: "001_neutral_zen",
+        setNumber: 1,
+        questionRange: "Q1–Q6",
+        mood: 55, energy: 50, stress: 35, sleep: 70,
+        mix: { veryLow: 0, low: 5, uneasy: 10, neutral: 70, good: 15, happy: 0, veryHappy: 0, euphoric: 0 },
+        dominant: "Neutral",
+        at: new Date(now - 86400000).toISOString(),
+        answersDetailed: [
+          { globalQ: 1, question: "A calm evening breeze flows through the courtyard.", chosenOption: "Observe the quiet rhythm of the sunset", mix: { neutral: 8, good: 2 } },
+          { globalQ: 2, question: "Smooth river pebbles sit undisturbed by the shore.", chosenOption: "Rest mindfully in steady presence", mix: { neutral: 8, uneasy: 2 } },
+          { globalQ: 3, question: "Soft ambient light illuminates the tea garden.", chosenOption: "Sip warm tea in gentle equilibrium", mix: { neutral: 7, good: 3 } },
+          { globalQ: 4, question: "Distant wind chimes sway in a steady cadence.", chosenOption: "Listen with peaceful awareness", mix: { neutral: 8, uneasy: 2 } },
+          { globalQ: 5, question: "The horizon settles into warm pastel hues.", chosenOption: "Maintain a calm and balanced perspective", mix: { neutral: 9, good: 1 } },
+          { globalQ: 6, question: "Evening calm settles across the quiet path.", chosenOption: "Embrace the serene stability of now", mix: { neutral: 8, good: 2 } }
+        ]
+      }
+    ],
     good: [
       {
         sessionId: `sess_${moodKey}_1`,
@@ -625,7 +648,7 @@ function getMoodProfile(moodKey) {
     veryLow:   { mood: 10, stress: 88, sleep: 30, mix: { veryLow: 85, low: 15, uneasy: 0, neutral: 0, good: 0, happy: 0, veryHappy: 0, euphoric: 0 }, dominant: "Very Low", story: "Misty Shadow Valley Journal", genre: "Atmospheric Reflections", setNumber: 1, questionRange: "Q1–Q6" },
     low:       { mood: 32, stress: 68, sleep: 50, mix: { veryLow: 10, low: 75, uneasy: 15, neutral: 0, good: 0, happy: 0, veryHappy: 0, euphoric: 0 }, dominant: "Low", story: "Twilight Amethyst Sanctuary", genre: "Gentle Reflections", setNumber: 1, questionRange: "Q1–Q6" },
     uneasy:    { mood: 42, stress: 75, sleep: 55, mix: { veryLow: 5, low: 15, uneasy: 75, neutral: 5, good: 0, happy: 0, veryHappy: 0, euphoric: 0 }, dominant: "Uneasy", story: "Electric Violet Echoes", genre: "Intensive Reflections", setNumber: 1, questionRange: "Q1–Q6" },
-    neutral:   { mood: 62, stress: 58, sleep: 44, mix: { veryLow: 0, low: 0, uneasy: 20, neutral: 30, good: 30, happy: 20, veryHappy: 0, euphoric: 0 }, dominant: "Neutral", story: "Sherlock Holmes", genre: "Detective & Mystery", setNumber: 1, questionRange: "Q1–Q6" },
+    neutral:   { mood: 55, stress: 45, sleep: 65, mix: { veryLow: 0, low: 5, uneasy: 10, neutral: 70, good: 15, happy: 0, veryHappy: 0, euphoric: 0 }, dominant: "Neutral", story: "Serene Sunset Zen Sanctuary", genre: "Mindful Balance & Calmness", setNumber: 1, questionRange: "Q1–Q6" },
     good:      { mood: 68, stress: 25, sleep: 80, mix: { veryLow: 0, low: 0, uneasy: 0, neutral: 10, good: 75, happy: 15, veryHappy: 0, euphoric: 0 }, dominant: "Good", story: "Mint Emerald Meadow Sanctuary", genre: "Nature & Renewal", setNumber: 1, questionRange: "Q1–Q6" },
     happy:     { mood: 82, stress: 15, sleep: 88, mix: { veryLow: 0, low: 0, uneasy: 0, neutral: 0, good: 15, happy: 75, veryHappy: 10, euphoric: 0 }, dominant: "Happy", story: "Golden Sunshine Horizon", genre: "Radiant Joy & Celebration", setNumber: 1, questionRange: "Q1–Q6" },
     veryHappy: { mood: 92, stress: 10, sleep: 90, mix: { veryLow: 0, low: 0, uneasy: 0, neutral: 0, good: 0, happy: 15, veryHappy: 75, euphoric: 10 }, dominant: "Very Happy", story: "Golden Horizon Celebration", genre: "Exuberant Energy & Fulfillment", setNumber: 1, questionRange: "Q1–Q6" },
@@ -1072,6 +1095,7 @@ function initDashboardUserSessionUI() {
     { key: "veryLow",   btn: $("#loadVeryLowUserBtn") },
     { key: "low",       btn: $("#loadLowUserBtn") },
     { key: "uneasy",    btn: $("#loadUneasyUserBtn") },
+    { key: "neutral",   btn: $("#loadNeutralUserBtn") },
     { key: "good",      btn: $("#loadGoodUserBtn") },
     { key: "happy",     btn: $("#loadHappyUserBtn") },
     { key: "veryHappy", btn: $("#loadVeryHappyUserBtn") },
