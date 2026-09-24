@@ -594,6 +594,29 @@ function updateRingsAndBars(latest, previous) {
   });
 }
 
+function initGamificationUI() {
+  const badgeHall = $("#badgeHallModal");
+  const levelUp = $("#levelUpModal");
+  const openHall = $("#openBadgeHallBtn");
+  const closeHall = $("#badgeHallCloseBtn");
+  const closeLevelUp = $("#levelUpCloseBtn");
+
+  if (openHall) {
+    openHall.onclick = () => {
+      window.WELLNESS_GAMIFICATION?.renderBadgeHall(activeUser?.id || "guest");
+      if (badgeHall) badgeHall.hidden = false;
+    };
+  }
+  if (closeHall) closeHall.onclick = () => { if (badgeHall) badgeHall.hidden = true; };
+  if (closeLevelUp) closeLevelUp.onclick = () => { if (levelUp) levelUp.hidden = true; };
+  if (badgeHall) {
+    badgeHall.onclick = e => { if (e.target === badgeHall) badgeHall.hidden = true; };
+  }
+  if (levelUp) {
+    levelUp.onclick = e => { if (e.target === levelUp) levelUp.hidden = true; };
+  }
+}
+
 function drawWeeklyWave(checkins) {
   const chartEl = $("#chart");
   if (!chartEl || !checkins || checkins.length === 0) return;
@@ -1001,45 +1024,394 @@ function drawReports(checkins) {
   };
 }
 
-function drawPaths() {
+let currentRecFilter = "all";
+let currentRecMetrics = null;
+let currentActiveRecItem = null;
+let recTimerInterval = null;
+let recTimerSecondsLeft = 0;
+let recTimerRunning = false;
+let recTimerDurationSeconds = 0;
+let recTimerElapsedSeconds = 0;
+let recTimerStartedAt = 0;
+let recTimerAwarded = false;
+
+function stopRecTimer() {
+  if (recTimerRunning) {
+    recTimerElapsedSeconds = getRecTimerElapsedSeconds();
+  }
+  if (recTimerInterval) {
+    clearInterval(recTimerInterval);
+    recTimerInterval = null;
+  }
+  recTimerRunning = false;
+  recTimerStartedAt = 0;
+  const startBtn = $("#modalTimerStart");
+  if (startBtn) startBtn.textContent = "Start Timer";
+  const status = $("#modalTimerStatus");
+  if (status) status.textContent = "Timer Paused";
+}
+
+function getRecTimerElapsedSeconds() {
+  if (!recTimerRunning || !recTimerStartedAt) return recTimerElapsedSeconds;
+  return Math.min(
+    recTimerDurationSeconds,
+    recTimerElapsedSeconds + Math.floor((Date.now() - recTimerStartedAt) / 1000),
+  );
+}
+
+function updateLiveTimerPoints() {
+  const pointsEl = $("#modalTimerPointsEarned");
+  if (!pointsEl || !window.WELLNESS_GAMIFICATION) return;
+  const preview = window.WELLNESS_GAMIFICATION.calculatePoints(
+    getRecTimerElapsedSeconds(),
+    recTimerDurationSeconds,
+    false,
+  );
+  pointsEl.textContent = `+${preview.points} pts earned`;
+}
+
+function awardRecTimerPoints(isFull) {
+  if (recTimerAwarded || !currentActiveRecItem || !window.WELLNESS_GAMIFICATION) return null;
+
+  const elapsed = isFull ? recTimerDurationSeconds : getRecTimerElapsedSeconds();
+  if (elapsed <= 0) return null;
+
+  recTimerElapsedSeconds = elapsed;
+  recTimerAwarded = true;
+  const result = window.WELLNESS_GAMIFICATION.calculatePoints(
+    elapsed,
+    recTimerDurationSeconds,
+    isFull,
+  );
+  const award = window.WELLNESS_GAMIFICATION.awardPoints(
+    activeUser?.id || "guest",
+    result.points,
+    result.minutes,
+    currentActiveRecItem.title,
+    currentActiveRecItem.id,
+  );
+
+  const pointsEl = $("#modalTimerPointsEarned");
+  if (pointsEl) pointsEl.textContent = `+${result.points} pts earned`;
+  if (typeof window.WELLNESS_GAMIFICATION.renderDashboardGamification === "function") {
+    window.WELLNESS_GAMIFICATION.renderDashboardGamification(activeUser?.id || "guest");
+  }
+  if (award.leveledUp && typeof window.WELLNESS_GAMIFICATION.triggerLevelUpModal === "function") {
+    window.WELLNESS_GAMIFICATION.triggerLevelUpModal(award.newLevel);
+  }
+  return award;
+}
+
+function startRecTimer() {
+  if (recTimerSecondsLeft <= 0 || recTimerAwarded) return;
+  recTimerRunning = true;
+  recTimerStartedAt = Date.now();
+  const startBtn = $("#modalTimerStart");
+  if (startBtn) startBtn.textContent = "Pause Timer";
+  const status = $("#modalTimerStatus");
+  if (status) status.textContent = "Focusing...";
+
+  recTimerInterval = setInterval(() => {
+    const elapsed = getRecTimerElapsedSeconds();
+    recTimerSecondsLeft = Math.max(0, recTimerDurationSeconds - elapsed);
+    updateTimerDisplay();
+    updateLiveTimerPoints();
+    if (recTimerSecondsLeft <= 0) {
+      stopRecTimer();
+      awardRecTimerPoints(true);
+      if (status) status.textContent = "Completed! Points awarded.";
+      const compBtn = $("#modalCompleteBtn");
+      if (compBtn && !compBtn.classList.contains("done")) {
+        toggleCompletedRec(activeUser?.id || "guest", currentActiveRecItem.id);
+        compBtn.textContent = "✓ Completed";
+        compBtn.classList.add("done");
+        drawPaths(currentRecMetrics);
+      }
+      // Mark all steps as checked
+      const stepsList = $("#modalSteps");
+      if (stepsList) {
+        stepsList.querySelectorAll(".step-check").forEach(c => (c.checked = true));
+        const label = $("#stepsProgressLabel");
+        if (label) label.textContent = "All steps completed!";
+      }
+      if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const timeEl = $("#modalTimerTime");
+  if (!timeEl) return;
+  const m = Math.floor(recTimerSecondsLeft / 60);
+  const s = recTimerSecondsLeft % 60;
+  timeEl.textContent = `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+}
+
+function getCompletedRecs(userId) {
+  try {
+    return JSON.parse(localStorage.getItem(`mindful.completedRecs.${userId}`) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function toggleCompletedRec(userId, recId) {
+  const completed = getCompletedRecs(userId);
+  const idx = completed.indexOf(recId);
+  if (idx >= 0) {
+    completed.splice(idx, 1);
+  } else {
+    completed.push(recId);
+  }
+  localStorage.setItem(`mindful.completedRecs.${userId}`, JSON.stringify(completed));
+  return completed.includes(recId);
+}
+
+function drawPaths(metrics) {
   const pathsContainer = $("#paths");
   if (!pathsContainer) return;
 
-  const recommendations = [
-    { id: "rec_1", icon: "🧘", title: "Meditation & Focus", desc: "5 min · Calm nervous system", progress: 75 },
-    { id: "rec_2", icon: "✍️", title: "Journaling Reflection", desc: "10 min · Express mood story", progress: 45 },
-    { id: "rec_3", icon: "✨", title: "Mindful Reset", desc: "5 min · Understand current state", progress: 85 },
-    { id: "rec_4", icon: "🌬", title: "Deep Breath Wave", desc: "3 min · Quick stress release", progress: 30 }
-  ];
+  if (metrics) {
+    currentRecMetrics = metrics;
+  } else if (!currentRecMetrics) {
+    currentRecMetrics = { mood: 55, stress: 45, sleep: 44, dominant: "Neutral" };
+  }
 
-  pathsContainer.innerHTML = recommendations.map(p => {
-    const lv = levelFor(p.progress);
-    return `
-    <li>
-      <button type="button" class="p-open" data-title="${p.title}" data-desc="${p.desc}">
-        <div class="p-ico" aria-hidden="true">${p.icon}</div>
-        <h3>${p.title}</h3>
-        <p class="muted small">${p.desc}</p>
-        <div class="bar"><i class="fill" style="background:${lv.color};box-shadow:0 0 10px ${lv.color}80" data-width="${p.progress}"></i></div>
-        <span class="small muted">${p.progress}% completed</span>
-      </button>
-    </li>`;
-  }).join("");
+  const m = currentRecMetrics;
+  const mLv = levelFor(m.mood);
 
-  pathsContainer.onclick = e => {
-    const btn = e.target.closest("button[data-title]");
-    if (!btn) return;
-    openModal(btn.dataset.title, "Personalized Recommendation", btn.dataset.desc + "\n\nFollow this guided activity to align your energy and lower stress after your story check-in.");
-  };
+  // Update subtitle
+  const sub = $("#recSubtitle");
+  if (sub) {
+    sub.innerHTML = `Tailored for detected mood <strong style="color:${mLv.color}">${mLv.label} (${m.mood}%)</strong> &amp; sleep rest <strong style="color:var(--sunset-gold)">${m.sleep} min</strong>`;
+  }
+
+  // Setup filter tabs
+  const tabContainer = $("#recTabs");
+  if (tabContainer && !tabContainer.dataset.initialized) {
+    tabContainer.dataset.initialized = "true";
+    tabContainer.addEventListener("click", e => {
+      const btn = e.target.closest(".rec-tab");
+      if (!btn) return;
+      tabContainer.querySelectorAll(".rec-tab").forEach(t => t.classList.remove("active"));
+      btn.classList.add("active");
+      currentRecFilter = btn.dataset.filter || "all";
+      renderRecCards();
+    });
+  }
+
+  renderRecCards();
+
+  function renderRecCards() {
+    const list = typeof window.getSmartRecommendations === "function"
+      ? window.getSmartRecommendations(m, currentRecFilter)
+      : [];
+
+    const completed = getCompletedRecs(activeUser?.id || "guest");
+
+    if (list.length === 0) {
+      pathsContainer.innerHTML = `<li class="rec-empty"><p class="muted">No activities found for this filter. Try selecting '★ Top Tailored'.</p></li>`;
+      return;
+    }
+
+    pathsContainer.innerHTML = list.map(rec => {
+      const isDone = completed.includes(rec.id);
+      const intensityColor = rec.intensity === "Gentle" ? "#42D39A" : rec.intensity === "Energizing" ? "#FF7A45" : "#48B9E8";
+
+      return `
+      <li class="rec-card ${isDone ? 'completed' : ''}" data-id="${rec.id}">
+        <button type="button" class="p-open" aria-label="${rec.title}">
+          <div class="rec-card-top">
+            <span class="rec-badge" style="background:${intensityColor}20; color:${intensityColor}; border-color:${intensityColor}40">
+              ${rec.intensity} · ${rec.duration}
+            </span>
+            <span class="rec-cat-tag">${rec.category}</span>
+          </div>
+
+          <div class="rec-header-row">
+            <div class="p-ico" aria-hidden="true">${rec.icon}</div>
+            <div>
+              <h3>${rec.title}</h3>
+              <p class="rec-match-badge">${rec.matchBadge || 'Recommended'}</p>
+            </div>
+          </div>
+
+          <p class="muted small rec-summary">${rec.summary}</p>
+
+          <div class="rec-card-footer">
+            <span class="rec-status-pill ${isDone ? 'done' : ''}">
+              ${isDone ? '✓ Completed' : 'Explore Guided Path →'}
+            </span>
+            <div class="rec-bar">
+              <i class="fill" style="width: ${isDone ? '100%' : '35%'}; background: ${isDone ? '#42D39A' : mLv.color}"></i>
+            </div>
+          </div>
+        </button>
+      </li>`;
+    }).join("");
+
+    pathsContainer.onclick = e => {
+      const card = e.target.closest("li[data-id]");
+      if (!card) return;
+      const rec = list.find(r => r.id === card.dataset.id);
+      if (rec) {
+        openRecommendationModal(rec);
+      }
+    };
+  }
+}
+
+function openRecommendationModal(rec) {
+  stopRecTimer();
+  awardRecTimerPoints(false);
+  currentActiveRecItem = rec;
+
+  const modal = $("#modal");
+  const modalClose = $("#modalClose");
+  const modalTitle = $("#modalTitle");
+  const modalMeta = $("#modalMeta");
+  const modalBody = $("#modalBody");
+  const modalCategory = $("#modalCategory");
+  const modalDuration = $("#modalDuration");
+  const modalIcon = $("#modalIcon");
+  const modalWhyBox = $("#modalWhyBox");
+  const modalWhyBadge = $("#modalWhyBadge");
+  const modalWhyText = $("#modalWhyText");
+  const stepsSec = $(".modal-steps-section");
+  const timerBox = $("#modalTimerBox");
+  const compBtn = $("#modalCompleteBtn");
+
+  if (modalCategory) {
+    modalCategory.style.display = "inline-block";
+    modalCategory.textContent = rec.category;
+  }
+  if (modalDuration) {
+    modalDuration.style.display = "inline-block";
+    modalDuration.textContent = `⏱ ${rec.duration}`;
+  }
+  if (modalIcon) {
+    modalIcon.style.display = "grid";
+    modalIcon.textContent = rec.icon;
+  }
+  if (modalTitle) modalTitle.textContent = rec.title;
+  if (modalMeta) modalMeta.textContent = `${rec.intensity} Pace · Tags: ${rec.tags.join(", ")}`;
+  if (modalBody) modalBody.textContent = rec.summary;
+
+  if (modalWhyBox) {
+    modalWhyBox.style.display = "flex";
+    if (modalWhyBadge) modalWhyBadge.textContent = rec.matchBadge || "Tailored Intervention";
+    if (modalWhyText) modalWhyText.textContent = rec.scienceWhy || "";
+  }
+
+  // Populate guided steps
+  if (stepsSec) stepsSec.style.display = "grid";
+  const stepsList = $("#modalSteps");
+  if (stepsList) {
+    stepsList.innerHTML = rec.instructions.map((step, idx) => `
+      <li class="modal-step-item">
+        <label class="step-check-label" for="step_chk_${idx}">
+          <input type="checkbox" class="step-check" data-idx="${idx}" id="step_chk_${idx}">
+          <span class="step-num">${idx + 1}</span>
+          <span class="step-text">${step}</span>
+        </label>
+      </li>
+    `).join("");
+
+    const label = $("#stepsProgressLabel");
+    if (label) label.textContent = `0 of ${rec.instructions.length} steps completed`;
+
+    stepsList.onchange = () => {
+      const total = rec.instructions.length;
+      const checked = stepsList.querySelectorAll(".step-check:checked").length;
+      if (label) {
+        label.textContent = `${checked} of ${total} steps completed`;
+      }
+      if (checked === total && compBtn && !compBtn.classList.contains("done")) {
+        compBtn.style.boxShadow = "0 0 16px var(--sunset-gold)";
+      }
+    };
+  }
+
+  // Setup guided timer
+  if (timerBox) timerBox.style.display = "flex";
+  recTimerDurationSeconds = rec.durationSeconds || 300;
+  recTimerSecondsLeft = recTimerDurationSeconds;
+  recTimerElapsedSeconds = 0;
+  recTimerAwarded = false;
+  updateTimerDisplay();
+  updateLiveTimerPoints();
+  const pointsRate = $("#modalTimerPointsRate");
+  if (pointsRate) pointsRate.textContent = "+10 pts / min + completion bonus";
+
+  const startBtn = $("#modalTimerStart");
+  const resetBtn = $("#modalTimerReset");
+  if (startBtn) {
+    startBtn.onclick = () => {
+      if (recTimerRunning) stopRecTimer();
+      else startRecTimer();
+    };
+  }
+  if (resetBtn) {
+    resetBtn.onclick = () => {
+      stopRecTimer();
+      recTimerDurationSeconds = rec.durationSeconds || 300;
+      recTimerSecondsLeft = recTimerDurationSeconds;
+      recTimerElapsedSeconds = 0;
+      recTimerAwarded = false;
+      updateTimerDisplay();
+      updateLiveTimerPoints();
+      const status = $("#modalTimerStatus");
+      if (status) status.textContent = "Timer Reset";
+    };
+  }
+
+  // Setup Complete button
+  if (compBtn) {
+    compBtn.style.display = "inline-flex";
+    const completed = getCompletedRecs(activeUser?.id || "guest");
+    const isDone = completed.includes(rec.id);
+    compBtn.textContent = isDone ? "✓ Completed (Click to Undo)" : "✓ Mark as Completed";
+    compBtn.classList.toggle("done", isDone);
+    compBtn.onclick = () => {
+      const nowDone = toggleCompletedRec(activeUser?.id || "guest", rec.id);
+      if (nowDone) {
+        stopRecTimer();
+        awardRecTimerPoints(recTimerSecondsLeft <= 0);
+      }
+      compBtn.textContent = nowDone ? "✓ Completed (Click to Undo)" : "✓ Mark as Completed";
+      compBtn.classList.toggle("done", nowDone);
+      drawPaths(currentRecMetrics);
+    };
+  }
+
+  if (modal) modal.hidden = false;
+  if (modalClose) modalClose.focus();
 }
 
 /* ---------- Shared Modal & Header Init ---------- */
 function openModal(title, meta, body) {
+  stopRecTimer();
   const modalTitle = $("#modalTitle");
   const modalMeta = $("#modalMeta");
   const modalBody = $("#modalBody");
   const modal = $("#modal");
   const modalClose = $("#modalClose");
+
+  // Hide recommendation-specific sections for generic modals
+  const whyBox = $("#modalWhyBox");
+  if (whyBox) whyBox.style.display = "none";
+  const timerBox = $("#modalTimerBox");
+  if (timerBox) timerBox.style.display = "none";
+  const stepsSec = $(".modal-steps-section");
+  if (stepsSec) stepsSec.style.display = "none";
+  const compBtn = $("#modalCompleteBtn");
+  if (compBtn) compBtn.style.display = "none";
+  const cat = $("#modalCategory");
+  if (cat) cat.style.display = "none";
+  const dur = $("#modalDuration");
+  if (dur) dur.style.display = "none";
+  const ico = $("#modalIcon");
+  if (ico) ico.style.display = "none";
 
   if (modalTitle) modalTitle.textContent = title;
   if (modalMeta) modalMeta.textContent = meta;
@@ -1068,15 +1440,21 @@ function buildInsight(latest, history) {
 function initModal() {
   const modal = $("#modal");
   const modalClose = $("#modalClose");
-  if (modalClose) modalClose.onclick = () => { if (modal) modal.hidden = true; };
-  if (modal) modal.onclick = e => { if (e.target === modal) modal.hidden = true; };
-  document.addEventListener("keydown", e => { if (e.key === "Escape" && modal) modal.hidden = true; });
+  const closeModal = () => {
+    stopRecTimer();
+    awardRecTimerPoints(false);
+    if (modal) modal.hidden = true;
+  };
+  if (modalClose) modalClose.onclick = closeModal;
+  if (modal) modal.onclick = e => { if (e.target === modal) closeModal(); };
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && modal) closeModal(); });
 }
 
 function initDashboardUserSessionUI() {
   const users = getUsers();
   const uid = getCurrentUserId();
   activeUser = users.find(u => u.id === uid) || users[0];
+  window.WELLNESS_GAMIFICATION?.renderDashboardGamification(activeUser.id);
 
   const select = $("#userSelectDashboard");
   if (select) {
@@ -1204,7 +1582,7 @@ async function loadDashboard() {
     if (emptyState) {
       emptyState.textContent = `Complete your first story check-in to start your personal wellness history. ${activeUser.name} is currently in a steady pattern.`;
     }
-    drawPaths();
+    drawPaths({ mood: defaultProfile.mood, stress: defaultProfile.stress, sleep: defaultProfile.sleep || 44, dominant: defaultProfile.dominant || "Neutral" });
     initSessionVisualizer([]);
     updateRingsAndBars({ mood: defaultProfile.mood, stress: defaultProfile.stress, sleep: defaultProfile.sleep || 44 }, null);
     drawMix(defaultProfile.mix);
@@ -1257,7 +1635,7 @@ async function loadDashboard() {
   drawMix(latest.mix);
   initSessionVisualizer(activeCheckins);
   drawReports(activeCheckins);
-  drawPaths();
+  drawPaths(latest);
 }
 
 /* ---------- Boot ---------- */
@@ -1272,7 +1650,43 @@ if (menuBtn && nav) {
   nav.onclick = e => { if (e.target.tagName === "A") nav.classList.remove("open"); };
 }
 
+const sessionPanel = $("#sessionPanel");
+const sessionPanelToggle = $("#sessionPanelToggle");
+const sessionPanelClose = $("#sessionPanelClose");
+const sessionPanelBackdrop = $("#sessionPanelBackdrop");
+const setSessionPanelOpen = (open) => {
+  if (!sessionPanel || !sessionPanelToggle || !sessionPanelBackdrop) return;
+  sessionPanel.classList.toggle("open", open);
+  sessionPanel.setAttribute("aria-hidden", String(!open));
+  sessionPanelToggle.setAttribute("aria-expanded", String(open));
+  sessionPanelToggle.setAttribute("aria-label", open ? "Close user session controls" : "Open user session controls");
+  sessionPanelBackdrop.hidden = !open;
+  document.body.classList.toggle("session-panel-open", open);
+};
+if (sessionPanelToggle) sessionPanelToggle.onclick = () => setSessionPanelOpen(!sessionPanel?.classList.contains("open"));
+if (sessionPanelClose) sessionPanelClose.onclick = () => setSessionPanelOpen(false);
+if (sessionPanelBackdrop) sessionPanelBackdrop.onclick = () => setSessionPanelOpen(false);
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") setSessionPanelOpen(false);
+});
+
 initModal();
+initGamificationUI();
+const fixedHeader = document.querySelector(".site-header");
+if (fixedHeader) {
+  const syncFixedHeaderSpace = () => {
+    document.documentElement.style.setProperty(
+      "--fixed-header-space",
+      `${fixedHeader.getBoundingClientRect().height + 24}px`,
+    );
+  };
+  syncFixedHeaderSpace();
+  if (typeof ResizeObserver === "function") {
+    new ResizeObserver(syncFixedHeaderSpace).observe(fixedHeader);
+  } else {
+    window.addEventListener("resize", syncFixedHeaderSpace);
+  }
+}
 //  Keep dashboard data loading asynchronous and tied to the auth session.
 loadDashboard();
 

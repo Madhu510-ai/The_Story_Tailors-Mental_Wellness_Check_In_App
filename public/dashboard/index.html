@@ -29,18 +29,40 @@
 <a class="skip-link" href="#main">Skip to content</a>
 
 <header class="site-header">
-  <div class="greet">
-    <img class="avatar" id="userAvatar" src="assets/brain.png" alt="User profile" />
-    <div>
-      <h1 class="hello">Hello, <span id="userName">Sara</span> <span aria-hidden="true">👋</span></h1>
-      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:4px;">
-        <p class="sub">How are you feeling today?</p>
-        <span id="activeThemeBadge" class="theme-mood-pill">🪨 Theme: Serene Sunset Zen (Neutral)</span>
+  <div class="header-main-row">
+    <div class="greet">
+      <img class="avatar" id="userAvatar" src="assets/brain.png" alt="User profile" />
+      <div>
+        <h1 class="hello">Hello, <span class="username-badge-icon" id="userNameBadgeIcon" aria-hidden="true">🥉</span><span id="userName">Sara</span> <span aria-hidden="true">👋</span></h1>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:4px;">
+          <p class="sub">How are you feeling today?</p>
+          <span id="activeThemeBadge" class="theme-mood-pill">🪨 Theme: Serene Sunset Zen (Neutral)</span>
+        </div>
       </div>
     </div>
+    <div class="header-rewards" aria-label="Wellness rewards">
+      <div class="user-top-badge" id="userTopBadge" aria-label="Current wellness badge">
+        <span class="top-badge-icon" id="userTopBadgeIcon" aria-hidden="true">🥉</span>
+        <span class="top-badge-copy"><small>Current badge</small><strong id="userTopBadgeTitle">Seeker</strong></span>
+      </div>
+      <div class="user-wallet" aria-label="Coin wallet">
+        <span class="wallet-coin" aria-hidden="true">🪙</span>
+        <span class="wallet-copy"><small>Coin wallet</small><strong id="userWalletCoins">0</strong></span>
+        <span class="wallet-reward-float" id="walletRewardFloat" aria-hidden="true"></span>
+      </div>
+    </div>
+    <button type="button" class="session-panel-toggle" id="sessionPanelToggle" aria-expanded="false" aria-controls="sessionPanel" aria-label="Open user session controls" title="User session controls">
+      <span aria-hidden="true">⋮</span>
+    </button>
   </div>
 
-  <div class="user-session-bar" aria-label="User session manager">
+  <div class="session-panel-backdrop" id="sessionPanelBackdrop" hidden></div>
+  <aside class="session-panel" id="sessionPanel" aria-label="User session manager" aria-hidden="true">
+    <div class="session-panel-head">
+      <h2>User Session</h2>
+      <button type="button" class="session-panel-close" id="sessionPanelClose" aria-label="Close user session controls">×</button>
+    </div>
+    <div class="user-session-bar">
     <span class="user-badge-label">Active User Session:</span>
     <select id="userSelectDashboard" class="user-select-dropdown" aria-label="Select user session"></select>
     <button type="button" id="loadVeryLowUserBtn" class="btn btn-ghost btn-sm" style="background: rgba(110, 231, 183, 0.2); color: #a7f3d0; border: 1px solid rgba(110, 231, 183, 0.4);" title="Switch to Very Low Mood Theme">🏔️ Very Low Mood</button>
@@ -52,7 +74,8 @@
     <button type="button" id="loadVeryHappyUserBtn" class="btn btn-ghost btn-sm" style="background: rgba(251, 146, 60, 0.2); color: #fed7aa; border: 1px solid rgba(251, 146, 60, 0.4);" title="Switch to Very Happy Mood Theme">🔥 Very Happy Mood</button>
     <button type="button" id="loadEuphoricUserBtn" class="btn btn-ghost btn-sm" style="background: rgba(255, 63, 142, 0.2); color: #fecdd3; border: 1px solid rgba(255, 63, 142, 0.4);" title="Switch to Euphoric Mood Theme">✨ Euphoric Mood</button>
     <button type="button" id="newUserBtnDashboard" class="btn btn-ghost btn-sm" title="Create new user profile">+ New Session</button>
-  </div>
+    </div>
+  </aside>
 
   <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="nav" aria-label="Open menu">
     <span></span><span></span><span></span>
@@ -198,22 +221,149 @@
       <a class="btn btn-gold" href="checkin.html">Start Next Story Session</a>
     </section>
 
+    <!-- Mindful Gamification & Badges Banner -->
+    <section class="card game-card reveal" id="gamificationBanner" aria-label="Wellness Level and Badges">
+      <div class="game-banner-header">
+        <div class="game-badge-avatar" id="gameUserBadgeIcon">🥉</div>
+        <div class="game-profile-info">
+          <div class="game-tier-title-row">
+            <span class="game-level-chip" id="gameUserLevel">Level 1</span>
+            <h2 id="gameUserBadgeTitle">Mindful Seeker</h2>
+            <button type="button" class="btn btn-ghost btn-sm game-hall-btn" id="openBadgeHallBtn" title="View all badges in hierarchy">🏆 Badge Hierarchy</button>
+          </div>
+          <p class="muted small" id="gameTierDesc">Earn points by spending time in mindful activities and completing timers.</p>
+        </div>
+        <div class="game-stats-counters">
+          <div class="game-stat-box">
+            <span class="muted small">Total Points</span>
+            <strong class="game-stat-val" id="gameUserPoints">0 <small>pts</small></strong>
+          </div>
+          <div class="game-stat-box">
+            <span class="muted small">Time Focused</span>
+            <strong class="game-stat-val" id="gameUserMinutes">0 <small>min</small></strong>
+          </div>
+        </div>
+      </div>
+      <div class="game-progress-wrapper">
+        <div class="game-progress-labels">
+          <span class="small muted" id="gameProgressNextTier">Next Rank: <strong>🥈 Calm Explorer (100 pts)</strong></span>
+          <span class="small muted" id="gameProgressPointsLeft">100 pts remaining</span>
+        </div>
+        <div class="game-progress-bar">
+          <i class="game-progress-fill" id="gameProgressFill" style="width: 0%"></i>
+        </div>
+      </div>
+    </section>
+
     <section class="card reveal" aria-label="Active path">
-      <header class="card-head"><div><h2>Active Path &amp; Recommendations</h2><p class="muted">Personalized for your detected session mood</p></div></header>
-      <ul class="paths" id="paths"></ul>
+      <header class="card-head rec-card-head">
+        <div>
+          <h2>Active Path &amp; Recommendations</h2>
+          <p class="muted" id="recSubtitle">Intricately personalized for your detected mood &amp; sleep scores</p>
+        </div>
+        <div class="rec-tabs" id="recTabs" role="tablist" aria-label="Filter recommendations">
+          <button type="button" class="rec-tab active" data-filter="all">★ Top Tailored</button>
+          <button type="button" class="rec-tab" data-filter="mood">Mood Focus</button>
+          <button type="button" class="rec-tab" data-filter="sleep">Sleep &amp; Rest</button>
+          <button type="button" class="rec-tab" data-filter="quick">Quick (&le; 5 min)</button>
+          <button type="button" class="rec-tab" data-filter="somatic">Somatic &amp; Action</button>
+        </div>
+      </header>
+      <ul class="paths rec-grid" id="paths"></ul>
     </section>
   </div>
 
 </main>
 
 <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" hidden>
-  <div class="modal-card">
-    <h3 id="modalTitle"></h3>
-    <p class="muted small" id="modalMeta"></p>
-    <p id="modalBody"></p>
-    <ul class="modal-steps" id="modalSteps" hidden></ul>
+  <div class="modal-card rec-modal-card">
+    <div class="modal-top-bar">
+      <span class="rec-modal-category" id="modalCategory">Mind &amp; Emotional Care</span>
+      <span class="rec-modal-duration" id="modalDuration">⏱ 5 min</span>
+    </div>
+    <div class="modal-title-row">
+      <span class="modal-icon" id="modalIcon" aria-hidden="true">🌿</span>
+      <div>
+        <h3 id="modalTitle"></h3>
+        <p class="muted small" id="modalMeta"></p>
+      </div>
+    </div>
 
-    <button class="btn btn-primary" type="button" id="modalClose">Close</button>
+    <div class="modal-why-box" id="modalWhyBox">
+      <span class="spark small" aria-hidden="true">💡</span>
+      <div>
+        <strong id="modalWhyBadge">Tailored for Your Current State</strong>
+        <p class="small muted" id="modalWhyText"></p>
+      </div>
+    </div>
+
+    <p id="modalBody" class="modal-summary"></p>
+
+    <div class="modal-steps-section">
+      <div class="modal-section-title">
+        <span>Guided Interactive Steps</span>
+        <span class="small muted" id="stepsProgressLabel">Check steps as you go</span>
+      </div>
+      <ul class="modal-steps" id="modalSteps"></ul>
+    </div>
+
+    <!-- Interactive Guided Timer widget inside modal with Gamification Points -->
+    <div class="modal-timer-box" id="modalTimerBox">
+      <div class="timer-display">
+        <span class="timer-time" id="modalTimerTime">00:00</span>
+        <span class="timer-status small muted" id="modalTimerStatus">Guided Timer</span>
+      </div>
+      <div class="timer-gamify-tag">
+        <span class="spark small" aria-hidden="true">⭐</span>
+        <div>
+          <span class="small muted" id="modalTimerPointsRate">+10 pts / min</span>
+          <strong class="game-points-live" id="modalTimerPointsEarned">+0 pts earned</strong>
+        </div>
+      </div>
+      <div class="timer-actions">
+        <button type="button" class="btn btn-secondary btn-sm" id="modalTimerStart">Start Timer</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="modalTimerReset">Reset</button>
+      </div>
+    </div>
+
+    <div class="modal-foot-actions">
+      <button class="btn btn-gold" type="button" id="modalCompleteBtn">✓ Mark as Completed</button>
+      <button class="btn btn-ghost" type="button" id="modalClose">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Badge Hierarchy Modal (Hall of Badges) -->
+<div class="modal" id="badgeHallModal" role="dialog" aria-modal="true" aria-labelledby="badgeHallTitle" hidden>
+  <div class="modal-card badge-hall-card">
+    <div class="badge-hall-header">
+      <div class="spark" aria-hidden="true">🏆</div>
+      <div>
+        <h3 id="badgeHallTitle">Badge Hierarchy &amp; Wellness Ranks</h3>
+        <p class="muted small">Earn points based on the time you invest in mindful breathing, grounding, and sleep routines.</p>
+      </div>
+    </div>
+
+    <ul class="badge-hierarchy-list" id="badgeHierarchyList"></ul>
+
+    <div class="modal-foot-actions">
+      <button class="btn btn-primary" type="button" id="badgeHallCloseBtn">Back to Dashboard</button>
+    </div>
+  </div>
+</div>
+
+<!-- Level Up Celebration Modal -->
+<div class="modal" id="levelUpModal" role="dialog" aria-modal="true" aria-labelledby="levelUpTitle" hidden>
+  <div class="modal-card level-up-card">
+    <div class="level-up-burst" aria-hidden="true">🎉</div>
+    <span class="eyebrow" style="color:var(--sunset-gold);letter-spacing:0.18em;">LEVEL UP!</span>
+    <div class="level-up-badge-avatar" id="levelUpBadgeIcon">🎖️</div>
+    <span class="game-level-chip" id="levelUpLevelNum">Level 4</span>
+    <h3 id="levelUpBadgeTitle" style="font-size:1.6rem !important;">Wellness Pro</h3>
+    <p class="muted" id="levelUpDesc" style="text-align:center; max-width:38ch;">Outstanding dedication! You unlocked a new tier on your mental wellness journey.</p>
+    <div class="modal-foot-actions" style="justify-content:center; width:100%;">
+      <button class="btn btn-gold" type="button" id="levelUpCloseBtn">Claim Badge &amp; Continue</button>
+    </div>
   </div>
 </div>
 
@@ -232,6 +382,8 @@
 
 <script src="auth-config.js"></script>
 <script src="auth.js"></script>
+<script src="gamification.js"></script>
+<script src="recommendations-pool.js"></script>
 <script src="script.js"></script>
 </body>
 </html>

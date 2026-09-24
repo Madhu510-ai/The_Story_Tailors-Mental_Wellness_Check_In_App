@@ -894,6 +894,37 @@ async function finish() {
     ).join("");
   }
 
+  // Populate Immediate Smart Recommendation
+  const recList = typeof window.getSmartRecommendations === "function"
+    ? window.getSmartRecommendations(result, "all")
+    : [];
+
+  const topRec = recList[0];
+  const doneRecCard = $("#doneRecCard");
+  if (topRec && doneRecCard) {
+    doneRecCard.hidden = false;
+    const title = $("#doneRecTitle");
+    const summary = $("#doneRecSummary");
+    const badge = $("#doneRecBadge");
+    const duration = $("#doneRecDuration");
+    const why = $("#doneRecWhy");
+    const matchBadge = $("#doneRecMatchBadge");
+    const openBtn = $("#doneRecOpenModalBtn");
+
+    if (title) title.textContent = `${topRec.icon} ${topRec.title}`;
+    if (summary) summary.textContent = topRec.summary;
+    if (badge) badge.textContent = `${topRec.category} · ${topRec.intensity}`;
+    if (duration) duration.textContent = `⏱ ${topRec.duration}`;
+    if (matchBadge) matchBadge.textContent = `💡 ${topRec.matchBadge || 'Why this was recommended'}`;
+    if (why) why.textContent = topRec.scienceWhy;
+
+    if (openBtn) {
+      openBtn.onclick = () => {
+        openCheckinRecommendationModal(topRec, uid);
+      };
+    }
+  }
+
   const nextSetNum = currentSetNumber + 1;
   const nextStartQ = (nextSetNum - 1) * 6 + 1;
   const nextEndQ = nextSetNum * 6;
@@ -939,6 +970,203 @@ async function finish() {
       if (saveStatus) saveStatus.textContent = `Saved locally (Cloud note: ${error.message})`;
     }
   }
+}
+
+/* ---------- Immediate Recommendation Modal & Timer for Check-in ---------- */
+let checkinTimerInterval = null;
+let checkinTimerSeconds = 0;
+let checkinTimerRunning = false;
+let checkinTimerDurationSeconds = 0;
+let checkinTimerElapsedSeconds = 0;
+let checkinTimerStartedAt = 0;
+let checkinTimerAwarded = false;
+
+function stopCheckinTimer() {
+  if (checkinTimerRunning) {
+    checkinTimerElapsedSeconds = getCheckinTimerElapsedSeconds();
+  }
+  if (checkinTimerInterval) {
+    clearInterval(checkinTimerInterval);
+    checkinTimerInterval = null;
+  }
+  checkinTimerRunning = false;
+  checkinTimerStartedAt = 0;
+  const startBtn = $("#checkinModalTimerStart");
+  if (startBtn) startBtn.textContent = "Start Timer";
+}
+
+function getCheckinTimerElapsedSeconds() {
+  if (!checkinTimerRunning || !checkinTimerStartedAt) return checkinTimerElapsedSeconds;
+  return Math.min(
+    checkinTimerDurationSeconds,
+    checkinTimerElapsedSeconds + Math.floor((Date.now() - checkinTimerStartedAt) / 1000),
+  );
+}
+
+function awardCheckinTimerPoints(isFull, rec, userId) {
+  if (checkinTimerAwarded || !window.WELLNESS_GAMIFICATION) return null;
+  const elapsed = isFull ? checkinTimerDurationSeconds : getCheckinTimerElapsedSeconds();
+  if (elapsed <= 0) return null;
+
+  checkinTimerElapsedSeconds = elapsed;
+  checkinTimerAwarded = true;
+  const result = window.WELLNESS_GAMIFICATION.calculatePoints(
+    elapsed,
+    checkinTimerDurationSeconds,
+    isFull,
+  );
+  const award = window.WELLNESS_GAMIFICATION.awardPoints(
+    userId || "guest",
+    result.points,
+    result.minutes,
+    rec.title,
+    rec.id,
+  );
+  if (award.leveledUp) {
+    window.WELLNESS_GAMIFICATION.triggerLevelUpModal(award.newLevel);
+  }
+  return award;
+}
+
+function openCheckinRecommendationModal(rec, userId) {
+  stopCheckinTimer();
+  awardCheckinTimerPoints(false, rec, userId);
+  const modal = $("#checkinRecModal");
+  const closeBtn = $("#checkinModalClose");
+  const title = $("#checkinModalTitle");
+  const meta = $("#checkinModalMeta");
+  const body = $("#checkinModalBody");
+  const cat = $("#checkinModalCategory");
+  const dur = $("#checkinModalDuration");
+  const ico = $("#checkinModalIcon");
+  const whyBadge = $("#checkinModalWhyBadge");
+  const whyText = $("#checkinModalWhyText");
+  const stepsList = $("#checkinModalSteps");
+  const label = $("#checkinStepsProgressLabel");
+  const compBtn = $("#checkinModalCompleteBtn");
+  const timeEl = $("#checkinModalTimerTime");
+  const statusEl = $("#checkinModalTimerStatus");
+
+  if (title) title.textContent = rec.title;
+  if (meta) meta.textContent = `${rec.intensity} Pace · Tags: ${rec.tags.join(", ")}`;
+  if (body) body.textContent = rec.summary;
+  if (cat) cat.textContent = rec.category;
+  if (dur) dur.textContent = `⏱ ${rec.duration}`;
+  if (ico) ico.textContent = rec.icon;
+  if (whyBadge) whyBadge.textContent = rec.matchBadge || "Tailored Intervention";
+  if (whyText) whyText.textContent = rec.scienceWhy || "";
+
+  if (stepsList) {
+    stepsList.innerHTML = rec.instructions.map((step, idx) => `
+      <li class="modal-step-item">
+        <label class="step-check-label" for="chk_step_${idx}">
+          <input type="checkbox" class="step-check" data-idx="${idx}" id="chk_step_${idx}">
+          <span class="step-num">${idx + 1}</span>
+          <span class="step-text">${step}</span>
+        </label>
+      </li>
+    `).join("");
+
+    if (label) label.textContent = `0 of ${rec.instructions.length} steps completed`;
+    stepsList.onchange = () => {
+      const checked = stepsList.querySelectorAll(".step-check:checked").length;
+      if (label) label.textContent = `${checked} of ${rec.instructions.length} steps completed`;
+      if (checked === rec.instructions.length && compBtn && !compBtn.classList.contains("done")) {
+        compBtn.style.boxShadow = "0 0 16px var(--sunset-gold)";
+      }
+    };
+  }
+
+  // Timer
+  checkinTimerDurationSeconds = rec.durationSeconds || 300;
+  checkinTimerSeconds = checkinTimerDurationSeconds;
+  checkinTimerElapsedSeconds = 0;
+  checkinTimerAwarded = false;
+  const updateDisplay = () => {
+    if (!timeEl) return;
+    const m = Math.floor(checkinTimerSeconds / 60);
+    const s = checkinTimerSeconds % 60;
+    timeEl.textContent = `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+  };
+  updateDisplay();
+
+  const startBtn = $("#checkinModalTimerStart");
+  const resetBtn = $("#checkinModalTimerReset");
+  if (startBtn) {
+    startBtn.onclick = () => {
+      if (checkinTimerRunning) {
+        stopCheckinTimer();
+      } else {
+        checkinTimerRunning = true;
+        checkinTimerStartedAt = Date.now();
+        startBtn.textContent = "Pause Timer";
+        if (statusEl) statusEl.textContent = "Focusing...";
+        checkinTimerInterval = setInterval(() => {
+          const elapsed = getCheckinTimerElapsedSeconds();
+          checkinTimerSeconds = Math.max(0, checkinTimerDurationSeconds - elapsed);
+          updateDisplay();
+          if (checkinTimerSeconds <= 0) {
+            stopCheckinTimer();
+            awardCheckinTimerPoints(true, rec, userId);
+            if (statusEl) statusEl.textContent = "Completed! Well done.";
+            if (stepsList) stepsList.querySelectorAll(".step-check").forEach(c => (c.checked = true));
+            if (label) label.textContent = "All steps completed!";
+          }
+        }, 1000);
+      }
+    };
+  }
+  if (resetBtn) {
+    resetBtn.onclick = () => {
+      stopCheckinTimer();
+      checkinTimerDurationSeconds = rec.durationSeconds || 300;
+      checkinTimerSeconds = checkinTimerDurationSeconds;
+      checkinTimerElapsedSeconds = 0;
+      checkinTimerAwarded = false;
+      updateDisplay();
+      if (statusEl) statusEl.textContent = "Guided Timer";
+    };
+  }
+
+  // Completion storage
+  const getCompleted = () => {
+    try {
+      return JSON.parse(localStorage.getItem(`mindful.completedRecs.${userId}`) || "[]");
+    } catch {
+      return [];
+    }
+  };
+  const isDone = getCompleted().includes(rec.id);
+  if (compBtn) {
+    compBtn.textContent = isDone ? "✓ Completed (Click to Undo)" : "✓ Mark as Completed";
+    compBtn.classList.toggle("done", isDone);
+    compBtn.onclick = () => {
+      const list = getCompleted();
+      const i = list.indexOf(rec.id);
+      if (i >= 0) list.splice(i, 1);
+      else list.push(rec.id);
+      localStorage.setItem(`mindful.completedRecs.${userId}`, JSON.stringify(list));
+      const nowDone = list.includes(rec.id);
+      if (nowDone) {
+        stopCheckinTimer();
+        awardCheckinTimerPoints(checkinTimerSeconds <= 0, rec, userId);
+      }
+      compBtn.textContent = nowDone ? "✓ Completed (Click to Undo)" : "✓ Mark as Completed";
+      compBtn.classList.toggle("done", nowDone);
+    };
+  }
+
+  const closeModal = () => {
+    stopCheckinTimer();
+    awardCheckinTimerPoints(false, rec, userId);
+    if (modal) modal.hidden = true;
+  };
+  if (closeBtn) closeBtn.onclick = closeModal;
+  if (modal) {
+    modal.onclick = e => { if (e.target === modal) closeModal(); };
+    modal.hidden = false;
+  }
+  document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); }, { once: true });
 }
 
 /* ---------- Boot ---------- */

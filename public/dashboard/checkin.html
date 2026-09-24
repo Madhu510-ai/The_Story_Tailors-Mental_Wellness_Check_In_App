@@ -138,6 +138,27 @@
           <li><span class="muted small">Sleep wellness</span><strong id="resSleep">—</strong></li>
         </ul>
         <div class="mix" id="resMix" role="img" aria-label="Detected mood mix"></div>
+
+        <!-- Immediate Tailored Recommendation -->
+        <div class="done-rec-card" id="doneRecCard" hidden>
+          <div class="done-rec-header">
+            <span class="spark" aria-hidden="true">✦</span>
+            <div class="done-rec-titles">
+              <span class="eyebrow" id="doneRecBadge">Tailored Intervention</span>
+              <h3 id="doneRecTitle">—</h3>
+            </div>
+            <span class="rec-badge" id="doneRecDuration">⏱ 5 min</span>
+          </div>
+          <p class="small muted" id="doneRecSummary">—</p>
+          <div class="done-rec-why-box">
+            <strong class="small" id="doneRecMatchBadge">Why this fits right now</strong>
+            <p class="small muted" id="doneRecWhy"></p>
+          </div>
+          <div class="done-rec-actions">
+            <button type="button" class="btn btn-gold btn-sm" id="doneRecOpenModalBtn">Explore Guided Steps &amp; Timer →</button>
+          </div>
+        </div>
+
         <div id="nextSetPrompt" class="next-set-prompt-card"></div>
         <p class="muted" id="saveStatus">
           Your dashboard has been updated with this check-in session.
@@ -150,6 +171,58 @@
         </div>
       </section>
     </main>
+
+    <!-- Guided Recommendation Modal for Check-in page -->
+    <div class="modal" id="checkinRecModal" role="dialog" aria-modal="true" aria-labelledby="checkinModalTitle" hidden>
+      <div class="modal-card rec-modal-card">
+        <div class="modal-top-bar">
+          <span class="rec-modal-category" id="checkinModalCategory">Somatic &amp; Nervous Reset</span>
+          <span class="rec-modal-duration" id="checkinModalDuration">⏱ 4 min</span>
+        </div>
+        <div class="modal-title-row">
+          <span class="modal-icon" id="checkinModalIcon" aria-hidden="true">🌿</span>
+          <div>
+            <h3 id="checkinModalTitle"></h3>
+            <p class="muted small" id="checkinModalMeta"></p>
+          </div>
+        </div>
+
+        <div class="modal-why-box" id="checkinModalWhyBox">
+          <span class="spark small" aria-hidden="true">💡</span>
+          <div>
+            <strong id="checkinModalWhyBadge">Tailored for Your Current State</strong>
+            <p class="small muted" id="checkinModalWhyText"></p>
+          </div>
+        </div>
+
+        <p id="checkinModalBody" class="modal-summary"></p>
+
+        <div class="modal-steps-section">
+          <div class="modal-section-title">
+            <span>Guided Interactive Steps</span>
+            <span class="small muted" id="checkinStepsProgressLabel">Check steps as you go</span>
+          </div>
+          <ul class="modal-steps" id="checkinModalSteps"></ul>
+        </div>
+
+        <!-- Guided Timer -->
+        <div class="modal-timer-box" id="checkinModalTimerBox">
+          <div class="timer-display">
+            <span class="timer-time" id="checkinModalTimerTime">00:00</span>
+            <span class="timer-status small muted" id="checkinModalTimerStatus">Guided Timer</span>
+          </div>
+          <div class="timer-actions">
+            <button type="button" class="btn btn-secondary btn-sm" id="checkinModalTimerStart">Start Timer</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="checkinModalTimerReset">Reset</button>
+          </div>
+        </div>
+
+        <div class="modal-foot-actions">
+          <button class="btn btn-gold" type="button" id="checkinModalCompleteBtn">✓ Mark as Completed</button>
+          <button class="btn btn-ghost" type="button" id="checkinModalClose">Close</button>
+        </div>
+      </div>
+    </div>
 
     <!-- New User Session Modal -->
     <div
@@ -181,6 +254,8 @@
 
     <script src="auth-config.js"></script>
     <script src="auth.js"></script>
+    <script src="gamification.js"></script>
+    <script src="recommendations-pool.js"></script>
     <script src="checkin.js"></script>
   </body>
 </html>
