@@ -4,7 +4,7 @@ window.WellnessAuth = (() => {
   const config = window.WELLNESS_SUPABASE_CONFIG || {};
   const configured = () =>
     /^https:\/\/.+\.supabase\.co$/i.test(config.url || "") && Boolean(config.anonKey);
-  const endpoint = (path) => `${config.url.replace(/\/$/, "")}${path}`;
+  const endpoint = (path) => config.url.replace(/\/$/, "") + path;
 
   const session = () => {
     try {
@@ -17,7 +17,7 @@ window.WellnessAuth = (() => {
   const clearSession = () => sessionStorage.removeItem(SESSION_KEY);
   const headers = (token, extra = {}) => ({
     apikey: config.anonKey,
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...(token ? { Authorization: "Bearer " + token } : {}),
     ...extra,
   });
 
@@ -91,7 +91,29 @@ window.WellnessAuth = (() => {
         story: checkin.story,
         answers: checkin.answers,
         results: checkin.results,
+        coins_earned: Math.max(0, Math.floor(Number(checkin.coins_earned) || 0)),
       }),
+    });
+  }
+
+  async function addCoinsToCheckin(checkinId, coins) {
+    const current = session();
+    const amount = Math.max(0, Math.floor(Number(coins) || 0));
+    if (!current?.access_token || !checkinId || amount === 0) return null;
+
+    const id = encodeURIComponent(checkinId);
+    const rows = await request(
+      "/rest/v1/wellness_checkins?id=eq." + id + "&select=coins_earned",
+      { headers: headers(current.access_token) },
+    );
+    const total = Math.max(0, Number(rows?.[0]?.coins_earned) || 0) + amount;
+    return request("/rest/v1/wellness_checkins?id=eq." + id, {
+      method: "PATCH",
+      headers: headers(current.access_token, {
+        "Content-Type": "application/json",
+        Prefer: "return=representation",
+      }),
+      body: JSON.stringify({ coins_earned: total }),
     });
   }
 
@@ -99,12 +121,20 @@ window.WellnessAuth = (() => {
     const current = session();
     if (!current?.access_token) return [];
     return request(
-      "/rest/v1/wellness_checkins?select=id,genre,story,answers,results,submitted_at&order=submitted_at.asc",
-      {
-        headers: headers(current.access_token),
-      },
+      "/rest/v1/wellness_checkins?select=id,genre,story,answers,results,coins_earned,submitted_at&order=submitted_at.asc",
+      { headers: headers(current.access_token) },
     );
   }
 
-  return { configured, session, getUser, signIn, signUp, signOut, saveCheckin, loadCheckins };
+  return {
+    configured,
+    session,
+    getUser,
+    signIn,
+    signUp,
+    signOut,
+    saveCheckin,
+    addCoinsToCheckin,
+    loadCheckins,
+  };
 })();
