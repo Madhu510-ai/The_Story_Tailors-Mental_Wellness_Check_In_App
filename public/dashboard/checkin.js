@@ -956,7 +956,8 @@ async function finish() {
     try {
       const user = await WellnessAuth.getUser();
       if (user) {
-        await WellnessAuth.saveCheckin(databaseRecord(result));
+        const savedCheckin = await WellnessAuth.saveCheckin(databaseRecord(result));
+        persistedCheckinId = savedCheckin?.[0]?.id || null;
         const saveStatus = $("#saveStatus");
         if (saveStatus)
           saveStatus.textContent = "Saved securely to your account. Your dashboard has been updated.";
@@ -980,6 +981,7 @@ let checkinTimerDurationSeconds = 0;
 let checkinTimerElapsedSeconds = 0;
 let checkinTimerStartedAt = 0;
 let checkinTimerAwarded = false;
+let persistedCheckinId = null;
 
 function stopCheckinTimer() {
   if (checkinTimerRunning) {
@@ -1024,6 +1026,15 @@ function awardCheckinTimerPoints(isFull, rec, userId) {
   );
   if (award.leveledUp) {
     window.WELLNESS_GAMIFICATION.triggerLevelUpModal(award.newLevel);
+  }
+  if (
+    persistedCheckinId &&
+    typeof WellnessAuth !== "undefined" &&
+    typeof WellnessAuth.addCoinsToCheckin === "function"
+  ) {
+    WellnessAuth.addCoinsToCheckin(persistedCheckinId, result.points).catch((error) => {
+      console.warn("Unable to persist earned coins:", error);
+    });
   }
   return award;
 }
