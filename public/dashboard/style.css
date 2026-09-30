@@ -4991,3 +4991,50 @@ html[data-mood-theme] .site-header #activeThemeBadge {
   justify-content: flex-end;
   margin-top: 4px;
 }
+
+html body.checkin-page:has(#pickCard:not([hidden]), #quizCard:not([hidden])) {
+  background: #071e24 fixed !important;
+}
+
+html body.checkin-page:has(#pickCard:not([hidden]), #quizCard:not([hidden]))::before {
+  display: none !important;
+}
+
+html body.checkin-page:has(#pickCard:not([hidden])) #pickCard {
+  background: rgba(15, 48, 57, 0.94) !important;
+  border-color: rgba(116, 164, 171, 0.28) !important;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.32), inset 0 1px rgba(190, 220, 222, 0.06) !important;
+}
+
+html body.checkin-page:has(#pickCard:not([hidden]), #quizCard:not([hidden])) #euphoricBgVideo,
+html body.checkin-page:has(#pickCard:not([hidden]), #quizCard:not([hidden])) #lowBgVideo,
+html body.checkin-page:has(#pickCard:not([hidden]), #quizCard:not([hidden])) #uneasyBgVideo,
+html body.checkin-page:has(#pickCard:not([hidden]), #quizCard:not([hidden])) #goodBgVideo,
+html body.checkin-page:has(#pickCard:not([hidden]), #quizCard:not([hidden])) #happyBgVideo,
+html body.checkin-page:has(#pickCard:not([hidden]), #quizCard:not([hidden])) #veryHappyBgVideo {
+  display: none !important;
+  opacity: 0 !important;
+}
+
+html body.checkin-page:has(#quizCard:not([hidden])) .set-banner {
+  background: rgba(19, 55, 64, 0.92) !important;
+  border-color: rgba(105, 184, 194, 0.42) !important;
+}
+
+html body.checkin-page:has(#quizCard:not([hidden])) .set-badge {
+  background: #247986 !important;
+  font-size: 0.82rem;
+  padding: 4px 12px;
+}
+
+html body.checkin-page:has(#quizCard:not([hidden])) .set-range {
+  color: #c0e8eb !important;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+html body.checkin-page:has(#quizCard:not([hidden])) .set-continuity {
+  color: #f0cb83 !important;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
